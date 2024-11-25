@@ -10,7 +10,7 @@ public class PrimaryCtrl {
 
     private Scene homeScene;
 
-    public void init(Stage primaryStage, Pair<HomeCtrl, Parent> home) {
+    public void init(Stage primaryStage, Pair<HomePageCtrl, Parent> home) {
         this.primaryStage = primaryStage;
         this.homeScene = new Scene(home.getValue());
         showHome();

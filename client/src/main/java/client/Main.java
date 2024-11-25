@@ -20,7 +20,7 @@ import static com.google.inject.Guice.createInjector;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import client.scenes.HomeCtrl;
+import client.scenes.HomePageCtrl;
 import client.scenes.PrimaryCtrl;
 import com.google.inject.Injector;
 
@@ -46,7 +46,7 @@ public class Main extends Application {
 			System.err.println(msg);
 			return;
 		}
-		var overview = FXML.load(HomeCtrl.class, "client", "scenes", "MainGUI.fxml");
+		var overview = FXML.load(HomePageCtrl.class, "client", "scenes", "MainGUI.fxml");
 		var mainCtrl = INJECTOR.getInstance(PrimaryCtrl.class);
 		mainCtrl.init(primaryStage, overview);
 	}
