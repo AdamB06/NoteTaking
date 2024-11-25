@@ -20,10 +20,10 @@ import static com.google.inject.Guice.createInjector;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import client.scenes.HomeCtrl;
+import client.scenes.PrimaryCtrl;
 import com.google.inject.Injector;
 
-import client.scenes.AddQuoteCtrl;
-import client.scenes.MainCtrl;
 import client.scenes.QuoteOverviewCtrl;
 import client.utils.ServerUtils;
 import javafx.application.Application;
@@ -47,11 +47,8 @@ public class Main extends Application {
 			System.err.println(msg);
 			return;
 		}
-
-		var overview = FXML.load(QuoteOverviewCtrl.class, "client", "scenes", "QuoteOverview.fxml");
-		var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
-
-		var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-		mainCtrl.initialize(primaryStage, overview, add);
+		var overview = FXML.load(HomeCtrl.class, "client", "scenes", "MainGUI.fxml");
+		var mainCtrl = INJECTOR.getInstance(PrimaryCtrl.class);
+		mainCtrl.init(primaryStage, overview);
 	}
 }
