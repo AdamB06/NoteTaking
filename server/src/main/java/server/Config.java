@@ -23,6 +23,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class Config {
 
+    /**
+     * Bean method to return a random
+     * @return Returns a pseudo-random number
+     */
     @Bean
     public Random getRandom() {
         return new Random();
