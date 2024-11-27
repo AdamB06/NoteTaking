@@ -10,6 +10,11 @@ public class PrimaryCtrl {
 
     private Scene homeScene;
 
+    /**
+     * Initialize the UI controller
+     * @param primaryStage Variable for the stage
+     * @param home Pair of UI and Controller
+     */
     public void init(Stage primaryStage, Pair<HomePageCtrl, Parent> home) {
         this.primaryStage = primaryStage;
         this.homeScene = new Scene(home.getValue());
@@ -17,6 +22,9 @@ public class PrimaryCtrl {
         primaryStage.show();
     }
 
+    /**
+     * Display the HomeScreen UI
+     */
     public void showHome() {
         primaryStage.setTitle("NetNote");
         primaryStage.setScene(homeScene);

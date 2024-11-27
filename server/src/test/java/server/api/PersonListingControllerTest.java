@@ -22,8 +22,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import commons.Person;
-
 public class PersonListingControllerTest {
 
 	private static final Person MICKEY = new Person("Mickey", "Mouse");
