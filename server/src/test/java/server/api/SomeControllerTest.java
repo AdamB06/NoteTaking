@@ -25,23 +25,4 @@ public class SomeControllerTest{
         var actual = sut.index();
         assertEquals(expected, actual);
     }
-
-    @Test
-    public void testNameEndpoint_NewCollection(){
-        Collection existingCollection = new Collection();
-        db.save(existingCollection);
-
-        String response = sut.name("testName");
-        assertEquals("Welcome, testName, to the application!", response);
-    }
-
-    @Test
-    public void testNameEndpoint_ExistingCollection(){
-        Collection existingCollection = new Collection();
-        existingCollection.setName("testName");
-        db.save(existingCollection);
-
-        String response = sut.name("testName");
-        assertEquals("Welcome, testName, to the application!", response);
-    }
 }

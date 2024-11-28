@@ -24,7 +24,7 @@ public class Collection {
     private List<Note> notes;
 
     @SuppressWarnings("unused")
-    private Collection() {
+    public Collection() {
         //this is for object mapping
     }
 
@@ -44,6 +44,22 @@ public class Collection {
      */
     public List<Note> getNotes() {
         return notes;
+    }
+
+    /**
+     *
+     * @param name that will be set for the Collection
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     *
+     * @param notes that will be set in the Collection
+     */
+    public void setNotes(List<Note> notes) {
+        this.notes = notes;
     }
 
     /**
