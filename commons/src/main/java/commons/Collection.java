@@ -2,7 +2,13 @@ package commons;
 
 
 import jakarta.persistence.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -10,58 +16,58 @@ public class Collection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long id;
+    private long id;
 
     private String name;
 
     @OneToMany
     private List<Note> notes;
 
-
-    /**
-     * @return id
-     */
-    public long getId() {
-        return id;
+    @SuppressWarnings("unused")
+    private Collection() {
+        //this is for object mapping
     }
 
     /**
-     * Returns the name of the user
-     * @return name
+     *
+     * @param list "a list of notes"
+     * @param name "name of the owner of the collection"
      */
-    public String getName() {
-        return name;
+    public Collection(String name, List<Note> list){
+        this.notes = new ArrayList<>(list);
+        this.name = name;
     }
 
     /**
-     * A method returning the list of notes in the collection
-     * @return collection
+     *
+     * @return list of notes
      */
     public List<Note> getNotes() {
         return notes;
     }
 
     /**
-     * A method for setting the id
-     * @param id
+     * @param obj "random obj that is being compared"
+     * @return true if equal else false
      */
-    public void setId(long id) {
-        this.id = id;
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 
     /**
-     * A method for setting the name of the user
-     * @param name
+     * @return hashcode
      */
-    public void setName(String name) {
-        this.name = name;
+    public int hashcode() {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
     /**
-     * A method for setting the list of notes of the user
-     * @param notes
+     * @return human-readable string format
      */
-    public void setNotes(List<Note> notes) {
-        this.notes = notes;
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this,
+                ToStringStyle.MULTI_LINE_STYLE);
     }
 }
+
