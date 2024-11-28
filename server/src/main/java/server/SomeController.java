@@ -12,8 +12,11 @@ import java.util.LinkedList;
 @RequestMapping("/")
 
 public class SomeController {
-    private CollectionRepository db;
+    private final CollectionRepository db;
 
+    /**
+     * @param db is the CollectionRepository, where all our Collections will be stored
+     */
     public SomeController( CollectionRepository db) {
         this.db = db;
     }
@@ -36,15 +39,16 @@ public class SomeController {
     @GetMapping("/name/{name}")
     @ResponseBody
     public String name(@PathVariable ("name") String name) {
-        if(!db.existsByName(name))
-        {
-            var col = new Collection();
+        if(!db.existsByName(name)){
+            Collection col;
+            col = new Collection();
             col.setName(name);
             var listOfNotes = new LinkedList<Note>();
             col.setNotes(listOfNotes);
             db.save(col);
         }
-        var sb = new StringBuilder("Welcome, ");
+        StringBuilder sb;
+        sb = new StringBuilder("Welcome, ");
         sb.append(name);
         sb.append(", to the application!");
         return sb.toString();

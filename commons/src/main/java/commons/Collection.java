@@ -39,7 +39,13 @@ public class Collection {
     }
 
     /**
-     *
+     * @return the name (the owner) of the collection
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * @return list of notes
      */
     public List<Note> getNotes() {
@@ -47,7 +53,6 @@ public class Collection {
     }
 
     /**
-     *
      * @param name that will be set for the Collection
      */
     public void setName(String name) {
@@ -55,7 +60,6 @@ public class Collection {
     }
 
     /**
-     *
      * @param notes that will be set in the Collection
      */
     public void setNotes(List<Note> notes) {
