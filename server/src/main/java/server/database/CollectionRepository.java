@@ -3,5 +3,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import commons.Collection;
 
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
-    //This purposefully left empty
+    public boolean existsByName(String name);
 }
