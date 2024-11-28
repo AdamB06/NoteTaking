@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,7 +34,7 @@ public class Collection {
      * @param name "name of the owner of the collection"
      */
     public Collection(String name, List<Note> list){
-        this.notes = list;
+        this.notes = new ArrayList<>(list);
         this.name = name;
     }
 
