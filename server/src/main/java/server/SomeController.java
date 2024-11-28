@@ -15,6 +15,10 @@ public class SomeController {
         this.db = db;
     }
 
+    /**
+     * Index method for returning text
+     * @return String to print
+     */
     @GetMapping("/")
     @ResponseBody
     public String index() {

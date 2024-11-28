@@ -1,11 +1,21 @@
 package commons;
 
+
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
-public class Collection{
+public class Collection {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
-    public String name;
+
+    private String name;
+
+    @OneToMany
+    private List<Note> notes;
+
+
 }
