@@ -5,6 +5,10 @@ import jakarta.inject.Inject;
 public class HomePageCtrl {
     private PrimaryCtrl pc;
 
+    /**
+     * Constructor method for HomePageCtrl class
+     * @param pc PrimaryCtrl Scene controller
+     */
     @Inject
     public HomePageCtrl(PrimaryCtrl pc) {
         this.pc = pc;
