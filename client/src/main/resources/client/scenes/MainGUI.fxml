@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
    <right>
-      <WebView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </right>
    <bottom>
       <HBox prefHeight="26.0" prefWidth="600.0" BorderPane.alignment="CENTER">
@@ -34,7 +34,7 @@
                   <Button alignment="TOP_LEFT" mnemonicParsing="false" text="Edit" />
                </children>
             </HBox>
-            <TextArea prefHeight="310.0" prefWidth="282.0" />
+            <TextArea fx:id="notesBodyArea" prefHeight="375.0" prefWidth="282.0" />
          </children>
       </VBox>
    </center>

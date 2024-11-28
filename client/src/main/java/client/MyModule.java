@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.scenes.HomePageCtrl;
 import client.scenes.PrimaryCtrl;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -29,5 +30,6 @@ public class MyModule implements Module {
     @Override
     public void configure(Binder binder) {
         binder.bind(PrimaryCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(HomePageCtrl.class).in(Scopes.SINGLETON);
     }
 }
