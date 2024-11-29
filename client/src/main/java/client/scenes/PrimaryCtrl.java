@@ -7,7 +7,6 @@ import javafx.util.Pair;
 
 public class PrimaryCtrl {
     private Stage primaryStage;
-
     private Scene homeScene;
 
     /**
