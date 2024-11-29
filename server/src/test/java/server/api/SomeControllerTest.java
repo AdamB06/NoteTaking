@@ -1,6 +1,7 @@
 package server.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import commons.Collection;
@@ -20,6 +21,15 @@ public class SomeControllerTest{
         sut = new SomeController(db);
     }
 
+    @Test
+    public void testConstructor(){
+        // Act: Instantiate SomeController with the mock repository
+        SomeController controller = new SomeController(db);
+
+        // Assert: Verify that the controller is correctly initialized
+        assertNotNull(controller, "The controller should not be null");
+        assertEquals(db, controller.db, "The repository instance should be correctly assigned");
+    }
     @Test
     public void indexReturnsHelloWorld(){
         var expected = "Hello world!";
