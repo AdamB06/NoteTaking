@@ -16,8 +16,8 @@
    <bottom>
       <HBox prefHeight="26.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#createNote" prefHeight="26.0" prefWidth="40.0" text="+" />
-            <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" mnemonicParsing="false" onAction="#deleteNote" prefHeight="26.0" prefWidth="40.0" text="-" />
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="40.0" text="+" />
+            <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="40.0" text="-" />
             <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="10.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="40.0" text="⟳" />
          </children>
       </HBox>
