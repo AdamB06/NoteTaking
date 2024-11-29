@@ -19,6 +19,10 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
 
 
+import commons.Note;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
 import jakarta.ws.rs.ProcessingException;
@@ -45,5 +49,20 @@ public class ServerUtils {
             }
         }
         return true;
+    }
+
+    /**
+     * Sends a note to the database.
+     * @param note note to be sent to the database
+     */
+    public void sendNote(Note note) {
+        Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(SERVER + "Note/")
+                    .request(APPLICATION_JSON)
+                    .post(entity);
+            System.out.println(response.getStatus());
+            response.close();
+        }
     }
 }

@@ -1,5 +1,9 @@
 package client.scenes;
 
+import client.MyModule;
+import client.utils.ServerUtils;
+import com.google.inject.Injector;
+import commons.Note;
 import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,6 +15,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static com.google.inject.Guice.createInjector;
 
 public class HomePageCtrl implements Initializable {
     private PrimaryCtrl pc;
@@ -75,5 +81,15 @@ public class HomePageCtrl implements Initializable {
      */
     public void updateWebView(String htmlText) {
         webView.getEngine().loadContent(htmlText);
+    }
+
+    /**
+     * When the add note button is pressed this sends a command to the server to create a note.
+     */
+    public Note createNote() {
+        Note note = new Note("", "");
+        Injector injector = createInjector(new MyModule());
+        injector.getInstance(ServerUtils.class).sendNote(note);
+        return note;
     }
 }
