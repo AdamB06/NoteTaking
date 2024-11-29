@@ -52,21 +52,21 @@ public class HomePageCtrl implements Initializable {
         if (notesBodyArea != null) {
             notesBodyArea.textProperty()
                     .addListener((observable, oldValue, markdownText) -> {
-                        markdownConverter(markdownText);
+                        updateWebView(markdownConverter(markdownText));
                     });
         } else {
-            System.out.println("TextArea not initialized!");
+            throw new IllegalStateException("TextArea is not initialized!");
         }
     }
 
     /**
      * Converts Markdown text to HTML and updates the WebView.
      * @param markdownText the Markdown text to be converted
+     * @return the HTML text
      */
-    public void markdownConverter(String markdownText) {
+    public String markdownConverter(String markdownText) {
         Node text = parser.parse(markdownText);
-        String htmlText = renderer.render(text);
-        updateWebView(htmlText);
+        return renderer.render(text);
     }
 
     /**
