@@ -8,20 +8,20 @@ import server.database.NoteRepository;
 @RestController
 @RequestMapping("/Note")
 public class NoteController {
-    private NoteRepository noteRepository;
+    private final NoteRepository noteRepository;
 
     public NoteController(NoteRepository noteRepository) {
         this.noteRepository = noteRepository;
     }
 
     /**
-     * This makes a new note and adds it to the repository.
+     * Adds the given note to the database
+     * @param note note to be added to the database
      */
     @PostMapping("/")
     @ResponseBody
     public void newNote(@RequestBody Note note) {
         noteRepository.save(note);
-        System.out.println(note);
     }
 
     /**

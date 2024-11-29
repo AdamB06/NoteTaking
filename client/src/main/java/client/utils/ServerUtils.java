@@ -17,13 +17,9 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import java.io.IOException;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import commons.Note;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
@@ -57,8 +53,8 @@ public class ServerUtils {
     }
 
     /**
-     *
-     * @param note note to be added in the database
+     * Sends a note to the database.
+     * @param note note to be sent to the database
      */
     public void sendNote(Note note) {
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
@@ -71,6 +67,10 @@ public class ServerUtils {
         }
     }
 
+    /**
+     * Sends the ID of a note to be deleted to the database
+     * @param note note to be deleted from the database
+     */
     public void deleteNote(Note note) {
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(SERVER + "Note/" + note.getId())
