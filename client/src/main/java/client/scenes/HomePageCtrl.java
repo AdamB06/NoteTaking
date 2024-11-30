@@ -24,13 +24,13 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private Button editButton;
 
-    private TitleCtrl titleCtrl;
     private Parser parser;
     private HtmlRenderer renderer;
-    private final PrimaryCtrl pc;
+    private PrimaryCtrl pc;
 
     /**
      * Constructor for HomePageCtrl.
+     *
      * @param pc the PrimaryCtrl instance to be injected
      */
     @Inject
@@ -42,14 +42,14 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Initializes the HomePageCtrl.
-     * @param url the URL
+     *
+     * @param url            the URL
      * @param resourceBundle the ResourceBundle
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         addListener();
         webView.getEngine().loadContent("");
-        titleCtrl = new TitleCtrl(titleField, editButton, pc);
     }
 
     /**
@@ -68,6 +68,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Converts Markdown text to HTML and updates the WebView.
+     *
      * @param markdownText the Markdown text to be converted
      * @return the HTML text
      */
@@ -78,9 +79,32 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Updates the WebView with the given HTML text.
+     *
      * @param htmlText the HTML text to be displayed
      */
     public void updateWebView(String htmlText) {
         webView.getEngine().loadContent(htmlText);
+    }
+
+
+    /**
+     * Makes sure you can edit the text in the textfield, will select
+     * everything to make editing more convenient.
+     */
+    @FXML
+    public void initializeEdit() {
+        editButton.setOnAction(actionEvent -> {
+            titleField.setEditable(true); //Makes sure you can edit
+            titleField.requestFocus(); //Focuses on text field
+            titleField.selectAll(); //Selects everything in the text field
+        });
+
+
+        titleField.focusedProperty().addListener((obs, oldFocus, newFocus) -> {
+            if (!newFocus) {
+                pc.editTitle(titleField.getText());
+                titleField.setEditable(false); // Disable editing after saving
+            }
+        });
     }
 }
