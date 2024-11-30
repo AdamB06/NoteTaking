@@ -65,4 +65,22 @@ public class ServerUtils {
             response.close();
         }
     }
+
+    /**
+     * Sends the ID of a note to be deleted to the database
+     * @param note note to be deleted from the database
+     */
+    public String deleteNote(Note note) {
+        try (Client client = ClientBuilder.newClient()) {
+            String ret = "Failed";
+            Response response = client.target(SERVER + "Note/" + note.getId())
+                    .request(APPLICATION_JSON)
+                    .delete();
+            if (response.getStatus() == 200){
+                ret = "Succesful";
+            }
+            response.close();
+            return ret;
+        }
+    }
 }

@@ -24,4 +24,13 @@ public class NotesController {
     public void newNote(@RequestBody Note note) {
         noteRepository.save(note);
     }
+
+    /**
+     * This deletes the note with the given ID.
+     * @param ID ID of the note that needs to be deleted.
+     */
+    @DeleteMapping("/{ID}")
+    public void deleteNote(@PathVariable long ID) {
+        noteRepository.deleteById(ID);
+    }
 }

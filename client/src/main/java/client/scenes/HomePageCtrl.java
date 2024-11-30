@@ -92,4 +92,14 @@ public class HomePageCtrl implements Initializable {
         injector.getInstance(ServerUtils.class).sendNote(note);
         return note;
     }
+
+    /**
+     * When the remove note button is pressed this sends a command to the server to delete the current note.
+     */
+    public void deleteNote() {
+        //TODO get current note
+        Note note = new Note("", "");
+        Injector injector = createInjector(new MyModule());
+        String status = injector.getInstance(ServerUtils.class).deleteNote(note);
+    }
 }
