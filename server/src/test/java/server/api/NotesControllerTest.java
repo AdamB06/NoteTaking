@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class NotesControllerTest {
     private NoteRepository noteRepository;
@@ -189,6 +189,6 @@ public class NotesControllerTest {
         Note note = new Note("Hello", "This is a note");
         notesController.newNote(note);
         notesController.deleteNote(note.getId());
-        assertEquals(noteRepository.getOne(note.getId()), null);
+        assertNull(noteRepository.getOne(note.getId()));
     }
 }
