@@ -12,12 +12,12 @@ import java.util.LinkedList;
 @RequestMapping("/")
 
 public class SomeController {
-    private final CollectionRepository db;
+    public final CollectionRepository db;
 
     /**
      * @param db is the CollectionRepository, where all our Collections will be stored
      */
-    public SomeController( CollectionRepository db) {
+    public SomeController(CollectionRepository db) {
         this.db = db;
     }
 
