@@ -8,20 +8,26 @@ import javafx.scene.web.WebView;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class HomePageCtrl implements Initializable {
-    private PrimaryCtrl pc;
-
     @FXML
     private TextArea notesBodyArea;
     @FXML
     private WebView webView;
+    @FXML
+    private TextField titleField;
+    @FXML
+    private Button editButton;
 
+    private TitleCtrl titleCtrl;
     private Parser parser;
     private HtmlRenderer renderer;
+    private final PrimaryCtrl pc;
 
     /**
      * Constructor for HomePageCtrl.
@@ -43,6 +49,7 @@ public class HomePageCtrl implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         addListener();
         webView.getEngine().loadContent("");
+        titleCtrl = new TitleCtrl(titleField, editButton, pc);
     }
 
     /**

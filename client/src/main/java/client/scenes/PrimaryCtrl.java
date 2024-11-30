@@ -29,4 +29,13 @@ public class PrimaryCtrl {
         primaryStage.setScene(homeScene);
     }
 
+    /**
+     *
+     * @param newTitle
+     */
+    public void editTitle(String newTitle){
+        System.out.println("Title updated: " + newTitle);
+
+    }
+
 }
