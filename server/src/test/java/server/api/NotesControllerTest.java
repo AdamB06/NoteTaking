@@ -69,6 +69,12 @@ public class NotesControllerTest {
                 return null;
             }
 
+            /**
+             * find all
+             * @param example something
+             * @return List of all found items
+             * @param <S> something
+             */
             @Override
             public <S extends Note> List<S> findAll(Example<S> example) {
                 return List.of();
@@ -79,6 +85,12 @@ public class NotesControllerTest {
                 return List.of();
             }
 
+            /**
+             * saves list
+             * @param entities list of entities
+             * @return list
+             * @param <S> something
+             */
             @Override
             public <S extends Note> List<S> saveAll(Iterable<S> entities) {
                 return List.of();
