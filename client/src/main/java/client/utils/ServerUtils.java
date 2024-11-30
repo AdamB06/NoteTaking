@@ -69,6 +69,7 @@ public class ServerUtils {
     /**
      * Sends the ID of a note to be deleted to the database
      * @param note note to be deleted from the database
+     * @return returns the status of the deletion
      */
     public String deleteNote(Note note) {
         try (Client client = ClientBuilder.newClient()) {

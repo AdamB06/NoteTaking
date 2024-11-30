@@ -85,6 +85,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * When the add note button is pressed this sends a command to the server to create a note.
+     * @return the note that was created
      */
     public Note createNote() {
         Note note = new Note("", "");
