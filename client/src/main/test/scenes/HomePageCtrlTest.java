@@ -64,4 +64,26 @@ public class HomePageCtrlTest {
         assertThrows(IllegalStateException.class, homePageCtrl::addListener);
     }
 
+    @Test
+    public void testCreateNote() {
+        Note note = homePageCtrl.createNote();
+        assertEquals(note.getTitle(), "");
+        assertEquals(note.getContent(), "");
+        long id = 1;
+        assertEquals(note.getId(), id);
+    }
+
+    @Test
+    public void testCreateNoteTwice() {
+        Note noteOne = homePageCtrl.createNote();
+        Note noteTwo = homePageCtrl.createNote();
+        assertEquals(note.getTitle(), "");
+        assertEquals(note.getContent(), "");
+        long id = 1;
+        assertEquals(note.getId(), id);
+        assertEquals(noteTwo.getTitle(), "");
+        assertEquals(noteTwo.getContent(), "");
+        long id = 2;
+        assertEquals(noteTwo.getId(), id);
+    }
 }
