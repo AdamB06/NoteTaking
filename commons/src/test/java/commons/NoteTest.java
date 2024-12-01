@@ -40,4 +40,20 @@ public class NoteTest {
 
     }
 
+    @Test
+    public void noteTitleNotEmpty(){
+        Note note = new Note("   ", "This is a Test");
+        Note note2 = new Note("", "This is a Test");
+        Note note3 = new Note("title", "This is another Test");
+
+        String expected = "New Note";
+
+        String actual = note.getTitle();
+        String actual2 = note2.getTitle();
+
+        assertEquals(expected, actual);
+        assertEquals(expected, actual2);
+        assertEquals("title", note3.getTitle());
+    }
+
 }

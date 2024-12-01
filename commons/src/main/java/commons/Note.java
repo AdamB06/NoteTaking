@@ -31,7 +31,7 @@ public class Note {
      * @param content "content of the note"
      */
     public Note(String title, String content) {
-        this.title = title;
+        this.title = title.replaceAll(" ", "").isEmpty() ? "New Note" : title;
         this.content = content;
     }
 
