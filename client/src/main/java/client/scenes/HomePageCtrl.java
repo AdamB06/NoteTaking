@@ -48,8 +48,10 @@ public class HomePageCtrl implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        titleField.setEditable(false);
         addListener();
         webView.getEngine().loadContent("");
+        initializeEdit();
     }
 
     /**
@@ -93,18 +95,38 @@ public class HomePageCtrl implements Initializable {
      */
     @FXML
     public void initializeEdit() {
+        editButton.setText("Edit");
+
         editButton.setOnAction(actionEvent -> {
-            titleField.setEditable(true); //Makes sure you can edit
-            titleField.requestFocus(); //Focuses on text field
-            titleField.selectAll(); //Selects everything in the text field
-        });
+            if (editButton.getText().equals("Edit")) {  //makes sure the button displays edit
+                titleField.setEditable(true); //Makes sure you can edit
+                titleField.requestFocus(); //Focuses on text field
+                titleField.selectAll(); //Selects everything in the text field
+                editButton.setText("Save"); //changes button to save
 
-
-        titleField.focusedProperty().addListener((obs, oldFocus, newFocus) -> {
-            if (!newFocus) {
+                //Saving function
+            } else if (editButton.getText().equals("Save")) {
                 pc.editTitle(titleField.getText());
-                titleField.setEditable(false); // Disable editing after saving
+                titleField.setEditable(false);
+                editButton.setText("Edit");
             }
         });
+    }
+
+    /**
+     * Makes sure that you can set a value to Edit button
+     * since its an private class
+     * @param editButton button that dislays edit on GUI
+     */
+    public void setEditButton(Button editButton) {
+        this.editButton = editButton;
+    }
+
+    /**
+     * Makes sure you can set a value to the titlefield
+     * @param titleField The textbox next to the edit button
+     */
+    public void setTitleField(TextField titleField) {
+        this.titleField = titleField;
     }
 }
