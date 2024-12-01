@@ -69,6 +69,5 @@ public class HomePageCtrlTest {
     public void testUninitializedTextArea() {
         assertThrows(IllegalStateException.class, homePageCtrl::addListener);
     }
-gi
 
 }
