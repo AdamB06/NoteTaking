@@ -8,23 +8,26 @@ import commons.Collection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import server.CounterService;
 import server.SomeController;
 import server.database.CollectionRepository;
 
 public class SomeControllerTest{
     private CollectionRepository db;
+    private CounterService cs;
     private SomeController sut;
 
     @BeforeEach
     public void setUp(){
         db = Mockito.mock(CollectionRepository.class);
-        sut = new SomeController(db);
+        cs = Mockito.mock(CounterService.class);
+        sut = new SomeController(cs, db);
     }
 
     @Test
     public void testConstructor(){
         // Act: Instantiate SomeController with the mock repository
-        SomeController controller = new SomeController(db);
+        SomeController controller = new SomeController(cs, db);
 
         // Assert: Verify that the controller is correctly initialized
         assertNotNull(controller, "The controller should not be null");
@@ -32,7 +35,7 @@ public class SomeControllerTest{
     }
     @Test
     public void indexReturnsHelloWorld(){
-        var expected = "Hello world!";
+        var expected = "LOCALHOST";
         var actual = sut.index();
         assertEquals(expected, actual);
     }
@@ -46,7 +49,7 @@ public class SomeControllerTest{
         String response = sut.name("testName");
 
         //Verifying that the response returns the expected outcome
-        assertEquals("Welcome, testName, to the application!", response);
+        assertEquals("Welcome, testName, to the application!\nYou are the " + cs.getAndIncrease() + "th visitor!", response);
 
         //Verifying that the repository's "save" method was used and called once
         Mockito.verify(db).save(any(Collection.class));
@@ -61,7 +64,7 @@ public class SomeControllerTest{
         String response = sut.name("testName");
 
         //Verifying that the response returns the expected outcome
-        assertEquals("Welcome, testName, to the application!", response);
+        assertEquals("Welcome, testName, to the application!\nYou are the " + cs.getAndIncrease() + "th visitor!", response);
 
         //Veryfying that the repository's "save" method was not used
         Mockito.verify(db, Mockito.never()).save(any(Collection.class));

@@ -12,12 +12,15 @@ import java.util.LinkedList;
 @RequestMapping("/")
 
 public class SomeController {
-    public final CollectionRepository db;
+    private CounterService counterService;
+    public CollectionRepository db;
 
     /**
+     * @param counterService is the counter that keeps track which visitor this is
      * @param db is the CollectionRepository, where all our Collections will be stored
      */
-    public SomeController(CollectionRepository db) {
+    public SomeController(CounterService counterService, CollectionRepository db){
+        this.counterService = counterService;
         this.db = db;
     }
 
@@ -28,7 +31,7 @@ public class SomeController {
     @GetMapping("/")
     @ResponseBody
     public String index() {
-        return "Hello world!";
+        return "LOCALHOST";
     }
 
     /**
@@ -42,7 +45,6 @@ public class SomeController {
         if(!db.existsByName(name)){
             Collection col;
             col = new Collection();
-            col.setName(name);
             var listOfNotes = new LinkedList<Note>();
             col.setNotes(listOfNotes);
             db.save(col);
@@ -50,7 +52,8 @@ public class SomeController {
         StringBuilder sb;
         sb = new StringBuilder("Welcome, ");
         sb.append(name);
-        sb.append(", to the application!");
+        sb.append(", to the application!\n");
+        sb.append("You are the ").append(counterService.getAndIncrease()).append("th visitor!");
         return sb.toString();
     }
 }
