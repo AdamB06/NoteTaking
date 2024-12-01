@@ -53,7 +53,19 @@ public class SomeController {
         sb = new StringBuilder("Welcome, ");
         sb.append(name);
         sb.append(", to the application!\n");
-        sb.append("You are the ").append(counterService.getAndIncrease()).append("th visitor!");
+        int number = counterService.getAndIncrease();
+        if(number % 10 == 1){
+            sb.append("You are the " + number + "st visitor!");
+        }
+        else if(number % 10 == 2){
+            sb.append("You are the " + number + "nd visitor!");
+        }
+        else if(number % 10 == 3){
+            sb.append("You are the " + number + "rd visitor!");
+        }
+        else{
+            sb.append("You are the " + number + "th visitor!");
+        }
         return sb.toString();
     }
 }
