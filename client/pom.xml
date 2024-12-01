@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>csep</groupId>
@@ -90,13 +90,6 @@
 			<version>${version.mockito}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.testfx</groupId>
-			<artifactId>openjfx-monocle</artifactId>
-			<version>21.0.2</version>
-			<type>pom</type>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -109,10 +102,7 @@
 					<argLine>
 						--add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
 						--add-exports javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
-						--add-exports javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
 						--add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
-						-Djavafx.platform=Monocle
-						-Dmonocle.platform=Headless
 						-Dprism.order=sw
 						-Dtestfx.robot=glass
 						-Dtestfx.headless=true
@@ -132,6 +122,12 @@
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>0.0.8</version>
 				<configuration>
+					<commandlineArgs>
+						--module-path
+						${java.home}/lib
+						--add-modules
+						javafx.controls,javafx.fxml,javafx.web
+					</commandlineArgs>
 					<mainClass>client.Main</mainClass>
 				</configuration>
 			</plugin>
@@ -142,8 +138,8 @@
 				<configuration>
 					<configLocation>../checkstyle.xml</configLocation>
 					<sourceDirectories>${project.basedir}</sourceDirectories>
-					<includes>src/**/*.java,**/*.xml,**/*.yml</includes>
-					<excludes>**/target/**</excludes>
+					<includes>src/*/.java,*/.xml,*/.yml</includes>
+					<excludes>*/target/*</excludes>
 				</configuration>
 				<executions>
 					<execution>
