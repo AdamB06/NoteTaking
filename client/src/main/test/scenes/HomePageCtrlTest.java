@@ -78,10 +78,10 @@ public class HomePageCtrlTest {
     public void testCreateNoteTwice() {
         Note noteOne = homePageCtrl.createNote();
         Note noteTwo = homePageCtrl.createNote();
-        assertEquals(note.getTitle(), "");
-        assertEquals(note.getContent(), "");
+        assertEquals(noteOne.getTitle(), "");
+        assertEquals(noteOne.getContent(), "");
         long id = 1;
-        assertEquals(note.getId(), id);
+        assertEquals(noteOne.getId(), id);
         assertEquals(noteTwo.getTitle(), "");
         assertEquals(noteTwo.getContent(), "");
         long id = 2;
