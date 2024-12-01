@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import javafx.application.Platform;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HomePageCtrlTest {
@@ -28,7 +27,6 @@ public class HomePageCtrlTest {
         editButton = new Button();
         titleField = new TextField();
 
-        homePageCtrl = new HomePageCtrl(null);
         homePageCtrl.setTitleField(titleField);
         homePageCtrl.setEditButton(editButton);
     }
