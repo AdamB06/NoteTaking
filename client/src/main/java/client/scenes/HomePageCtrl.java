@@ -7,11 +7,14 @@ import commons.Note;
 import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.web.WebView;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -25,12 +28,18 @@ public class HomePageCtrl implements Initializable {
     private TextArea notesBodyArea;
     @FXML
     private WebView webView;
+    @FXML
+    private TextField titleField;
+    @FXML
+    private Button editButton;
+
 
     private Parser parser;
     private HtmlRenderer renderer;
 
     /**
      * Constructor for HomePageCtrl.
+     *
      * @param pc the PrimaryCtrl instance to be injected
      */
     @Inject
@@ -42,13 +51,16 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Initializes the HomePageCtrl.
-     * @param url the URL
+     *
+     * @param url            the URL
      * @param resourceBundle the ResourceBundle
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        titleField.setEditable(false);
         addListener();
         webView.getEngine().loadContent("");
+        initializeEdit();
     }
 
     /**
@@ -67,6 +79,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Converts Markdown text to HTML and updates the WebView.
+     *
      * @param markdownText the Markdown text to be converted
      * @return the HTML text
      */
@@ -77,6 +90,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Updates the WebView with the given HTML text.
+     *
      * @param htmlText the HTML text to be displayed
      */
     public void updateWebView(String htmlText) {
@@ -85,6 +99,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * When the add note button is pressed this sends a command to the server to create a note.
+     *
      * @return the note that was created
      */
     public Note createNote() {
@@ -103,4 +118,26 @@ public class HomePageCtrl implements Initializable {
         Injector injector = createInjector(new MyModule());
         String status = injector.getInstance(ServerUtils.class).deleteNote(note);
     }
+
+    public void initializeEdit() {
+        editButton.setText("Edit");
+
+        editButton.setOnAction(actionEvent -> {
+            if (editButton.getText().equals("Edit")) {  //makes sure the button displays edit
+                titleField.setEditable(true); //Makes sure you can edit
+                titleField.requestFocus(); //Focuses on text field
+                titleField.selectAll(); //Selects everything in the text field
+                editButton.setText("Save");
+            }
+            //Saving function
+            else if (editButton.getText().equals("Save")) {
+                pc.editTitle(titleField.getText());
+                titleField.setEditable(false); // Disable editing after saving
+                titleField.setEditable(false);
+                editButton.setText("Edit");
+            }
+        });
+    }
+
+
 }

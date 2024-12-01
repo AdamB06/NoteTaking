@@ -18,9 +18,10 @@ package server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import java.util.Scanner;
 
 @SpringBootApplication
-@EntityScan(basePackages = { "commons", "server" })
+@EntityScan(basePackages = {"commons","server"})
 public class Main {
 
     /**
@@ -28,6 +29,24 @@ public class Main {
      * @param args Main method arguments
      */
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        //SpringApplication.run(Main.class, args);
+        SpringApplication app = new SpringApplication(Main.class);
+        app.run(args);
+        System.out.println("RECEIVING THIS MESSAGE MEANS THAT THE SERVER HAS STARTED!");
+        Scanner scanner = new Scanner(System.in);
+        while(true) {
+            String input = scanner.nextLine();
+            switch(input.toLowerCase()){
+                case "q":
+                case "exit":
+                    System.out.println("Stopping application...");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Unknown command: "+ input);
+                    break;
+            }
+        }
+
     }
 }
