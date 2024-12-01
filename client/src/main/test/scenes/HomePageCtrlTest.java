@@ -1,5 +1,6 @@
 package scenes;
 
+import commons.Note;
 import client.scenes.HomePageCtrl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
