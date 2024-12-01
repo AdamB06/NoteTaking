@@ -2,4 +2,7 @@ image: maven:3.9.9-amazoncorretto-23
 
 build:
   script:
-    - mvn -B -ntp clean verify
+    - mvn -B -ntp clean verify test:
+  script:
+    - mvn -B -ntp clean verify -Djavafx.platform=Monocle -Dprism.order=sw -Dmonocle.platform=Headless
+
