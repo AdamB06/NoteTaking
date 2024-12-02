@@ -105,8 +105,7 @@ public class HomePageCtrl implements Initializable {
     public Note createNote() {
         Note note = new Note("", "");
         Injector injector = createInjector(new MyModule());
-        injector.getInstance(ServerUtils.class).sendNote(note);
-        return note;
+        return injector.getInstance(ServerUtils.class).sendNote(note);
     }
 
     /**

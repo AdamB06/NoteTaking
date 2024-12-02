@@ -54,15 +54,24 @@ public class ServerUtils {
     /**
      * Sends a note to the database.
      * @param note note to be sent to the database
+     * @return returns the note sent to the database
      */
-    public void sendNote(Note note) {
+    public Note sendNote(Note note) {
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(SERVER + "Note/")
                     .request(APPLICATION_JSON)
                     .post(entity);
-            System.out.println(response.getStatus());
-            response.close();
+            System.out.println("Response Status: " + response.getStatus());
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                Note returnedNote = response.readEntity(Note.class);
+                response.close();
+                return returnedNote;
+            } else {
+                System.out.println("Error: " + response.getStatus());
+                response.close();
+                return null;
+            }
         }
     }
 
