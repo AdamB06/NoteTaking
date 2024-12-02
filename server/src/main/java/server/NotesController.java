@@ -18,11 +18,13 @@ public class NotesController {
      * Adds the given note to the database
      *
      * @param note note to be added to the database
+     * @return returns the added note
      */
     @PostMapping("/")
     @ResponseBody
-    public void newNote(@RequestBody Note note) {
+    public Note newNote(@RequestBody Note note) {
         noteRepository.save(note);
+        return note;
     }
 
     /**
