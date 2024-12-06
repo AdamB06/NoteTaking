@@ -89,7 +89,7 @@ public class TestNoteRepository implements NoteRepository {
      */
     @Override
     public Note getOne(Long aLong) {
-        return null;
+        return find(aLong).orElse(null);
     }
 
     /**
@@ -99,7 +99,7 @@ public class TestNoteRepository implements NoteRepository {
     @Override
     public Note getById(Long aLong) {
         call("getById");
-        return find(aLong).get();
+        return find(aLong).orElse(null);
     }
 
     /**
@@ -199,6 +199,7 @@ public class TestNoteRepository implements NoteRepository {
     @Override
     public <S extends Note> S save(S entity) {
         call("save");
+        notes.add(entity);
         return entity;
     }
 
