@@ -17,9 +17,6 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import client.scenes.HomePageCtrl;
 import client.scenes.PrimaryCtrl;
 import com.google.inject.Injector;
@@ -36,10 +33,8 @@ public class Main extends Application {
     /**
      * PSVM method
      * @param args PSVM method arguments
-     * @throws URISyntaxException Checks for URI Syntax exception
-     * @throws IOException Checks for IO exception
      */
-    public static void main(String[] args) throws URISyntaxException, IOException {
+    public static void main(String[] args) {
         launch();
     }
 
