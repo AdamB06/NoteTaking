@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.LanguageController;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
@@ -8,6 +9,7 @@ import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.web.WebView;
@@ -32,10 +34,13 @@ public class HomePageCtrl implements Initializable {
     private TextField titleField;
     @FXML
     private Button editButton;
+    @FXML
+    private ChoiceBox<Integer> languageChoiceBox;
 
 
     private Parser parser;
     private HtmlRenderer renderer;
+    private LanguageController lc;
 
     /**
      * Constructor for HomePageCtrl.
@@ -47,6 +52,9 @@ public class HomePageCtrl implements Initializable {
         this.pc = pc;
         this.parser = Parser.builder().build();
         this.renderer = HtmlRenderer.builder().build();
+
+        this.lc = new LanguageController();
+        this.lc.loadLanguage(0);
     }
 
     /**
@@ -109,7 +117,8 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * When the remove note button is pressed this sends a command to the server to delete the current note.
+     * When the remove note button is pressed,
+     * this sends a command to the server to delete the current note.
      */
     public void deleteNote() {
         //TODO get current note
@@ -122,25 +131,31 @@ public class HomePageCtrl implements Initializable {
      * Initializes the edit button.
      */
     public void initializeEdit() {
-        editButton.setText("Edit");
+        editButton.setText(lc.getEditText());
 
         editButton.setOnAction(actionEvent -> {
-            if (editButton.getText().equals("Edit")) {  //makes sure the button displays edit
+            if (editButton.getText().equals(
+                    lc.getEditText())) {  //makes sure the button displays edit
+
                 titleField.setEditable(true); //Makes sure you can edit
                 titleField.requestFocus(); //Focuses on text field
                 titleField.selectAll(); //Selects everything in the text field
-                editButton.setText("Save");
+
+                editButton.setText(lc.getSaveText());
             }
-            //Saving function
-            else if (editButton.getText().equals("Save")) {
+            else if (editButton.getText()
+                    .equals(lc.getSaveText())) {
                 long noteId = 0; //TODO: replace with getting the current note id
                 pc.editTitle(titleField.getText());
+
                 titleField.setEditable(false); // Disable editing after saving
                 Injector injector = createInjector(new MyModule());
                 injector.getInstance(ServerUtils.class)
                         .updateNoteTitle(noteId, titleField.getText());
                 editButton.setText("Edit");
-            }
+                titleField.setEditable(false);
+
+                editButton.setText(lc.getEditText());}
         });
     }
 }
