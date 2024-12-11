@@ -38,10 +38,28 @@ public class NoteController {
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
         if(checkDuplicateTitle(note.getTitle())) {
-            return ResponseEntity.badRequest().build();
+            throw new IllegalArgumentException("Note title already exists");
         }
         else{
             Note savedNote = noteService.saveNote(note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * Endpoint to edit the content of a note.
+     * @param title New title for the note
+     * @param id ID of the note to be edited
+     * @return The edited note
+     */
+    public ResponseEntity<Note> editNoteTitle (String title, @PathVariable long id){
+        if(checkDuplicateTitle(title)){
+            throw new IllegalArgumentException("Note title already exists");
+        }
+        else{
+            Note note = noteService.getNoteById(id);
+            note.setTitle(title);
+            Note savedNote = noteService.saveNote (note);
             return ResponseEntity.ok(savedNote);
         }
     }

@@ -236,7 +236,7 @@ public class TestNoteRepository implements NoteRepository {
      */
     @Override
     public List<Note> findAll() {
-        return List.of();
+        return notes;
     }
 
     /**

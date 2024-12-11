@@ -7,6 +7,7 @@ import server.database.NoteRepository;
 import commons.Note;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NoteService {
@@ -40,5 +41,14 @@ public class NoteService {
      */
     public List<Note> getAllNotes() {
         return noteRepository.findAll();
+    }
+
+    /**
+     * Retrieves a note by its ID from the database.
+     * @param id The ID of the note to be retrieved.
+     * @return The note with the specified ID.
+     */
+    public Note getNoteById(long id) {
+        return noteRepository.getReferenceById(id);
     }
 }
