@@ -54,8 +54,7 @@ public class NoteController {
     @PutMapping("/{id}")
     public ResponseEntity<Note> editNoteTitle (@RequestBody String title, @PathVariable("id") long id){
         Note note = noteService.getNoteById(id);
-        // Handles edge case where user does not change title and checks for duplicate titles
-        if(!note.getTitle().equals(title) && checkDuplicateTitle(title)){
+        if(checkDuplicateTitle(title)){
             throw new IllegalArgumentException("Note title already exists");
         }
         else{
