@@ -118,6 +118,9 @@ public class HomePageCtrl implements Initializable {
         String status = injector.getInstance(ServerUtils.class).deleteNote(note);
     }
 
+    /**
+     * Initializes the edit button.
+     */
     public void initializeEdit() {
         editButton.setText("Edit");
 
@@ -130,13 +133,14 @@ public class HomePageCtrl implements Initializable {
             }
             //Saving function
             else if (editButton.getText().equals("Save")) {
+                long noteId = 0; //TODO: replace with getting the current note id
                 pc.editTitle(titleField.getText());
                 titleField.setEditable(false); // Disable editing after saving
-                titleField.setEditable(false);
+                Injector injector = createInjector(new MyModule());
+                injector.getInstance(ServerUtils.class)
+                        .updateNoteTitle(noteId, titleField.getText());
                 editButton.setText("Edit");
             }
         });
     }
-
-
 }

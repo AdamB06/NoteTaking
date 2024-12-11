@@ -1,6 +1,5 @@
 package server;
 
-
 import commons.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,12 +51,14 @@ public class NoteController {
      * @param id ID of the note to be edited
      * @return The edited note
      */
-    public ResponseEntity<Note> editNoteTitle (String title, @PathVariable long id){
-        if(checkDuplicateTitle(title)){
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> editNoteTitle (String title, @PathVariable("id") long id){
+        Note note = noteService.getNoteById(id);
+        // Handles edge case where user does not change title and checks for duplicate titles
+        if(!note.getTitle().equals(title) && checkDuplicateTitle(title)){
             throw new IllegalArgumentException("Note title already exists");
         }
         else{
-            Note note = noteService.getNoteById(id);
             note.setTitle(title);
             Note savedNote = noteService.saveNote (note);
             return ResponseEntity.ok(savedNote);

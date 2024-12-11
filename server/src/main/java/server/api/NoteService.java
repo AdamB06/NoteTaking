@@ -7,7 +7,6 @@ import server.database.NoteRepository;
 import commons.Note;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class NoteService {
