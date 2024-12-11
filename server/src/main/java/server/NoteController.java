@@ -54,18 +54,6 @@ public class NoteController {
     }
 
     /**
-     * Adds the given note to the database
-     * @param note note to be added to the database
-     * @return returns the added note
-     */
-    @PostMapping("/")
-    @ResponseBody
-    public Note newNote(@RequestBody Note note) {
-        noteRepository.save(note);
-        return note;
-    }
-
-    /**
      * This deletes the note with the given ID.
      * @param id ID of the note that needs to be deleted.
      */
