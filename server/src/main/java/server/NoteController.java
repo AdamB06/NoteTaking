@@ -37,8 +37,28 @@ public class NoteController {
      */
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
-        Note savedNote = noteService.saveNote(note);
-        return ResponseEntity.ok(savedNote);
+        if(checkDuplicateTitle(note.getTitle())) {
+            return ResponseEntity.badRequest().build();
+        }
+        else{
+            Note savedNote = noteService.saveNote(note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * Checks if the provided note title is a duplicate from the list of notes.
+     * @param title The title of the note
+     * @return True if the title is a duplicate, false otherwise.
+     */
+    public boolean checkDuplicateTitle(String title) {
+        List<Note> notes = noteService.getAllNotes();
+        for (Note note : notes) {
+            if (note.getTitle().equals(title)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
