@@ -20,6 +20,11 @@ public class HomePageCtrlTest {
     }
 
     @Test
+    public void testForSearchBar(){
+
+    }
+
+    @Test
     public void testHeaderMarkdownConverter() {
         notesBodyArea = "# Hello World";
         String htmlText = homePageCtrl.markdownConverter(notesBodyArea);

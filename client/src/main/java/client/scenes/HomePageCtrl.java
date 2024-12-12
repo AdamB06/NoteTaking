@@ -59,6 +59,7 @@ public class HomePageCtrl implements Initializable {
     private List<Note> notes;
     //The list of titles of notes that are filtered after usage of searchbar
     private List<String> filteredTitles;
+    private List<Note> filteredNotes;
 
     /**
      * Constructor for HomePageCtrl.
@@ -128,7 +129,8 @@ public class HomePageCtrl implements Initializable {
             // Update the ListView with the filtered titles
             //As final we clear all the notes within the note list view and then add only the ones that are within the filtered titles
             noteListView.getItems().clear();
-            noteListView.getItems().addAll(filteredTitles);
+            noteListView.getItems().
+                    addAll(filteredNotes.stream().map(Note::getTitle).toList());
         });
 
         titleField.setOnKeyTyped(event -> {
@@ -168,8 +170,10 @@ public class HomePageCtrl implements Initializable {
      */
     private void resetFilteredList(){
         filteredTitles.clear();
+        filteredNotes.clear();
         for(Note note : currentCollection != null ? currentCollection.getNotes() : notes) {
             filteredTitles.add(note.getTitle());
+            filteredNotes.add(note);
         }
     }
 
@@ -202,22 +206,18 @@ public class HomePageCtrl implements Initializable {
     private void filterNotes(String searchBoxQuery){
         List<String> filtered = new ArrayList<>();
 
-        for(String title : filteredTitles){
-            if(title.toLowerCase().contains(searchBoxQuery.toLowerCase())){
-                filtered.add(title);
-            }
-        }
-        for(String content : filteredTitles){
-            if(content.toLowerCase().contains(searchBoxQuery.toLowerCase())
-                && !filtered.contains(content)){
-                filtered.add(content);
+        String fixedSearchQuery = searchBoxQuery.toLowerCase().trim();
+
+        for(Note note : filteredNotes) {
+            if(note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
+            note.getContent().toLowerCase().contains(fixedSearchQuery)){
+                filtered.add(note.getTitle());
             }
         }
     }
 
     public void refreshNotes(){
         updateNoteList();
-        //TODO: refreshPreviewText method ...
     }
 
     /**
