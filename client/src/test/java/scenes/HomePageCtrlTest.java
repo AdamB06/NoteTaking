@@ -5,6 +5,9 @@ import client.scenes.HomePageCtrl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -85,5 +88,23 @@ public class HomePageCtrlTest {
         assertEquals("", noteOne.getContent());
         assertEquals("New Note", noteTwo.getTitle());
         assertEquals("", noteTwo.getContent());
+    }
+
+    @Test
+    public void testSearch(){
+        String[] titles = {"Title1", "Title2", "Title3", "Title4"};
+
+        // Contents for the notes
+        String[] contents = {"Content1", "Content2", "Content3", "Content4"};
+
+        // Create and store the notes
+        List<Note> testList = new ArrayList<>();
+        for (int i = 0; i < titles.length; i++) {
+            Note note = new Note(titles[i], contents[i]);
+            testList.add(note);
+        }
+        List<Note> expectedList = new ArrayList<>();
+        expectedList.addAll(testList);
+        assertEquals(expectedList, homePageCtrl.filterNotes("t", testList));
     }
 }

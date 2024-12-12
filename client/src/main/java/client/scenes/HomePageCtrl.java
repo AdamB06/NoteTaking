@@ -20,6 +20,7 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class HomePageCtrl implements Initializable {
     private List<Note> notes;
     //The list of titles of notes that are filtered after usage of searchbar
     private List<String> filteredTitles;
-    private List<Note> filteredNotes;
+    private List<Note> filteredNotes = new ArrayList<>();
 
     /**
      * Constructor for HomePageCtrl.
@@ -123,14 +124,11 @@ public class HomePageCtrl implements Initializable {
             } else {
                 //When the search bar is not empty (it has a string inside) we will perform an immediate
                 //filtering to find out what notes match the string, by looking at their title and content
-                filterNotes(newValue);
+                filterNotes(newValue, notes);
             }
 
             // Update the ListView with the filtered titles
-            //As final we clear all the notes within the note list view and then add only the ones that are within the filtered titles
-            noteListView.getItems().clear();
-            noteListView.getItems().
-                    addAll(filteredNotes.stream().map(Note::getTitle).toList());
+            refreshNotes();
         });
 
         titleField.setOnKeyTyped(event -> {
@@ -195,7 +193,7 @@ public class HomePageCtrl implements Initializable {
 
         //Filling the list with the titles that are left after filtering
         filteredTitles = new ArrayList<>();
-        for (Note note : currentCollection != null ? currentCollection.getNotes() : notes) {
+        for (Note note : currentCollection != null ? currentCollection.getNotes() : filteredNotes) {
             filteredTitles.add(note.getTitle());
         }
 
@@ -203,17 +201,18 @@ public class HomePageCtrl implements Initializable {
         noteListView.getItems().addAll(filteredTitles);
     }
 
-    private void filterNotes(String searchBoxQuery){
-        List<String> filtered = new ArrayList<>();
+    public static List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
+        List<Note> returnNotes = new ArrayList<>();
 
         String fixedSearchQuery = searchBoxQuery.toLowerCase().trim();
 
-        for(Note note : filteredNotes) {
+        for(Note note : noteList) {
             if(note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
             note.getContent().toLowerCase().contains(fixedSearchQuery)){
-                filtered.add(note.getTitle());
+                returnNotes.add(note);
             }
         }
+        return returnNotes;
     }
 
     public void refreshNotes(){
