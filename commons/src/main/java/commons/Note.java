@@ -98,6 +98,13 @@ public class Note {
     }
 
 
+    /**
+     * Setter method for the note
+     * @param title New title of the note
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }
 
 
