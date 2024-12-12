@@ -1,6 +1,5 @@
 package server;
 
-
 import commons.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +36,47 @@ public class NoteController {
      */
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
-        Note savedNote = noteService.saveNote(note);
-        return ResponseEntity.ok(savedNote);
+        if(checkDuplicateTitle(note.getTitle())) {
+            throw new IllegalArgumentException("Note title already exists");
+        }
+        else{
+            Note savedNote = noteService.saveNote(note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * Endpoint to edit the content of a note.
+     * @param title New title for the note
+     * @param id ID of the note to be edited
+     * @return The edited note
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> editNoteTitle (@RequestBody String title, @PathVariable("id") long id){
+        Note note = noteService.getNoteById(id);
+        if(checkDuplicateTitle(title)){
+            throw new IllegalArgumentException("Note title already exists");
+        }
+        else{
+            note.setTitle(title);
+            Note savedNote = noteService.saveNote (note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * Checks if the provided note title is a duplicate from the list of notes.
+     * @param title The title of the note
+     * @return True if the title is a duplicate, false otherwise.
+     */
+    public boolean checkDuplicateTitle(String title) {
+        List<Note> notes = noteService.getAllNotes();
+        for (Note note : notes) {
+            if (note.getTitle().equals(title)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -51,18 +89,6 @@ public class NoteController {
     public ResponseEntity<List<Note>> getAllNotes() {
         List<Note> notes = noteService.getAllNotes();
         return ResponseEntity.ok(notes);
-    }
-
-    /**
-     * Adds the given note to the database
-     * @param note note to be added to the database
-     * @return returns the added note
-     */
-    @PostMapping("/")
-    @ResponseBody
-    public Note newNote(@RequestBody Note note) {
-        noteRepository.save(note);
-        return note;
     }
 
     /**
