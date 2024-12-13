@@ -72,7 +72,7 @@ public class HomePageCtrlTest {
     public void testUninitializedTextArea() {
         assertThrows(IllegalStateException.class, homePageCtrl::addListener);
     }
-
+     //TODO: The tests are not fubctiooning for some reason. Needs to be fixed in week6
 //    @Test
 //    public void testCreateNote() {
 //        Note note = homePageCtrl.createNote();

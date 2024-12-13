@@ -58,14 +58,6 @@ public class Note {
     }
 
     /**
-     * a setter for the titles of a note
-     * @param title
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    /**
      * a setter for the content of a note
      * @param content
      */

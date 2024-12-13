@@ -102,19 +102,6 @@ public class HomePageCtrl implements Initializable {
         // rather than using the arrows of the keyboard
         searchBox.setFocusTraversable(false);
 
-        //Adding a listener to handle live selection changes on the listView,
-        //which presents all the notes that match the search based on title or content
-        noteListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->{
-            if(newValue != null){
-                //Find the notes that match the search based on title
-                currentNote.set(searchNotesByTitle(newValue));
-
-                if(currentNote.get() != null){
-                    updatingPanel(false);
-                }
-            }
-        });
-
         //With the addition of a listener, we can get accurate real-time input to the search bar
         searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
             //When the search box is cleared, it is logical for us to get all the notes,
@@ -128,14 +115,13 @@ public class HomePageCtrl implements Initializable {
             }
 
             // Update the ListView with the filtered titles
-            refreshNotes();
         });
 
         titleField.setOnKeyTyped(event -> {
             String input = titleField.getText(); // Get the current input from the TextField
             if(currentNote.get() != null) {
                 currentNote.get().setTitle(input);
-                updateNoteList();
+                //updateNoteList();
             }
         });
         notesBodyArea.setOnKeyTyped(event -> {
@@ -180,25 +166,10 @@ public class HomePageCtrl implements Initializable {
             currentNote.set(null);
             titleField.setText(null);
             notesBodyArea.setText(null);
-            refreshNotes();
             return;
         }
         titleField.setText(currentNote.get().getTitle());
         notesBodyArea.setText(currentNote.get().getContent());
-    }
-
-    private void updateNoteList() {
-        //First, we clear all the notes in the list
-        noteListView.getItems().clear();
-
-        //Filling the list with the titles that are left after filtering
-        filteredTitles = new ArrayList<>();
-        for (Note note : currentCollection != null ? currentCollection.getNotes() : filteredNotes) {
-            filteredTitles.add(note.getTitle());
-        }
-
-        //As a last step we put all the filtered titles of notes into the note list view
-        noteListView.getItems().addAll(filteredTitles);
     }
 
     public static List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
@@ -213,10 +184,6 @@ public class HomePageCtrl implements Initializable {
             }
         }
         return returnNotes;
-    }
-
-    public void refreshNotes(){
-        updateNoteList();
     }
 
     /**
