@@ -35,6 +35,7 @@ public class ServerUtils {
 
     /**
      * Checks if the server is available
+     *
      * @return Whether the server is available
      */
     public boolean isServerAvailable() {
@@ -53,6 +54,7 @@ public class ServerUtils {
 
     /**
      * Sends a note to the database.
+     *
      * @param note note to be sent to the database
      * @return returns the note sent to the database
      */
@@ -77,7 +79,8 @@ public class ServerUtils {
 
     /**
      * Sends the ID of a note to be updated to the database
-     * @param id ID of the note to be updated
+     *
+     * @param id       ID of the note to be updated
      * @param newTitle New title for the note
      * @return The updated note
      */
@@ -96,6 +99,7 @@ public class ServerUtils {
 
     /**
      * Sends the ID of a note to be deleted to the database
+     *
      * @param note note to be deleted from the database
      * @return returns the status of the deletion
      */
@@ -105,11 +109,16 @@ public class ServerUtils {
             Response response = client.target(SERVER + "Note/" + note.getId())
                     .request(APPLICATION_JSON)
                     .delete();
-            if (response.getStatus() == 200){
+            if (response.getStatus() == 200) {
                 ret = "Succesful";
             }
             response.close();
             return ret;
         }
+    }
+
+    public String saveChanges(String text) {
+        System.out.println("saveChanges");
+        return "";
     }
 }

@@ -18,6 +18,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -36,6 +38,10 @@ public class HomePageCtrl implements Initializable {
 
     private Parser parser;
     private HtmlRenderer renderer;
+
+    private static int keyCount = 0;
+    private Timer timer = new Timer();
+    private TimerTask saveTask = null;
 
     /**
      * Constructor for HomePageCtrl.
@@ -116,6 +122,31 @@ public class HomePageCtrl implements Initializable {
         Note note = new Note("", "");
         Injector injector = createInjector(new MyModule());
         String status = injector.getInstance(ServerUtils.class).deleteNote(note);
+    }
+
+    public void addKeyPressed() {
+        keyCount++;
+        if (saveTask != null) {
+            saveTask.cancel();
+        }
+        if (keyCount >= 10) {
+            keyCount = 0;
+            System.out.println("keyCount >= 10");
+            Injector injector = createInjector(new MyModule());
+            String status = injector.getInstance(ServerUtils.class).saveChanges(notesBodyArea.getText());
+        }
+        else {
+            saveTask = new TimerTask() {
+                @Override
+                public void run() {
+                    keyCount = 0;
+                    System.out.println("Timer");
+                    Injector injector = createInjector(new MyModule());
+                    String status = injector.getInstance(ServerUtils.class).saveChanges(notesBodyArea.getText());
+                }
+            };
+            timer.schedule(saveTask, 5000);
+        }
     }
 
     /**
