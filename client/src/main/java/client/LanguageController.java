@@ -1,16 +1,13 @@
 package client;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class LanguageController {
-    private static final List<String> languages = List.of("en", "nl", "es");
-
     private ResourceBundle bundle;
 
-    public void loadLanguage(int index){
-        Locale locale = new Locale(languages.get(index));
+    public void loadLanguage(String language){
+        Locale locale = new Locale(language);
         bundle = ResourceBundle.getBundle("i18n.messages", locale);
     }
 
