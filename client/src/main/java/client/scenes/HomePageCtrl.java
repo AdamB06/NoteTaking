@@ -154,7 +154,11 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
+<<<<<<< HEAD
      * Initializes the edit button.
+=======
+     * Initializes the edit button
+>>>>>>> 43db5c5 (Implemented tests for the LanguageController class and added missing Checkstyle)
      */
     public void initializeEdit() {
         isEditText = true;
@@ -189,9 +193,13 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
+    /**
+     * loads a certain language on changing the value in the ComboBox
+     * @param actionEvent additional event data
+     */
     private void loadLanguage(ActionEvent actionEvent) {
         HBox flag = languageComboBox.getValue();
-        String language = hBox2Language(flag);
+        String language = hBox2Language();
 
         lc.loadLanguage(language);
 
@@ -201,12 +209,16 @@ public class HomePageCtrl implements Initializable {
             editButton.setText(lc.getSaveText());
     }
 
-    private String hBox2Language(HBox hBox){
+    /**
+     * Converts a given HBox from the ComboBox to the selected language
+     * @return the language String code
+     */
+    private String hBox2Language(){
         HBox selectedItem = languageComboBox.getSelectionModel().getSelectedItem();
 
         Image flag = null;
 
-        ImageView imageView = (ImageView) selectedItem.getChildren().get(0);
+        ImageView imageView = (ImageView) selectedItem.getChildren().getFirst();
         flag = imageView.getImage();
 
         int k = 0;
@@ -226,6 +238,9 @@ public class HomePageCtrl implements Initializable {
         return defaultLanguage;
     }
 
+    /**
+     * loads all the flags in the ComboBox
+     */
     private void loadAllFlags(){
 
         languageComboBox.getItems().addAll(
@@ -235,6 +250,11 @@ public class HomePageCtrl implements Initializable {
         );
     }
 
+    /**
+     * Creates a flag item from a given image used in the ComboBox
+     * @param image the Image to convert
+     * @return the created HBox item containing the ImageView
+     */
     private HBox createFlagItem(Image image) {
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(50);
