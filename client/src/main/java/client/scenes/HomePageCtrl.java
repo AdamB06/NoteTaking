@@ -140,7 +140,7 @@ public class HomePageCtrl implements Initializable {
      * This method filters the notes by accessing the title and content of it
      * @param searchBoxQuery
      * @param noteList
-     * @return
+     * @return return the notes that match the searchBoxQuery
      */
     public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
         List<Note> returnNotes = new ArrayList<>();
