@@ -106,9 +106,13 @@ public class NoteController {
      * Endpoint for patch request to edit content of note
      * @param id of the to be edited note
      * @param changes to be added into the contents
+     * @param overrideMethod to use post as patch mapping
+     * @return returns a response of if the method successfully executed
      */
     @PostMapping("/{id}")
-    public ResponseEntity<Void> patchNote(@PathVariable("id") long id, @RequestBody Map<String, Object> changes,  @RequestHeader(value = "X-HTTP-Method-Override", required = false) String overrideMethod) {
+    public ResponseEntity<Void> patchNote(@PathVariable("id") long id,
+                                          @RequestBody Map<String, Object> changes,
+                                          @RequestHeader(value = "X-HTTP-Method-Override", required = false) String overrideMethod) {
         if ("PATCH".equals(overrideMethod)) {
             String operation = (String) changes.get("operation");
             int startIndex = (Integer) changes.get("startIndex");
@@ -118,7 +122,8 @@ public class NoteController {
             Note note = noteService.getNoteById(id);
             String originalContent = note.getContent();
 
-            String updatedContent = applyPatch(originalContent, operation, startIndex, endIndex, newText);
+            String updatedContent = applyPatch(originalContent,
+                    operation, startIndex, endIndex, newText);
 
             noteService.saveNote(note);
             System.out.println("Updated Content");
@@ -138,9 +143,11 @@ public class NoteController {
      * @param newText the text to be added
      * @return the resulting string
      */
-    public String applyPatch(String originalContent, String operation, int startIndex, int endIndex, String newText) {
+    public String applyPatch(String originalContent, String operation,
+                             int startIndex, int endIndex, String newText) {
         if ("Replace".equals(operation)) {
-            return originalContent.substring(0, startIndex) + newText + originalContent.substring(endIndex);
+            return originalContent.substring(0, startIndex) + newText +
+                    originalContent.substring(endIndex);
         }
         throw new UnsupportedOperationException("Unsupported operation: " + operation);
     }
