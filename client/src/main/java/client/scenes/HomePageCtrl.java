@@ -51,9 +51,9 @@ public class HomePageCtrl implements Initializable {
     private final HtmlRenderer renderer;
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
     //With the variable below, we store the FULL list of notes and never change it
-    private List<Note> notes;
+    private List<Note> notes = new ArrayList<>();
     //The list of titles of notes that are filtered after usage of searchbar
-    private List<String> filteredTitles;
+    private List<String> filteredTitles = new ArrayList<>();
     private List<Note> filteredNotes = new ArrayList<>();
 
     /**
