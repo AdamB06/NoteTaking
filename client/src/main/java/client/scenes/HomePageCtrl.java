@@ -6,7 +6,6 @@ import com.google.inject.Injector;
 import commons.Collection;
 import commons.Note;
 import jakarta.inject.Inject;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -42,10 +41,6 @@ public class HomePageCtrl implements Initializable {
 
     //Collection
     private Collection currentCollection;
-
-    //CollectionFXML
-    //TODO: When we have added the drop down menu
-    // to include a variable SplitMenuButton with a name "collectionMEnuButton"
 
     private final Parser parser;
     private final HtmlRenderer renderer;
@@ -107,31 +102,23 @@ public class HomePageCtrl implements Initializable {
 
         //With the addition of a listener, we can get accurate real-time input to the search bar
         searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
-            //When the search box is cleared, it is logical for us to get all the notes,
-            //as that means that there are no requirements
             if (newValue == null || newValue.trim().isEmpty()) {
                 resetFilteredList();
             } else {
-                //When the search bar is not empty (it has a string inside) we will perform an immediate
-                //filtering to find out what notes match the string, by looking at their title and content
                 filterNotes(newValue, notes);
             }
-
-            // Update the ListView with the filtered titles
         });
 
         titleField.setOnKeyTyped(event -> {
             String input = titleField.getText(); // Get the current input from the TextField
             if(currentNote.get() != null) {
                 currentNote.get().setTitle(input);
-                //updateNoteList();
             }
         });
         notesBodyArea.setOnKeyTyped(event -> {
             String input = notesBodyArea.getText(); // Get the current input from the TextField
             if(currentNote.get() != null) {
                 currentNote.get().setContent(input);
-                //refreshPreviewText();
             }
         });
 
@@ -149,6 +136,12 @@ public class HomePageCtrl implements Initializable {
         }
     }
 
+    /**
+     * This method filters the notes by accessing the title and content of it
+     * @param searchBoxQuery
+     * @param noteList
+     * @return
+     */
     public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
         List<Note> returnNotes = new ArrayList<>();
 
