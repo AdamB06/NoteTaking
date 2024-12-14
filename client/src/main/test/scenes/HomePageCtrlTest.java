@@ -5,6 +5,9 @@ import client.scenes.HomePageCtrl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -80,5 +83,29 @@ public class HomePageCtrlTest {
         assertEquals("", noteOne.getContent());
         assertEquals("New Note", noteTwo.getTitle());
         assertEquals("", noteTwo.getContent());
+    }
+
+    @Test
+    public void testGetChanges() {
+        String original = "Hello World";
+        String modified = "Hello There World";
+        Map<String, Object> changes = new HashMap<>();
+        changes.put("operation", "Replace");
+        changes.put("startIndex", 6);
+        changes.put("endIndex", 6);
+        changes.put("newText", "There ");
+        assertEquals(changes, homePageCtrl.getChanges(original, modified));
+    }
+
+    @Test
+    public void testGetChangesReplace() {
+        String original = "Hello World";
+        String modified = "Hi World";
+        Map<String, Object> changes = new HashMap<>();
+        changes.put("operation", "Replace");
+        changes.put("startIndex", 1);
+        changes.put("endIndex", 5);
+        changes.put("newText", "i");
+        assertEquals(changes, homePageCtrl.getChanges(original, modified));
     }
 }

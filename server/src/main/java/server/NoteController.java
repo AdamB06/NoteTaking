@@ -129,7 +129,7 @@ public class NoteController {
         }
     }
 
-    private String applyPatch(String originalContent, String operation, int startIndex, int endIndex, String newText) {
+    public String applyPatch(String originalContent, String operation, int startIndex, int endIndex, String newText) {
         if ("Replace".equals(operation)) {
             return originalContent.substring(0, startIndex) + newText + originalContent.substring(endIndex);
         }
