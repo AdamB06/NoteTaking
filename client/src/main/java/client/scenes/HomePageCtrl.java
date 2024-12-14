@@ -83,11 +83,28 @@ public class HomePageCtrl implements Initializable {
         addListener();
         webView.getEngine().loadContent("");
         initializeEdit();
+    }
 
+    /**
+     * With this method we manage to filter the notes that match the search with their title
+     * @param title The title of the note
+     * @return returns the Note that matches the title, but if it doesn't find anything then null
+     */
+    //TODO: Need to find a way to implement the method filters the content as well.
+    private Note searchNotesByTitle(String title){
+        for(Note note : notes){
+            if(note.getTitle().equals(title)){
+                return note;
+            }
+        }
+        return null;
+    }
+
+    public void initializeFilteringOfNotes(){
         //To disable the property of titleOfNote whose contents are null
         titleField.disableProperty().bind(Bindings.createBooleanBinding(
                 () -> currentNote.get() == null, currentNote
-                ));
+        ));
 
         //To disable the property of titlePfNote whose notes are null
         notesBodyArea.disableProperty().bind(Bindings.createBooleanBinding(
@@ -132,21 +149,6 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * With this method we manage to filter the notes that match the search with their title
-     * @param title The title of the note
-     * @return returns the Note that matches the title, but if it doesn't find anything then null
-     */
-    //TODO: Need to find a way to implement the method filters the content as well.
-    private Note searchNotesByTitle(String title){
-        for(Note note : notes){
-            if(note.getTitle().equals(title)){
-                return note;
-            }
-        }
-        return null;
-    }
-
-    /**
      * When the search box is empty we reset the filtered list to the list of the full notes
      */
     private void resetFilteredList(){
@@ -158,7 +160,7 @@ public class HomePageCtrl implements Initializable {
         }
     }
 
-    public static List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
+    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
         List<Note> returnNotes = new ArrayList<>();
 
         String fixedSearchQuery = searchBoxQuery.toLowerCase().trim();
