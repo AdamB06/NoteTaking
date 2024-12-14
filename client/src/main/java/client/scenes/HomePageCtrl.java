@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.web.WebView;
@@ -20,7 +19,6 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +41,6 @@ public class HomePageCtrl implements Initializable {
     private Button editButton;
 
     //Collection
-    private final List<Collection> collections = new ArrayList<>();
     private Collection currentCollection;
 
     //CollectionFXML
@@ -83,6 +80,7 @@ public class HomePageCtrl implements Initializable {
         addListener();
         webView.getEngine().loadContent("");
         initializeEdit();
+        initializeFilteringOfNotes();
     }
 
     /**
