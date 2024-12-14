@@ -34,9 +34,6 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private WebView webView;
     @FXML
-    private ListView<String> noteListView;
-    //TODO: not sure whether I need "TextField titleOfNote" yet for the initialize method or should I stick with titleField
-    @FXML
     private TextField searchBox;
     @FXML
     private TextField titleField;
@@ -159,17 +156,6 @@ public class HomePageCtrl implements Initializable {
             filteredTitles.add(note.getTitle());
             filteredNotes.add(note);
         }
-    }
-
-    public void updatingPanel(boolean toSetNoteToNull){
-        if(toSetNoteToNull){
-            currentNote.set(null);
-            titleField.setText(null);
-            notesBodyArea.setText(null);
-            return;
-        }
-        titleField.setText(currentNote.get().getTitle());
-        notesBodyArea.setText(currentNote.get().getContent());
     }
 
     public static List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){

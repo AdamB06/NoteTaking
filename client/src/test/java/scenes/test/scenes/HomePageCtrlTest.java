@@ -1,6 +1,7 @@
 package scenes.test.scenes;
 
 import client.scenes.HomePageCtrl;
+import commons.Note;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeAll;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import javafx.application.Platform;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,5 +72,57 @@ public class HomePageCtrlTest {
     public void testUninitializedTextArea() {
         assertThrows(IllegalStateException.class, homePageCtrl::addListener);
     }
+      //TODO: Fixing the two tests
+//    @Test
+//    public void testCreateNote() {
+//        Note note = homePageCtrl.createNote();
+//        assertEquals("New Note", note.getTitle());
+//        assertEquals("", note.getContent());
+//    }
+//
+//    @Test
+//    public void testCreateNoteTwice() {
+//        Note noteOne = homePageCtrl.createNote();
+//        Note noteTwo = homePageCtrl.createNote();
+//        assertEquals("New Note", noteOne.getTitle());
+//        assertEquals("", noteOne.getContent());
+//        assertEquals("New Note", noteTwo.getTitle());
+//        assertEquals("", noteTwo.getContent());
+//    }
 
+    @Test
+    public void testSearch(){
+        String[] titles = {"Title1", "Title2", "Title3", "Title4"};
+
+        // Contents for the notes
+        String[] contents = {"Content1", "Content2", "Content3", "Content4"};
+
+        // Create and store the notes
+        List<Note> testList = new ArrayList<>();
+        for (int i = 0; i < titles.length; i++) {
+            Note note = new Note(titles[i], contents[i]);
+            testList.add(note);
+        }
+        List<Note> expectedList = new ArrayList<>();
+        expectedList.addAll(testList);
+        assertEquals(expectedList, homePageCtrl.filterNotes("title", testList));
+    }
+
+    @Test
+    public void testSearchSecond(){
+        String[] titles = {"Title1", "Title2", "Title3", "Title4"};
+
+        // Contents for the notes
+        String[] contents = {"Content1", "Content2", "Content3", "Content4"};
+
+        // Create and store the notes
+        List<Note> testList = new ArrayList<>();
+        for (int i = 0; i < titles.length; i++) {
+            Note note = new Note(titles[i], contents[i]);
+            testList.add(note);
+        }
+        List<Note> expectedList = new ArrayList<>();
+        expectedList.addAll(testList);
+        assertEquals(expectedList, homePageCtrl.filterNotes("content", testList));
+    }
 }
