@@ -76,6 +76,25 @@ public class ServerUtils {
     }
 
     /**
+     * Sends the ID of a note to be updated to the database
+     * @param id ID of the note to be updated
+     * @param newTitle New title for the note
+     * @return The updated note
+     */
+    public String updateNoteTitle(long id, String newTitle) {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(SERVER + "Note/" + id)
+                    .request(APPLICATION_JSON)
+                    .put(Entity.entity(newTitle, APPLICATION_JSON));
+            if (response.getStatus() == 200) {
+                return newTitle;
+            } else {
+                return "Error: " + response.getStatus();
+            }
+        }
+    }
+
+    /**
      * Sends the ID of a note to be deleted to the database
      * @param note note to be deleted from the database
      * @return returns the status of the deletion

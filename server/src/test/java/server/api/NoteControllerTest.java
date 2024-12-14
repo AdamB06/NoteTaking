@@ -6,23 +6,67 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.NoteController;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NoteControllerTest {
 
-    private NoteController nc;
-    private TestNoteRepository nr;
+    private NoteController notesController;
+    private TestNoteRepository noteRepository;
 
     @BeforeEach
     public void setup() {
-        nr = new TestNoteRepository();
-        nc = new NoteController(new NoteService(nr));
+        noteRepository = new TestNoteRepository();
+        notesController = new NoteController(noteRepository, new NoteService(noteRepository));
     }
 
     @Test
     public void databaseIsUsed() {
         Note n = new Note("title", "content");
-        nc.createNote(n);
-        assertTrue(nr.methodIsCalled("save"));
+        notesController.createNote(n);
+        assertTrue(noteRepository.methodIsCalled("save"));
+    }
+
+
+    @Test
+    public void testNewNote() {
+        Note note = new Note("Hello", "This is a note");
+        notesController.createNote(note);
+        assertEquals(note, noteRepository.getById(note.getId()));
+    }
+
+    @Test
+    public void testDeleteNote() {
+        Note note = new Note("Hello", "This is a note");
+        Note note2 = new Note("Hello2", "This is a note2");
+        notesController.createNote(note);
+        notesController.createNote(note2);
+        notesController.deleteNote(note2.getId());
+        assertNotEquals(note2, noteRepository.getOne(note.getId()));
+        assertEquals(note, noteRepository.getOne(note.getId()));
+    }
+
+    @Test
+    public void testNewDuplicateNote(){
+        Note note = new Note ("Hello", "This is a note");
+        notesController.createNote (note);
+        Note note2 = new Note ("Hello", "This is a note");
+        assertThrows(IllegalArgumentException.class, () -> notesController.createNote(note2));
+    }
+
+    @Test
+    public void testEditNoteTitle(){
+        Note note = new Note ("Hello", "This is a note");
+        notesController.createNote (note);
+        Note note2 = new Note ("Hello2", "This is a note");
+        notesController.editNoteTitle("Hello2", note.getId());
+        assertEquals(note2, noteRepository.getOne(note.getId()));
+    }
+
+    @Test
+    public void testEditDuplicateNoteTitle(){
+        Note note = new Note ("Hello", "This is a note");
+        notesController.createNote (note);
+        Note note2 = new Note ("Hello2", "This is a note");
+        assertThrows(IllegalArgumentException.class, () -> notesController.editNoteTitle("Hello", note2.getId()));
     }
 }

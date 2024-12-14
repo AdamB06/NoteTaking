@@ -154,7 +154,7 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * Initializes the edit button
+     * Initializes the edit button.
      */
     public void initializeEdit() {
         isEditText = true;

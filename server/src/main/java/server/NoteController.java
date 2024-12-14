@@ -1,30 +1,29 @@
 package server;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import commons.Note;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import server.api.NoteService;
-
+import server.database.NoteRepository;
+import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notes")
+@RequestMapping("/Note")
 public class NoteController {
-
+    private final NoteRepository noteRepository;
     private final NoteService noteService;
 
     /**
-     * Constructor for NoteController.
-     * This injects the NoteService to interact with the service layer.
-     *
-     * @param noteService The service layer for handling logic related to notes.
+     * @param noteRepository The note repository
+     * @param noteService The note service interface
      */
     @Autowired
-    public NoteController(NoteService noteService) {
+    public NoteController(NoteRepository noteRepository, NoteService noteService) {
+        this.noteRepository = noteRepository;
         this.noteService = noteService;
     }
+
 
     /**
      * Endpoint to create a new note.
@@ -37,8 +36,47 @@ public class NoteController {
      */
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
-        Note savedNote = noteService.saveNote(note);
-        return ResponseEntity.ok(savedNote);
+        if(checkDuplicateTitle(note.getTitle())) {
+            throw new IllegalArgumentException("Note title already exists");
+        }
+        else{
+            Note savedNote = noteService.saveNote(note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * Endpoint to edit the content of a note.
+     * @param title New title for the note
+     * @param id ID of the note to be edited
+     * @return The edited note
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> editNoteTitle (@RequestBody String title, @PathVariable("id") long id){
+        Note note = noteService.getNoteById(id);
+        if(checkDuplicateTitle(title)){
+            throw new IllegalArgumentException("Note title already exists");
+        }
+        else{
+            note.setTitle(title);
+            Note savedNote = noteService.saveNote (note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * Checks if the provided note title is a duplicate from the list of notes.
+     * @param title The title of the note
+     * @return True if the title is a duplicate, false otherwise.
+     */
+    public boolean checkDuplicateTitle(String title) {
+        List<Note> notes = noteService.getAllNotes();
+        for (Note note : notes) {
+            if (note.getTitle().equals(title)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -51,5 +89,14 @@ public class NoteController {
     public ResponseEntity<List<Note>> getAllNotes() {
         List<Note> notes = noteService.getAllNotes();
         return ResponseEntity.ok(notes);
+    }
+
+    /**
+     * This deletes the note with the given ID.
+     * @param id ID of the note that needs to be deleted.
+     */
+    @DeleteMapping("/{id}")
+    public void deleteNote(@PathVariable long id) {
+        noteRepository.deleteById(id);
     }
 }
