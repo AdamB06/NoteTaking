@@ -103,9 +103,9 @@ public class NoteController {
     }
 
     /**
-     *
-     * @param id
-     * @param changes
+     * Endpoint for patch request to edit content of note
+     * @param id of the to be edited note
+     * @param changes to be added into the contents
      */
     @PostMapping("/{id}")
     public ResponseEntity<Void> patchNote(@PathVariable("id") long id, @RequestBody Map<String, Object> changes,  @RequestHeader(value = "X-HTTP-Method-Override", required = false) String overrideMethod) {
@@ -129,6 +129,15 @@ public class NoteController {
         }
     }
 
+    /**
+     * Takes the patch and applies it on the content in the database
+     * @param originalContent the saved content
+     * @param operation what operation to do
+     * @param startIndex from where to place the new text
+     * @param endIndex to where to place the new text
+     * @param newText the text to be added
+     * @return the resulting string
+     */
     public String applyPatch(String originalContent, String operation, int startIndex, int endIndex, String newText) {
         if ("Replace".equals(operation)) {
             return originalContent.substring(0, startIndex) + newText + originalContent.substring(endIndex);
