@@ -181,13 +181,13 @@ public class HomePageCtrl implements Initializable {
                 pc.editTitle(titleField.getText());
 
                 titleField.setEditable(false); // Disable editing after saving
+
                 Injector injector = createInjector(new MyModule());
                 injector.getInstance(ServerUtils.class)
                         .updateNoteTitle(noteId, titleField.getText());
-                editButton.setText("Edit");
-                titleField.setEditable(false);
 
                 editButton.setText(lc.getEditText());
+                titleField.setEditable(false);
                 isEditText = true;
             }
         });
