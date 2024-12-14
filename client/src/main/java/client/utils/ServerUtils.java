@@ -17,6 +17,7 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
+import java.util.Map;
 
 
 import commons.Note;
@@ -110,15 +111,31 @@ public class ServerUtils {
                     .request(APPLICATION_JSON)
                     .delete();
             if (response.getStatus() == 200) {
-                ret = "Succesful";
+                ret = "Successful";
             }
             response.close();
             return ret;
         }
     }
 
-    public String saveChanges(String text) {
-        System.out.println("saveChanges");
-        return "";
+    /**
+     * Takes a map of the changes and the id of the note and sends it to the server
+     * @param id id of the edited note
+     * @param changes map of the changes and their location
+     * @return Success or fail
+     */
+    public String saveChanges(long id, Map<String, Object> changes) {
+        try (Client client = ClientBuilder.newClient()) {
+            String ret = "Failed";
+            Response response = client.target(SERVER + "Note/" + id)
+                    .request()
+                    .header("X-HTTP-Method-Override", "PATCH")
+                    .post(Entity.entity(changes, APPLICATION_JSON));
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                ret = "Successful";
+            }
+            response.close();
+            return ret;
+        }
     }
 }

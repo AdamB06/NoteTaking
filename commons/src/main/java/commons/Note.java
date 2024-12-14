@@ -22,7 +22,7 @@ public class Note {
     private String content;
 
     @SuppressWarnings("unused")
-    private Note() {
+    public Note() {
         //this is for object mapping
     }
 
@@ -88,6 +88,14 @@ public class Note {
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    /**
+     * Setter method for the note
+     * @param content New content of the note
+     */
+    public void setContent(String content) {
+        this.content = content;
     }
 }
 
