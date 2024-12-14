@@ -99,15 +99,6 @@ public class HomePageCtrl implements Initializable {
     }
 
     public void initializeFilteringOfNotes(){
-        //To disable the property of titleOfNote whose contents are null
-        titleField.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> currentNote.get() == null, currentNote
-        ));
-
-        //To disable the property of titlePfNote whose notes are null
-        notesBodyArea.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> currentNote.get() == null, currentNote
-        ));
         //TODO: After making the first TODO, we include "the name" to be disableProperty...
 
         //this ensures that the only way to access the searchbar is by clicking on it,
