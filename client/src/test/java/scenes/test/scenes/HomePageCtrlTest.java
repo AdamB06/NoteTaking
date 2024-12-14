@@ -1,6 +1,7 @@
 package scenes.test.scenes;
 
 import client.scenes.HomePageCtrl;
+import commons.Note;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeAll;
@@ -68,6 +69,23 @@ public class HomePageCtrlTest {
     @Test
     public void testUninitializedTextArea() {
         assertThrows(IllegalStateException.class, homePageCtrl::addListener);
+    }
+
+    @Test
+    public void testCreateNote() {
+        Note note = homePageCtrl.createNote();
+        assertEquals("New Note", note.getTitle());
+        assertEquals("", note.getContent());
+    }
+
+    @Test
+    public void testCreateNoteTwice() {
+        Note noteOne = homePageCtrl.createNote();
+        Note noteTwo = homePageCtrl.createNote();
+        assertEquals("New Note", noteOne.getTitle());
+        assertEquals("", noteOne.getContent());
+        assertEquals("New Note", noteTwo.getTitle());
+        assertEquals("", noteTwo.getContent());
     }
 
 }

@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.web.WebView;
@@ -17,6 +18,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.google.inject.Guice.createInjector;
@@ -32,6 +34,8 @@ public class HomePageCtrl implements Initializable {
     private TextField titleField;
     @FXML
     private Button editButton;
+    @FXML
+    private ListView<Note> notesListView;
 
 
     private Parser parser;
@@ -61,6 +65,8 @@ public class HomePageCtrl implements Initializable {
         addListener();
         webView.getEngine().loadContent("");
         initializeEdit();
+        refreshNotes();
+        deleteNote();
     }
 
     /**
@@ -99,8 +105,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * When the add note button is pressed this sends a command to the server to create a note.
-     *
-     * @return the note that was created
+     * @return returns note
      */
     public Note createNote() {
         Note note = new Note("", "");
@@ -112,10 +117,19 @@ public class HomePageCtrl implements Initializable {
      * When the remove note button is pressed this sends a command to the server to delete the current note.
      */
     public void deleteNote() {
-        //TODO get current note
-        Note note = new Note("", "");
-        Injector injector = createInjector(new MyModule());
-        String status = injector.getInstance(ServerUtils.class).deleteNote(note);
+        Note selectedNote = notesListView.getSelectionModel().getSelectedItem(); // Fetch selected note
+        if (selectedNote != null) {
+            Injector injector = createInjector(new MyModule());
+            String status = injector.getInstance(ServerUtils.class).deleteNote(selectedNote);
+
+            if ("Succesful".equals(status)) {
+                refreshNotes(); // Refresh the ListView
+            } else {
+                System.err.println("Failed to delete the note.");
+            }
+        } else {
+            System.out.println("No note selected for deletion.");
+        }
     }
 
     public void initializeEdit() {
@@ -138,5 +152,15 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
+    public void refreshNotes() {
+        Injector injector = createInjector(new MyModule());
+        List<Note> notes = injector.getInstance(ServerUtils.class).getNotes();
 
+        if (notesListView != null) {
+            notesListView.getItems().clear();
+            notesListView.getItems().addAll(notes);
+        } else {
+            System.err.println("ListView not initialized!");
+        }
+    }
 }
