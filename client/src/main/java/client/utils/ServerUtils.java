@@ -17,6 +17,7 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
+import java.util.Map;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class ServerUtils {
 
     /**
      * Checks if the server is available
+     *
      * @return Whether the server is available
      */
     public boolean isServerAvailable() {
@@ -56,6 +58,7 @@ public class ServerUtils {
 
     /**
      * Sends a note to the database.
+     *
      * @param note note to be sent to the database
      * @return returns the note sent to the database
      */
@@ -108,8 +111,29 @@ public class ServerUtils {
             Response response = client.target(SERVER + "Note/" + note.getId())
                     .request(APPLICATION_JSON)
                     .delete();
-            if (response.getStatus() == 200){
-                ret = "Succesful";
+            if (response.getStatus() == 200) {
+                ret = "Successful";
+            }
+            response.close();
+            return ret;
+        }
+    }
+
+    /**
+     * Takes a map of the changes and the id of the note and sends it to the server
+     * @param id id of the edited note
+     * @param changes map of the changes and their location
+     * @return Success or fail
+     */
+    public String saveChanges(long id, Map<String, Object> changes) {
+        try (Client client = ClientBuilder.newClient()) {
+            String ret = "Failed";
+            Response response = client.target(SERVER + "Note/" + id)
+                    .request()
+                    .header("X-HTTP-Method-Override", "PATCH")
+                    .post(Entity.entity(changes, APPLICATION_JSON));
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                ret = "Successful";
             }
             response.close();
             return ret;

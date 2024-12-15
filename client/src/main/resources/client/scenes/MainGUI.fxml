@@ -35,7 +35,7 @@
                   <Button fx:id="editButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#initializeEdit" prefHeight="26.0" prefWidth="42.0" text="eidt" />
                </children>
             </HBox>
-            <TextArea fx:id="notesBodyArea" prefHeight="375.0" prefWidth="282.0" />
+            <TextArea fx:id="notesBodyArea" onKeyPressed="#addKeyPressed" prefHeight="375.0" prefWidth="282.0" />
          </children>
       </VBox>
    </center>

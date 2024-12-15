@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -148,5 +150,28 @@ public class HomePageCtrlTest {
         assertNotEquals(expectedList, homePageCtrl.filterNotes("nothingInCommonString", testList));
     }
 
+    @Test
+    public void testGetChanges() {
+        String original = "Hello World";
+        String modified = "Hello There World";
+        Map<String, Object> changes = new HashMap<>();
+        changes.put("operation", "Replace");
+        changes.put("startIndex", 6);
+        changes.put("endIndex", 6);
+        changes.put("newText", "There ");
+        assertEquals(changes, homePageCtrl.getChanges(original, modified));
+    }
+
+    @Test
+    public void testGetChangesReplace() {
+        String original = "Hello World";
+        String modified = "Hi World";
+        Map<String, Object> changes = new HashMap<>();
+        changes.put("operation", "Replace");
+        changes.put("startIndex", 1);
+        changes.put("endIndex", 5);
+        changes.put("newText", "i");
+        assertEquals(changes, homePageCtrl.getChanges(original, modified));
+    }
 
 }
