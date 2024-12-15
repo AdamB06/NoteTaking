@@ -8,10 +8,12 @@ import commons.Note;
 import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
+import javafx.scene.image.Image;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -33,9 +35,28 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private Button editButton;
 
+    @FXML
+    private ComboBox<HBox> languageComboBox;
+
+    @FXML
+    private Image englishFlag;
+    @FXML
+    private Image dutchFlag;
+    @FXML
+    private Image spanishFlag;
+
+
+    private Image[] flags = new Image[3];
+    private String[] languages = {"en", "nl", "es"};
+
 
     private Parser parser;
     private HtmlRenderer renderer;
+    private LanguageController lc;
+
+    private boolean isEditText;
+    private String path = "flags/";
+    private String defaultLanguage = languages[0];
 
     /**
      * Constructor for HomePageCtrl.
@@ -47,6 +68,8 @@ public class HomePageCtrl implements Initializable {
         this.pc = pc;
         this.parser = Parser.builder().build();
         this.renderer = HtmlRenderer.builder().build();
+
+        this.lc = new LanguageController();
     }
 
     /**
@@ -57,10 +80,21 @@ public class HomePageCtrl implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        lc.loadLanguage("en");
+
         titleField.setEditable(false);
         addListener();
         webView.getEngine().loadContent("");
         initializeEdit();
+
+        englishFlag = new Image(path + "uk_flag.png");
+        dutchFlag = new Image(path + "nl_flag.png");
+        spanishFlag = new Image(path + "es_flag.png");
+
+        flags = new Image[] {englishFlag, dutchFlag, spanishFlag};
+
+        loadAllFlags();
+        languageComboBox.setOnAction(this::loadLanguage);
     }
 
     /**
@@ -123,22 +157,101 @@ public class HomePageCtrl implements Initializable {
      * Initializes the edit button.
      */
     public void initializeEdit() {
-        editButton.setText("Edit");
+        isEditText = true;
+        editButton.setText(lc.getEditText());
 
         editButton.setOnAction(actionEvent -> {
-            if (editButton.getText().equals("Edit")) {  //makes sure the button displays edit
+            if (editButton.getText().equals(
+                    lc.getEditText())) {  //makes sure the button displays edit
+
                 titleField.setEditable(true); //Makes sure you can edit
                 titleField.requestFocus(); //Focuses on text field
                 titleField.selectAll(); //Selects everything in the text field
-                editButton.setText("Save");
+
+                editButton.setText(lc.getSaveText());
+                isEditText = false;
             }
             //Saving function
-            else if (editButton.getText().equals("Save")) {
+            else if (editButton.getText()
+                    .equals(lc.getSaveText())) {
                 pc.editTitle(titleField.getText());
+
                 titleField.setEditable(false); // Disable editing after saving
                 titleField.setEditable(false);
-                editButton.setText("Edit");
+
+                editButton.setText(lc.getEditText());
+                isEditText = true;
             }
         });
+    }
+
+    /**
+     * loads a certain language on changing the value in the ComboBox
+     * @param actionEvent additional event data
+     */
+    private void loadLanguage(ActionEvent actionEvent) {
+        HBox flag = languageComboBox.getValue();
+        String language = hBox2Language();
+
+        lc.loadLanguage(language);
+
+        if(isEditText)
+            editButton.setText(lc.getEditText());
+        else
+            editButton.setText(lc.getSaveText());
+    }
+
+    /**
+     * Converts a given HBox from the ComboBox to the selected language
+     * @return the language String code
+     */
+    private String hBox2Language(){
+        HBox selectedItem = languageComboBox.getSelectionModel().getSelectedItem();
+
+        Image flag = null;
+
+        ImageView imageView = (ImageView) selectedItem.getChildren().getFirst();
+        flag = imageView.getImage();
+
+        int k = 0;
+
+        // This does work and fixes the flags disappearing
+        // but prints an error in the console, does not stop the program
+
+        //languageComboBox.getItems().clear();
+        //loadAllFlags();
+
+        for(Image i : flags){
+            if(i.getUrl().equals(flag.getUrl())){
+                return languages[k];
+            }
+            k++;
+        }
+        return defaultLanguage;
+    }
+
+    /**
+     * loads all the flags in the ComboBox
+     */
+    private void loadAllFlags(){
+
+        languageComboBox.getItems().addAll(
+                createFlagItem(englishFlag),
+                createFlagItem(dutchFlag),
+                createFlagItem(spanishFlag)
+        );
+    }
+
+    /**
+     * Creates a flag item from a given image used in the ComboBox
+     * @param image the Image to convert
+     * @return the created HBox item containing the ImageView
+     */
+    private HBox createFlagItem(Image image) {
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(50);
+        imageView.setFitHeight(25);
+
+        return new HBox(10, imageView);
     }
 }
