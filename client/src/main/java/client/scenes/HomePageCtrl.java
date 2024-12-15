@@ -55,9 +55,6 @@ public class HomePageCtrl implements Initializable {
     private Image[] flags = new Image[3];
     private String[] languages = {"en", "nl", "es"};
 
-
-    private Parser parser;
-    private HtmlRenderer renderer;
     private LanguageController lc;
 
     private boolean isEditText;
