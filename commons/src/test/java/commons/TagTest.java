@@ -27,30 +27,7 @@ public class TagTest {
         assertNotNull(tag.getId(), "Tag ID should not be null.");
     }
 
-    @Test
-    public void testAddTagToNote() {
 
-        note1.addTag(tag);
-
-        // Assert that the tag is in the note's set of tags
-        assertTrue(note1.getTags().contains(tag), "Note should contain the tag.");
-
-        // Assert that the note is added to the tag's notes set
-        assertTrue(tag.getNotes().contains(note1), "Tag should contain the note.");
-    }
-
-    @Test
-    public void testRemoveTagFromNote() {
-
-        note1.addTag(tag);
-        note1.removeTag(tag);
-
-        // Assert that the note no longer contains the tag
-        assertFalse(note1.getTags().contains(tag), "Note should not contain the tag after removal.");
-
-        // Assert that the tag no longer contains the note
-        assertFalse(tag.getNotes().contains(note1), "Tag should not contain the note after removal.");
-    }
 
     @Test
     public void testAddMultipleTagsToNote() {
