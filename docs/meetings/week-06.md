@@ -3,8 +3,8 @@
 | Date :       | 18/12/2024                                            |
 | Time :       | 13:45 - 14:30                                         |
 | Location :   | DW PC1 Cubicle 10                                     |
-| Chair        | Aidan Voskamp                                         |
-| Minute Taker | Adam Bezard                                           |
+| Chair        | Kelvin Li                                             |
+| Minute Taker | Kevin Moonen                                          |
 | Attendees :  | Kelvin Li, Omer Majeed, Kevin Moonen, Georgi Yordanov |
 
 ### Agenda Items :
