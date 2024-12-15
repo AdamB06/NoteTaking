@@ -10,6 +10,10 @@ import jakarta.inject.Inject;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -31,16 +35,17 @@ public class HomePageCtrl implements Initializable {
     private final PrimaryCtrl pc;
 
     @FXML
-    private WebView webView;
+    private TextArea notesBodyArea;
     @FXML
-    private TextField searchBox;
+    private WebView webView;
     @FXML
     private TextField titleField;
     @FXML
-    private TextArea notesBodyArea;
-    @FXML
     private Button editButton;
-
+    @FXML
+    private ListView<Note> notesListView;
+    @FXML
+    private TextField searchBox;
     @FXML
     private ComboBox<HBox> languageComboBox;
 
@@ -60,7 +65,7 @@ public class HomePageCtrl implements Initializable {
     private boolean isEditText;
     private String path = "flags/";
     private String defaultLanguage = languages[0];
-    
+
     //Collection
     private Collection currentCollection;
 
@@ -101,6 +106,8 @@ public class HomePageCtrl implements Initializable {
         addListener();
         webView.getEngine().loadContent("");
         initializeEdit();
+        refreshNotes();
+        deleteNote();
 
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
@@ -111,6 +118,11 @@ public class HomePageCtrl implements Initializable {
         loadAllFlags();
         languageComboBox.setOnAction(this::loadLanguage);
         initializeFilteringOfNotes();
+    }
+
+    private void loadLanguage(ActionEvent event) {
+        String language = hBox2Language();
+        lc.loadLanguage(language);
     }
 
     /**
@@ -241,10 +253,19 @@ public class HomePageCtrl implements Initializable {
      * this sends a command to the server to delete the current note.
      */
     public void deleteNote() {
-        //TODO get current note
-        Note note = new Note("", "");
-        Injector injector = createInjector(new MyModule());
-        String status = injector.getInstance(ServerUtils.class).deleteNote(note);
+        Note selectedNote = notesListView.getSelectionModel().getSelectedItem(); // Fetch selected note
+        if (selectedNote != null) {
+            Injector injector = createInjector(new MyModule());
+            String status = injector.getInstance(ServerUtils.class).deleteNote(selectedNote);
+
+            if ("Succesful".equals(status)) {
+                refreshNotes(); // Refresh the ListView
+            } else {
+                System.err.println("Failed to delete the note.");
+            }
+        } else {
+            System.out.println("No note selected for deletion.");
+        }
     }
 
     /**
@@ -279,20 +300,16 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
-    /**
-     * loads a certain language on changing the value in the ComboBox
-     * @param actionEvent additional event data
-     */
-    private void loadLanguage(ActionEvent actionEvent) {
-        HBox flag = languageComboBox.getValue();
-        String language = hBox2Language();
+    public void refreshNotes() {
+        Injector injector = createInjector(new MyModule());
+        List<Note> notes = injector.getInstance(ServerUtils.class).getNotes();
 
-        lc.loadLanguage(language);
-
-        if(isEditText)
-            editButton.setText(lc.getEditText());
-        else
-            editButton.setText(lc.getSaveText());
+        if (notesListView != null) {
+            notesListView.getItems().clear();
+            notesListView.getItems().addAll(notes);
+        } else {
+            System.err.println("ListView not initialized!");
+        }
     }
 
     /**
