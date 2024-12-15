@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.LanguageController;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
@@ -14,7 +15,6 @@ import javafx.scene.web.WebView;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
-
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -109,7 +109,8 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * When the remove note button is pressed this sends a command to the server to delete the current note.
+     * When the remove note button is pressed,
+     * this sends a command to the server to delete the current note.
      */
     public void deleteNote() {
         //TODO get current note
@@ -118,6 +119,9 @@ public class HomePageCtrl implements Initializable {
         String status = injector.getInstance(ServerUtils.class).deleteNote(note);
     }
 
+    /**
+     * Initializes the edit button.
+     */
     public void initializeEdit() {
         editButton.setText("Edit");
 
@@ -137,6 +141,4 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
-
-
 }
