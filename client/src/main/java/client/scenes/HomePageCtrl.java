@@ -4,8 +4,10 @@ import client.LanguageController;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
+import commons.Collection;
 import commons.Note;
 import jakarta.inject.Inject;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.event.ActionEvent;
@@ -19,19 +21,23 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.google.inject.Guice.createInjector;
 
 public class HomePageCtrl implements Initializable {
-    private PrimaryCtrl pc;
+    private final PrimaryCtrl pc;
 
-    @FXML
-    private TextArea notesBodyArea;
     @FXML
     private WebView webView;
     @FXML
+    private TextField searchBox;
+    @FXML
     private TextField titleField;
+    @FXML
+    private TextArea notesBodyArea;
     @FXML
     private Button editButton;
 
@@ -57,6 +63,18 @@ public class HomePageCtrl implements Initializable {
     private boolean isEditText;
     private String path = "flags/";
     private String defaultLanguage = languages[0];
+    
+    //Collection
+    private Collection currentCollection;
+
+    private final Parser parser;
+    private final HtmlRenderer renderer;
+    private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
+    //With the variable below, we store the FULL list of notes and never change it
+    private List<Note> notes = new ArrayList<>();
+    //The list of titles of notes that are filtered after usage of searchbar
+    private List<String> filteredTitles = new ArrayList<>();
+    private List<Note> filteredNotes = new ArrayList<>();
 
     /**
      * Constructor for HomePageCtrl.
@@ -95,6 +113,85 @@ public class HomePageCtrl implements Initializable {
 
         loadAllFlags();
         languageComboBox.setOnAction(this::loadLanguage);
+        initializeFilteringOfNotes();
+    }
+
+    /**
+     * With this method we manage to filter the notes that match the search with their title
+     * @param title The title of the note
+     * @return returns the Note that matches the title, but if it doesn't find anything then null
+     */
+    //TODO: Need to find a way to implement the method filters the content as well.
+    private Note searchNotesByTitle(String title){
+        for(Note note : notes){
+            if(note.getTitle().equals(title)){
+                return note;
+            }
+        }
+        return null;
+    }
+
+    public void initializeFilteringOfNotes(){
+        //TODO: After making the first TODO, we include "the name" to be disableProperty...
+
+        //this ensures that the only way to access the searchbar is by clicking on it,
+        // rather than using the arrows of the keyboard
+        searchBox.setFocusTraversable(false);
+
+        //With the addition of a listener, we can get accurate real-time input to the search bar
+        searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.trim().isEmpty()) {
+                resetFilteredList();
+            } else {
+                filterNotes(newValue, notes);
+            }
+        });
+
+        titleField.setOnKeyTyped(event -> {
+            String input = titleField.getText(); // Get the current input from the TextField
+            if(currentNote.get() != null) {
+                currentNote.get().setTitle(input);
+            }
+        });
+        notesBodyArea.setOnKeyTyped(event -> {
+            String input = notesBodyArea.getText(); // Get the current input from the TextField
+            if(currentNote.get() != null) {
+                currentNote.get().setContent(input);
+            }
+        });
+
+    }
+
+    /**
+     * When the search box is empty we reset the filtered list to the list of the full notes
+     */
+    private void resetFilteredList(){
+        filteredTitles.clear();
+        filteredNotes.clear();
+        for(Note note : currentCollection != null ? currentCollection.getNotes() : notes) {
+            filteredTitles.add(note.getTitle());
+            filteredNotes.add(note);
+        }
+    }
+
+    /**
+     * This method filters the notes by accessing the title and content of it
+     * @param searchBoxQuery
+     * @param noteList
+     * @return return the notes that match the searchBoxQuery
+     */
+    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
+        List<Note> returnNotes = new ArrayList<>();
+
+        String fixedSearchQuery = searchBoxQuery.toLowerCase().trim();
+
+        for(Note note : noteList) {
+            if(note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
+            note.getContent().toLowerCase().contains(fixedSearchQuery)){
+                returnNotes.add(note);
+            }
+        }
+        return returnNotes;
     }
 
     /**

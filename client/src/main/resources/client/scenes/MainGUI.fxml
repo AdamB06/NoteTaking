@@ -31,7 +31,7 @@
          <children>
             <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="282.0">
                <children>
-                  <TextField fx:id="titleField" editable="false" prefHeight="26.0" prefWidth="244.0" />
+                  <TextField fx:id="titleField" onAction="#initializeFilteringOfNotes" prefHeight="26.0" prefWidth="244.0" />
                   <Button fx:id="editButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#initializeEdit" prefHeight="26.0" prefWidth="42.0" text="eidt" />
                </children>
             </HBox>
@@ -42,8 +42,7 @@
    <top>
       <HBox BorderPane.alignment="CENTER">
          <children>
-            <TextField prefHeight="33.0" prefWidth="547.0" promptText="Search" HBox.hgrow="ALWAYS" />
-            <ComboBox fx:id="languageComboBox" prefHeight="33.0" prefWidth="102.0" />
+               <TextField fx:id="searchBox" prefHeight="33.0" prefWidth="579.0" promptText="Search" BorderPane.alignment="CENTER" />               <ComboBox fx:id="languageComboBox" prefHeight="33.0" prefWidth="102.0" />
          </children>
       </HBox>
    </top>

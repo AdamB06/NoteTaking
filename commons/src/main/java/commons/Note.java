@@ -58,6 +58,14 @@ public class Note {
     }
 
     /**
+     * a setter for the content of a note
+     * @param content
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
      * @param obj "random obj that is being compared"
      * @return true if equal else false
      */

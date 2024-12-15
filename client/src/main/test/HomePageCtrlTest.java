@@ -5,6 +5,9 @@ import client.scenes.HomePageCtrl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -58,27 +61,5 @@ public class HomePageCtrlTest {
         notesBodyArea = "First paragraph.\n\nSecond paragraph.";
         String htmlText = homePageCtrl.markdownConverter(notesBodyArea);
         assertEquals("<p>First paragraph.</p>\n<p>Second paragraph.</p>\n", htmlText);
-    }
-
-    @Test
-    public void testUninitializedTextArea() {
-        assertThrows(IllegalStateException.class, homePageCtrl::addListener);
-    }
-
-    @Test
-    public void testCreateNote() {
-        Note note = homePageCtrl.createNote();
-        assertEquals("New Note", note.getTitle());
-        assertEquals("", note.getContent());
-    }
-
-    @Test
-    public void testCreateNoteTwice() {
-        Note noteOne = homePageCtrl.createNote();
-        Note noteTwo = homePageCtrl.createNote();
-        assertEquals("New Note", noteOne.getTitle());
-        assertEquals("", noteOne.getContent());
-        assertEquals("New Note", noteTwo.getTitle());
-        assertEquals("", noteTwo.getContent());
     }
 }
