@@ -17,11 +17,14 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
+import java.util.Collections;
+import java.util.List;
 
 
 import commons.Note;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -110,6 +113,19 @@ public class ServerUtils {
             }
             response.close();
             return ret;
+        }
+    }
+    public List<Note> getNotes() {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(SERVER + "Note")
+                    .request(APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == 200) {
+                return response.readEntity(new GenericType<List<Note>>() {});
+            } else {
+                System.out.println("Error fetching notes: " + response.getStatus());
+                return Collections.emptyList();
+            }
         }
     }
 }

@@ -72,6 +72,10 @@ public class HomePageCtrlTest {
     public void testUninitializedTextArea() {
         assertThrows(IllegalStateException.class, homePageCtrl::addListener);
     }
+
+    // These are the tests that I imported these test methods from the other test class that is know deleted, they
+    // are in comments due to the fact that these will break the pipeline due to not being able to connect to the
+    // server
       //TODO: Fixing the two tests
 //    @Test
 //    public void testCreateNote() {
@@ -143,4 +147,6 @@ public class HomePageCtrlTest {
         expectedList.addAll(testList);
         assertNotEquals(expectedList, homePageCtrl.filterNotes("nothingInCommonString", testList));
     }
+
+
 }
