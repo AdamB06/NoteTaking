@@ -2,11 +2,13 @@ package server;
 
 import commons.Note;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import server.api.NoteService;
 import server.database.NoteRepository;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/Note")
@@ -98,5 +100,55 @@ public class NoteController {
     @DeleteMapping("/{id}")
     public void deleteNote(@PathVariable long id) {
         noteRepository.deleteById(id);
+    }
+
+    /**
+     * Endpoint for patch request to edit content of note
+     * @param id of the to be edited note
+     * @param changes to be added into the contents
+     * @param overrideMethod to use post as patch mapping
+     * @return returns a response of if the method successfully executed
+     */
+    @PostMapping("/{id}")
+    public ResponseEntity<Void> patchNote(@PathVariable("id") long id,
+                                          @RequestBody Map<String, Object> changes,
+                                          @RequestHeader(value = "X-HTTP-Method-Override", required = false) String overrideMethod) {
+        if ("PATCH".equals(overrideMethod)) {
+            String operation = (String) changes.get("operation");
+            int startIndex = (Integer) changes.get("startIndex");
+            int endIndex = (Integer) changes.get("endIndex");
+            String newText = (String) changes.get("newText");
+
+            Note note = noteService.getNoteById(id);
+            String originalContent = note.getContent();
+
+            String updatedContent = applyPatch(originalContent,
+                    operation, startIndex, endIndex, newText);
+
+            noteService.saveNote(note);
+            System.out.println("Updated Content");
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+        }
+    }
+
+    /**
+     * Takes the patch and applies it on the content in the database
+     * @param originalContent the saved content
+     * @param operation what operation to do
+     * @param startIndex from where to place the new text
+     * @param endIndex to where to place the new text
+     * @param newText the text to be added
+     * @return the resulting string
+     */
+    public String applyPatch(String originalContent, String operation,
+                             int startIndex, int endIndex, String newText) {
+        if ("Replace".equals(operation)) {
+            return originalContent.substring(0, startIndex) + newText +
+                    originalContent.substring(endIndex);
+        }
+        throw new UnsupportedOperationException("Unsupported operation: " + operation);
     }
 }

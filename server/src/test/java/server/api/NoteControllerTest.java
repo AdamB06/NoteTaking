@@ -69,4 +69,26 @@ public class NoteControllerTest {
         Note note2 = new Note ("Hello2", "This is a note");
         assertThrows(IllegalArgumentException.class, () -> notesController.editNoteTitle("Hello", note2.getId()));
     }
+
+    @Test
+    public void testApplyPatch() {
+        String original = "Hello World";
+        String edited = "Hello There World";
+        String newText = "There ";
+        String operation = "Replace";
+        int startIndex = 6;
+        int endIndex = 6;
+        assertEquals(edited, notesController.applyPatch(original, operation, startIndex, endIndex, newText));
+    }
+
+    @Test
+    public void testApplyPatchReplace() {
+        String original = "Hello World";
+        String edited = "Hi World";
+        String newText = "i";
+        String operation = "Replace";
+        int startIndex = 1;
+        int endIndex = 5;
+        assertEquals(edited, notesController.applyPatch(original, operation, startIndex, endIndex, newText));
+    }
 }
