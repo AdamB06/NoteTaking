@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 public class NoteTest {
 
     private static final Note note = new Note("TestNote", "This is a Test");
@@ -54,6 +55,33 @@ public class NoteTest {
         assertEquals(expected, actual);
         assertEquals(expected, actual2);
         assertEquals("title", note3.getTitle());
+    }
+@Test
+    public void testAddTag() {
+        Tag tag = new Tag(1L, "Java");
+        Note note = new Note();
+
+        note.addTag(tag);
+
+
+        assertTrue(note.getTags().contains(tag));
+
+        // Verify that the tag contains the note (bi-directional relationship)
+        assertTrue(tag.getNotes().contains(note));
+    }
+
+    @Test
+    public void testRemoveTag() {
+        Tag tag = new Tag(1L, "Java");
+        Note note = new Note();
+
+        note.addTag(tag);
+        note.removeTag(tag);
+
+        assertFalse(note.getTags().contains(tag));
+
+
+        assertFalse(tag.getNotes().contains(note));
     }
 
 }

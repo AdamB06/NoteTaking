@@ -18,11 +18,14 @@ package client.utils;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
 import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 
 import commons.Note;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -80,8 +83,7 @@ public class ServerUtils {
 
     /**
      * Sends the ID of a note to be updated to the database
-     *
-     * @param id       ID of the note to be updated
+     * @param id ID of the note to be updated
      * @param newTitle New title for the note
      * @return The updated note
      */
@@ -100,7 +102,6 @@ public class ServerUtils {
 
     /**
      * Sends the ID of a note to be deleted to the database
-     *
      * @param note note to be deleted from the database
      * @return returns the status of the deletion
      */
@@ -136,6 +137,19 @@ public class ServerUtils {
             }
             response.close();
             return ret;
+        }
+    }
+    public List<Note> getNotes() {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(SERVER + "Note")
+                    .request(APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == 200) {
+                return response.readEntity(new GenericType<List<Note>>() {});
+            } else {
+                System.out.println("Error fetching notes: " + response.getStatus());
+                return Collections.emptyList();
+            }
         }
     }
 }
