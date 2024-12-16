@@ -91,7 +91,6 @@ public class HomePageCtrl implements Initializable {
         this.pc = pc;
         this.parser = Parser.builder().build();
         this.renderer = HtmlRenderer.builder().build();
-
         this.lc = new LanguageController();
     }
 
@@ -111,7 +110,6 @@ public class HomePageCtrl implements Initializable {
         initializeEdit();
         original = notesBodyArea.getText();
         refreshNotes();
-        deleteNote();
 
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
@@ -243,13 +241,27 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * When the add note button is pressed this sends a command to the server to create a note.
-     *
      * @return the note that was created
      */
     public Note createNote() {
-        Note note = new Note("", "");
+        int counter = 1;
+        String uniqueTitle = "New Note Title " + counter;
         Injector injector = createInjector(new MyModule());
-        return injector.getInstance(ServerUtils.class).sendNote(note);
+        while(injector.getInstance(ServerUtils.class).isTitleDuplicate(uniqueTitle)){
+            uniqueTitle = "New Note Title " + counter;
+            counter++;
+        }
+        Note note = new Note(uniqueTitle, "New Note Content");
+        Note createdNote = injector.getInstance(ServerUtils.class).sendNote(note);
+
+        if (createdNote != null) {
+            notesListView.getItems().add(createdNote);
+            System.out.println("Note created with ID: " + createdNote.getId());
+            return createdNote;
+        } else {
+            System.err.println("Failed to create note.");
+            return null;
+        }
     }
 
     /**

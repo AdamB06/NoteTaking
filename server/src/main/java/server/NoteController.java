@@ -67,6 +67,16 @@ public class NoteController {
     }
 
     /**
+     * @param title The title of the note
+     * @return True if the title is a duplicate, false otherwise.
+     */
+    @GetMapping("/checkDuplicateTitle/{title}")
+    public ResponseEntity<Boolean> checkDuplicateTitleEndpoint(@PathVariable String title) {
+        boolean isDuplicate = checkDuplicateTitle(title);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
+    /**
      * Checks if the provided note title is a duplicate from the list of notes.
      * @param title The title of the note
      * @return True if the title is a duplicate, false otherwise.
