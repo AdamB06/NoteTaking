@@ -80,7 +80,8 @@ public class HomePageCtrl implements Initializable {
     private Timer timer = new Timer();
     private TimerTask saveTask = null;
     private String original;
-
+    private Injector injector;
+    private ServerUtils serverUtils;
     /**
      * Constructor for HomePageCtrl.
      *
@@ -91,8 +92,10 @@ public class HomePageCtrl implements Initializable {
         this.pc = pc;
         this.parser = Parser.builder().build();
         this.renderer = HtmlRenderer.builder().build();
-
         this.lc = new LanguageController();
+        injector = createInjector(new MyModule());
+        this.serverUtils = injector.getInstance(ServerUtils.class);
+
     }
 
     /**
@@ -144,6 +147,9 @@ public class HomePageCtrl implements Initializable {
         return null;
     }
 
+    /**
+     * Initializes the filtering of notes.
+     */
     public void initializeFilteringOfNotes(){
         //TODO: After making the first TODO, we include "the name" to be disableProperty...
 
@@ -193,14 +199,14 @@ public class HomePageCtrl implements Initializable {
      * @param noteList
      * @return return the notes that match the searchBoxQuery
      */
-    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
+    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList) {
         List<Note> returnNotes = new ArrayList<>();
 
         String fixedSearchQuery = searchBoxQuery.toLowerCase().trim();
 
-        for(Note note : noteList) {
-            if(note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
-            note.getContent().toLowerCase().contains(fixedSearchQuery)){
+        for (Note note : noteList) {
+            if (note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
+                    note.getContent().toLowerCase().contains(fixedSearchQuery)) {
                 returnNotes.add(note);
             }
         }
@@ -247,9 +253,14 @@ public class HomePageCtrl implements Initializable {
      * @return the note that was created
      */
     public Note createNote() {
-        Note note = new Note("New Note Title" + UUID.randomUUID().toString(), "New Note Content");
-        Injector injector = createInjector(new MyModule());
-        Note createdNote = injector.getInstance(ServerUtils.class).sendNote(note);
+        int counter = 1;
+        String uniqueTitle = "New Note Title " + counter;
+        while(serverUtils.isTitleDuplicate(uniqueTitle)){
+            uniqueTitle = "New Note Title " + counter;
+            counter++;
+        }
+        Note note = new Note(uniqueTitle, "New Note Content");
+        Note createdNote = serverUtils.sendNote(note);
 
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
@@ -259,8 +270,8 @@ public class HomePageCtrl implements Initializable {
             System.err.println("Failed to create note.");
             return null;
         }
-    }
 
+    }
     private void setupNotesListView() {
         // Custom cell factory to show only titles
         notesListView.setCellFactory(listView -> new ListCell<Note>() {
@@ -286,16 +297,15 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
-
     /**
      * When the remove note button is pressed,
      * this sends a command to the server to delete the current note.
      */
     public void deleteNote() {
-        Note selectedNote = notesListView.getSelectionModel().getSelectedItem(); // Fetch selected note
+        Note selectedNote = notesListView.getSelectionModel()
+                .getSelectedItem(); // Fetch selected note
         if (selectedNote != null) {
-            Injector injector = createInjector(new MyModule());
-            String status = injector.getInstance(ServerUtils.class).deleteNote(selectedNote);
+            String status = serverUtils.deleteNote(selectedNote);
 
             if ("Succesful".equals(status)) {
                 refreshNotes(); // Refresh the ListView
@@ -308,7 +318,8 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * When a key is pressed this calls getChanges to get the changes to the text and then calls the saving function of the text.
+     * When a key is pressed this calls getChanges to get the changes to the text
+     * and then calls the saving function of the text.
      */
     public void addKeyPressed() {
         keyCount++;
@@ -321,8 +332,7 @@ public class HomePageCtrl implements Initializable {
             String edited = notesBodyArea.getText();
             Map<String, Object> changes = getChanges(original, edited);
             original = edited;
-            Injector injector = createInjector(new MyModule());
-            String status = injector.getInstance(ServerUtils.class).saveChanges(noteId, changes);
+            String status = serverUtils.saveChanges(noteId, changes);
         }
         else {
             saveTask = new TimerTask() {
@@ -332,8 +342,8 @@ public class HomePageCtrl implements Initializable {
                     String edited = notesBodyArea.getText();
                     Map<String, Object> changes = getChanges(original, edited);
                     original = edited;
-                    Injector injector = createInjector(new MyModule());
-                    String status = injector.getInstance(ServerUtils.class).saveChanges(noteId, changes);
+                    String status = serverUtils
+                            .saveChanges(noteId, changes);
                 }
             };
             timer.schedule(saveTask, 5000);
@@ -349,13 +359,15 @@ public class HomePageCtrl implements Initializable {
     public Map<String, Object> getChanges(String original, String edited) {
         int startIndex = 0;
 
-        while (startIndex < original.length() && startIndex < edited.length() && original.charAt(startIndex) == edited.charAt(startIndex)) {
+        while (startIndex < original.length() && startIndex < edited.length()
+                && original.charAt(startIndex) == edited.charAt(startIndex)) {
             startIndex++;
         }
         int endIndexOriginal = original.length() - 1;
         int endIndexEdited = edited.length() - 1;
 
-        while (endIndexOriginal >= startIndex && endIndexEdited >= startIndex && original.charAt(endIndexOriginal) == edited.charAt(endIndexEdited)) {
+        while (endIndexOriginal >= startIndex && endIndexEdited >= startIndex
+                && original.charAt(endIndexOriginal) == edited.charAt(endIndexEdited)) {
             endIndexOriginal--;
             endIndexEdited--;
         }
@@ -379,9 +391,11 @@ public class HomePageCtrl implements Initializable {
         editButton.setOnAction(actionEvent -> {
             if (editButton.getText().equals(
                     lc.getEditText())) {  //makes sure the button displays edit
+
                 titleField.setEditable(true); //Makes sure you can edit
                 titleField.requestFocus(); //Focuses on text field
                 titleField.selectAll(); //Selects everything in the text field
+
                 editButton.setText(lc.getSaveText());
                 isEditText = false;
             }
@@ -390,24 +404,27 @@ public class HomePageCtrl implements Initializable {
                     .equals(lc.getSaveText())) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 if(selectedNote != null){
-                    selectedNote.setTitle(titleField.getText());
-                    pc.editTitle(titleField.getText());
+                    if(serverUtils.updateNoteTitle(selectedNote.getId(), titleField.getText()).equals(titleField.getText())){
+                        selectedNote.setTitle(titleField.getText());
 
-                    int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
-                    notesListView.getItems().set(selectedIndex, selectedNote);
-                    notesListView.refresh();
+                        int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
+                        notesListView.getItems().set(selectedIndex, selectedNote);
+                        notesListView.refresh();
+                    }
+                    System.err.println("Title is a duplicate, not valid");
                 }
-                pc.editTitle(titleField.getText());
                 titleField.setEditable(false);
+
                 editButton.setText(lc.getEditText());
                 isEditText = true;
             }
         });
     }
-
+    /**
+     * Refreshes the notes in the ListView.
+     */
     public void refreshNotes() {
-        Injector injector = createInjector(new MyModule());
-        List<Note> notes = injector.getInstance(ServerUtils.class).getNotes();
+        List<Note> notes = serverUtils.getNotes();
 
         if (notesListView != null) {
             notesListView.getItems().clear();
