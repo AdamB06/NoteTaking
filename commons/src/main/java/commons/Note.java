@@ -37,6 +37,9 @@ public class Note {
         return tags;
     }
 
+    /**
+     * Default constructor for note
+     */
     @SuppressWarnings("unused")
     public Note() {
         //this is for object mapping

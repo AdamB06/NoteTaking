@@ -157,6 +157,10 @@ public class ServerUtils {
             return ret;
         }
     }
+
+    /**
+     * @return returns a list of notes
+     */
     public List<Note> getNotes() {
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(SERVER + "Note")

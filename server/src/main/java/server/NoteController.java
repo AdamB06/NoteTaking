@@ -54,7 +54,8 @@ public class NoteController {
      * @return The edited note
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Note> editNoteTitle (@RequestBody String title, @PathVariable("id") long id){
+    public ResponseEntity<Note> editNoteTitle (@RequestBody String title,
+                                               @PathVariable("id") long id){
         Note note = noteService.getNoteById(id);
         if(checkDuplicateTitle(title)){
             throw new IllegalArgumentException("Note title already exists");
@@ -122,7 +123,8 @@ public class NoteController {
     @PostMapping("/{id}")
     public ResponseEntity<Void> patchNote(@PathVariable("id") long id,
                                           @RequestBody Map<String, Object> changes,
-                                          @RequestHeader(value = "X-HTTP-Method-Override", required = false) String overrideMethod) {
+                                          @RequestHeader(value = "X-HTTP-Method-Override",
+                                                  required = false) String overrideMethod) {
         if ("PATCH".equals(overrideMethod)) {
             String operation = (String) changes.get("operation");
             int startIndex = (Integer) changes.get("startIndex");
