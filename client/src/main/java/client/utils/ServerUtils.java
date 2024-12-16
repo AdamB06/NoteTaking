@@ -65,7 +65,7 @@ public class ServerUtils {
     public Note sendNote(Note note) {
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note/")
+            Response response = client.target(SERVER + "Note")
                     .request(APPLICATION_JSON)
                     .post(entity);
             System.out.println("Response Status: " + response.getStatus());

@@ -111,7 +111,6 @@ public class HomePageCtrl implements Initializable {
         initializeEdit();
         original = notesBodyArea.getText();
         refreshNotes();
-        deleteNote();
 
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
@@ -122,6 +121,7 @@ public class HomePageCtrl implements Initializable {
         loadAllFlags();
         languageComboBox.setOnAction(this::loadLanguage);
         initializeFilteringOfNotes();
+        setupNotesListView();
     }
 
     private void loadLanguage(ActionEvent event) {
@@ -247,9 +247,44 @@ public class HomePageCtrl implements Initializable {
      * @return the note that was created
      */
     public Note createNote() {
-        Note note = new Note("", "");
+        Note note = new Note("New Note Title" + UUID.randomUUID().toString(), "New Note Content");
         Injector injector = createInjector(new MyModule());
-        return injector.getInstance(ServerUtils.class).sendNote(note);
+        Note createdNote = injector.getInstance(ServerUtils.class).sendNote(note);
+
+        if (createdNote != null) {
+            notesListView.getItems().add(createdNote);
+            System.out.println("Note created with ID: " + createdNote.getId());
+            return createdNote;
+        } else {
+            System.err.println("Failed to create note.");
+            return null;
+        }
+    }
+
+    private void setupNotesListView() {
+        // Custom cell factory to show only titles
+        notesListView.setCellFactory(listView -> new ListCell<Note>() {
+            @Override
+            protected void updateItem(Note note, boolean empty) {
+                super.updateItem(note, empty);
+                if (empty || note == null) {
+                    setText(null);
+                } else {
+                    setText(note.getTitle());
+                }
+            }
+        });
+
+        notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
+            if (newNote != null) {
+                titleField.setText(newNote.getTitle());
+                titleField.setEditable(false);
+                notesBodyArea.setText(newNote.getContent());
+            } else {
+                titleField.clear();
+                notesBodyArea.clear();
+            }
+        });
     }
 
     /**
@@ -344,22 +379,26 @@ public class HomePageCtrl implements Initializable {
         editButton.setOnAction(actionEvent -> {
             if (editButton.getText().equals(
                     lc.getEditText())) {  //makes sure the button displays edit
-
                 titleField.setEditable(true); //Makes sure you can edit
                 titleField.requestFocus(); //Focuses on text field
                 titleField.selectAll(); //Selects everything in the text field
-
                 editButton.setText(lc.getSaveText());
                 isEditText = false;
             }
             //Saving function
             else if (editButton.getText()
                     .equals(lc.getSaveText())) {
+                Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
+                if(selectedNote != null){
+                    selectedNote.setTitle(titleField.getText());
+                    pc.editTitle(titleField.getText());
+
+                    int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
+                    notesListView.getItems().set(selectedIndex, selectedNote);
+                    notesListView.refresh();
+                }
                 pc.editTitle(titleField.getText());
-
-                titleField.setEditable(false); // Disable editing after saving
                 titleField.setEditable(false);
-
                 editButton.setText(lc.getEditText());
                 isEditText = true;
             }
