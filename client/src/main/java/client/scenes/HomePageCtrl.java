@@ -91,7 +91,6 @@ public class HomePageCtrl implements Initializable {
         this.pc = pc;
         this.parser = Parser.builder().build();
         this.renderer = HtmlRenderer.builder().build();
-
         this.lc = new LanguageController();
     }
 
@@ -111,7 +110,6 @@ public class HomePageCtrl implements Initializable {
         initializeEdit();
         original = notesBodyArea.getText();
         refreshNotes();
-        deleteNote();
 
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
@@ -144,6 +142,9 @@ public class HomePageCtrl implements Initializable {
         return null;
     }
 
+    /**
+     * Initializes the filtering of notes.
+     */
     public void initializeFilteringOfNotes(){
         //TODO: After making the first TODO, we include "the name" to be disableProperty...
 
@@ -193,14 +194,14 @@ public class HomePageCtrl implements Initializable {
      * @param noteList
      * @return return the notes that match the searchBoxQuery
      */
-    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
+    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList) {
         List<Note> returnNotes = new ArrayList<>();
 
         String fixedSearchQuery = searchBoxQuery.toLowerCase().trim();
 
-        for(Note note : noteList) {
-            if(note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
-            note.getContent().toLowerCase().contains(fixedSearchQuery)){
+        for (Note note : noteList) {
+            if (note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
+                    note.getContent().toLowerCase().contains(fixedSearchQuery)) {
                 returnNotes.add(note);
             }
         }
@@ -243,13 +244,27 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * When the add note button is pressed this sends a command to the server to create a note.
-     *
      * @return the note that was created
      */
     public Note createNote() {
-        Note note = new Note("", "");
+        int counter = 1;
+        String uniqueTitle = "New Note Title " + counter;
         Injector injector = createInjector(new MyModule());
-        return injector.getInstance(ServerUtils.class).sendNote(note);
+        while(injector.getInstance(ServerUtils.class).isTitleDuplicate(uniqueTitle)){
+            uniqueTitle = "New Note Title " + counter;
+            counter++;
+        }
+        Note note = new Note(uniqueTitle, "New Note Content");
+        Note createdNote = injector.getInstance(ServerUtils.class).sendNote(note);
+
+        if (createdNote != null) {
+            notesListView.getItems().add(createdNote);
+            System.out.println("Note created with ID: " + createdNote.getId());
+            return createdNote;
+        } else {
+            System.err.println("Failed to create note.");
+            return null;
+        }
     }
 
     /**
@@ -257,7 +272,8 @@ public class HomePageCtrl implements Initializable {
      * this sends a command to the server to delete the current note.
      */
     public void deleteNote() {
-        Note selectedNote = notesListView.getSelectionModel().getSelectedItem(); // Fetch selected note
+        Note selectedNote = notesListView.getSelectionModel()
+                .getSelectedItem(); // Fetch selected note
         if (selectedNote != null) {
             Injector injector = createInjector(new MyModule());
             String status = injector.getInstance(ServerUtils.class).deleteNote(selectedNote);
@@ -273,7 +289,8 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * When a key is pressed this calls getChanges to get the changes to the text and then calls the saving function of the text.
+     * When a key is pressed this calls getChanges to get the changes to the text
+     * and then calls the saving function of the text.
      */
     public void addKeyPressed() {
         keyCount++;
@@ -298,7 +315,8 @@ public class HomePageCtrl implements Initializable {
                     Map<String, Object> changes = getChanges(original, edited);
                     original = edited;
                     Injector injector = createInjector(new MyModule());
-                    String status = injector.getInstance(ServerUtils.class).saveChanges(noteId, changes);
+                    String status = injector.getInstance(ServerUtils.class)
+                            .saveChanges(noteId, changes);
                 }
             };
             timer.schedule(saveTask, 5000);
@@ -314,13 +332,15 @@ public class HomePageCtrl implements Initializable {
     public Map<String, Object> getChanges(String original, String edited) {
         int startIndex = 0;
 
-        while (startIndex < original.length() && startIndex < edited.length() && original.charAt(startIndex) == edited.charAt(startIndex)) {
+        while (startIndex < original.length() && startIndex < edited.length()
+                && original.charAt(startIndex) == edited.charAt(startIndex)) {
             startIndex++;
         }
         int endIndexOriginal = original.length() - 1;
         int endIndexEdited = edited.length() - 1;
 
-        while (endIndexOriginal >= startIndex && endIndexEdited >= startIndex && original.charAt(endIndexOriginal) == edited.charAt(endIndexEdited)) {
+        while (endIndexOriginal >= startIndex && endIndexEdited >= startIndex
+                && original.charAt(endIndexOriginal) == edited.charAt(endIndexEdited)) {
             endIndexOriginal--;
             endIndexEdited--;
         }
@@ -366,6 +386,9 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
+    /**
+     * Refreshes the notes in the ListView.
+     */
     public void refreshNotes() {
         Injector injector = createInjector(new MyModule());
         List<Note> notes = injector.getInstance(ServerUtils.class).getNotes();

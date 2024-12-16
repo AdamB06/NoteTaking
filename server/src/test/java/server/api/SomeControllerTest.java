@@ -31,7 +31,7 @@ public class SomeControllerTest{
 
         // Assert: Verify that the controller is correctly initialized
         assertNotNull(controller, "The controller should not be null");
-        assertEquals(db, controller.db, "The repository instance should be correctly assigned");
+        assertEquals(db, controller.getDb(), "The repository instance should be correctly assigned");
     }
     @Test
     public void indexReturnsHelloWorld(){

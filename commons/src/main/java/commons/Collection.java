@@ -23,6 +23,9 @@ public class Collection {
     @OneToMany
     private List<Note> notes;
 
+    /**
+     * Default constructor for collection
+     */
     @SuppressWarnings("unused")
     public Collection() {
         //this is for object mapping
