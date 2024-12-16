@@ -20,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.image.Image;
+import javafx.util.Callback;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -54,15 +55,14 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private Image spanishFlag;
 
+    private final String[] languages = {"en", "nl", "es"};
 
-    private Image[] flags = new Image[3];
-    private String[] languages = {"en", "nl", "es"};
-
-    private LanguageController lc;
+    private final LanguageController lc;
 
     private boolean isEditText;
-    private String path = "flags/";
-    private String defaultLanguage = languages[0];
+    private final String path = "flags/";
+    private final String defaultLanguage = languages[0];
+    private boolean isLoadingLanguage = false;
 
     //Collection
     private Collection currentCollection;
@@ -103,7 +103,7 @@ public class HomePageCtrl implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        lc.loadLanguage("en");
+        lc.loadLanguage(defaultLanguage);
 
         titleField.setEditable(false);
         addListener();
@@ -117,34 +117,46 @@ public class HomePageCtrl implements Initializable {
         dutchFlag = new Image(path + "nl_flag.png");
         spanishFlag = new Image(path + "es_flag.png");
 
-        flags = new Image[] {englishFlag, dutchFlag, spanishFlag};
-
-        loadAllFlags();
+        loadAllFlags(0);
         languageComboBox.setOnAction(this::loadLanguage);
+
         initializeFilteringOfNotes();
     }
 
     private void loadLanguage(ActionEvent event) {
-        String language = hBox2Language();
+        if (isLoadingLanguage)
+            return;
+
+        isLoadingLanguage = true;
+
+        int i = getCurrentLanguage();
+
+        String language = languages[i];
         lc.loadLanguage(language);
+        editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
+
+        loadAllFlags(i);
+
+        isLoadingLanguage = false;
     }
 
     /**
      * With this method we manage to filter the notes that match the search with their title
+     *
      * @param title The title of the note
      * @return returns the Note that matches the title, but if it doesn't find anything then null
      */
     //TODO: Need to find a way to implement the method filters the content as well.
-    private Note searchNotesByTitle(String title){
-        for(Note note : notes){
-            if(note.getTitle().equals(title)){
+    private Note searchNotesByTitle(String title) {
+        for (Note note : notes) {
+            if (note.getTitle().equals(title)) {
                 return note;
             }
         }
         return null;
     }
 
-    public void initializeFilteringOfNotes(){
+    public void initializeFilteringOfNotes() {
         //TODO: After making the first TODO, we include "the name" to be disableProperty...
 
         //this ensures that the only way to access the searchbar is by clicking on it,
@@ -162,13 +174,13 @@ public class HomePageCtrl implements Initializable {
 
         titleField.setOnKeyTyped(event -> {
             String input = titleField.getText(); // Get the current input from the TextField
-            if(currentNote.get() != null) {
+            if (currentNote.get() != null) {
                 currentNote.get().setTitle(input);
             }
         });
         notesBodyArea.setOnKeyTyped(event -> {
             String input = notesBodyArea.getText(); // Get the current input from the TextField
-            if(currentNote.get() != null) {
+            if (currentNote.get() != null) {
                 currentNote.get().setContent(input);
             }
         });
@@ -178,10 +190,10 @@ public class HomePageCtrl implements Initializable {
     /**
      * When the search box is empty we reset the filtered list to the list of the full notes
      */
-    private void resetFilteredList(){
+    private void resetFilteredList() {
         filteredTitles.clear();
         filteredNotes.clear();
-        for(Note note : currentCollection != null ? currentCollection.getNotes() : notes) {
+        for (Note note : currentCollection != null ? currentCollection.getNotes() : notes) {
             filteredTitles.add(note.getTitle());
             filteredNotes.add(note);
         }
@@ -189,18 +201,19 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * This method filters the notes by accessing the title and content of it
+     *
      * @param searchBoxQuery
      * @param noteList
      * @return return the notes that match the searchBoxQuery
      */
-    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList){
+    public List<Note> filterNotes(String searchBoxQuery, List<Note> noteList) {
         List<Note> returnNotes = new ArrayList<>();
 
         String fixedSearchQuery = searchBoxQuery.toLowerCase().trim();
 
-        for(Note note : noteList) {
-            if(note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
-            note.getContent().toLowerCase().contains(fixedSearchQuery)){
+        for (Note note : noteList) {
+            if (note.getTitle().toLowerCase().contains(fixedSearchQuery) ||
+                    note.getContent().toLowerCase().contains(fixedSearchQuery)) {
                 returnNotes.add(note);
             }
         }
@@ -288,8 +301,7 @@ public class HomePageCtrl implements Initializable {
             original = edited;
             Injector injector = createInjector(new MyModule());
             String status = injector.getInstance(ServerUtils.class).saveChanges(noteId, changes);
-        }
-        else {
+        } else {
             saveTask = new TimerTask() {
                 @Override
                 public void run() {
@@ -307,8 +319,9 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Compares two strings and finds the difference and where it is
+     *
      * @param original the not edited string
-     * @param edited the edited string
+     * @param edited   the edited string
      * @return a map of what needs to be changed and where
      */
     public Map<String, Object> getChanges(String original, String edited) {
@@ -379,48 +392,33 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * Converts a given HBox from the ComboBox to the selected language
-     * @return the language String code
+     * @return the selected language in the dropdown
      */
-    private String hBox2Language(){
-        HBox selectedItem = languageComboBox.getSelectionModel().getSelectedItem();
-
-        Image flag = null;
-
-        ImageView imageView = (ImageView) selectedItem.getChildren().getFirst();
-        flag = imageView.getImage();
-
-        int k = 0;
-
-        // This does work and fixes the flags disappearing
-        // but prints an error in the console, does not stop the program
-
-        //languageComboBox.getItems().clear();
-        //loadAllFlags();
-
-        for(Image i : flags){
-            if(i.getUrl().equals(flag.getUrl())){
-                return languages[k];
+    private int getCurrentLanguage() {
+        for (int i = 0; i < 3; i++) {
+            if (languageComboBox.getSelectionModel().isSelected(i)) {
+                return i;
             }
-            k++;
         }
-        return defaultLanguage;
+        return 0;
     }
 
     /**
      * loads all the flags in the ComboBox
      */
-    private void loadAllFlags(){
-
+    private void loadAllFlags(int index) {
+        languageComboBox.getItems().clear();
         languageComboBox.getItems().addAll(
                 createFlagItem(englishFlag),
                 createFlagItem(dutchFlag),
                 createFlagItem(spanishFlag)
         );
+        languageComboBox.getSelectionModel().select(index);
     }
 
     /**
      * Creates a flag item from a given image used in the ComboBox
+     *
      * @param image the Image to convert
      * @return the created HBox item containing the ImageView
      */
