@@ -307,7 +307,7 @@ public class HomePageCtrl implements Initializable {
         if (selectedNote != null) {
             String status = serverUtils.deleteNote(selectedNote);
 
-            if ("Succesful".equals(status)) {
+            if ("Successful".equals(status)) {
                 refreshNotes(); // Refresh the ListView
             } else {
                 System.err.println("Failed to delete the note.");
@@ -323,7 +323,8 @@ public class HomePageCtrl implements Initializable {
      */
     public void addKeyPressed() {
         keyCount++;
-        long noteId = 0; //TODO get current note id
+        Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
+        long noteId = selectedNote.getId();
         if (saveTask != null) {
             saveTask.cancel();
         }
@@ -411,7 +412,9 @@ public class HomePageCtrl implements Initializable {
                         notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
                     }
-                    System.err.println("Title is a duplicate, not valid");
+                    else {
+                        System.err.println("Title is a duplicate, not valid");
+                    }
                 }
                 titleField.setEditable(false);
 
