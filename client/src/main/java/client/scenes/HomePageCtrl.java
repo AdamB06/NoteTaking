@@ -80,7 +80,8 @@ public class HomePageCtrl implements Initializable {
     private Timer timer = new Timer();
     private TimerTask saveTask = null;
     private String original;
-
+    private Injector injector;
+    private ServerUtils serverUtils;
     /**
      * Constructor for HomePageCtrl.
      *
@@ -92,6 +93,9 @@ public class HomePageCtrl implements Initializable {
         this.parser = Parser.builder().build();
         this.renderer = HtmlRenderer.builder().build();
         this.lc = new LanguageController();
+        injector = createInjector(new MyModule());
+        this.serverUtils = injector.getInstance(ServerUtils.class);
+
     }
 
     /**
@@ -120,6 +124,7 @@ public class HomePageCtrl implements Initializable {
         loadAllFlags();
         languageComboBox.setOnAction(this::loadLanguage);
         initializeFilteringOfNotes();
+        setupNotesListView();
     }
 
     private void loadLanguage(ActionEvent event) {
@@ -244,18 +249,18 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * When the add note button is pressed this sends a command to the server to create a note.
+     *
      * @return the note that was created
      */
     public Note createNote() {
         int counter = 1;
         String uniqueTitle = "New Note Title " + counter;
-        Injector injector = createInjector(new MyModule());
-        while(injector.getInstance(ServerUtils.class).isTitleDuplicate(uniqueTitle)){
+        while(serverUtils.isTitleDuplicate(uniqueTitle)){
             uniqueTitle = "New Note Title " + counter;
             counter++;
         }
         Note note = new Note(uniqueTitle, "New Note Content");
-        Note createdNote = injector.getInstance(ServerUtils.class).sendNote(note);
+        Note createdNote = serverUtils.sendNote(note);
 
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
@@ -265,8 +270,33 @@ public class HomePageCtrl implements Initializable {
             System.err.println("Failed to create note.");
             return null;
         }
-    }
 
+    }
+    private void setupNotesListView() {
+        // Custom cell factory to show only titles
+        notesListView.setCellFactory(listView -> new ListCell<Note>() {
+            @Override
+            protected void updateItem(Note note, boolean empty) {
+                super.updateItem(note, empty);
+                if (empty || note == null) {
+                    setText(null);
+                } else {
+                    setText(note.getTitle());
+                }
+            }
+        });
+
+        notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
+            if (newNote != null) {
+                titleField.setText(newNote.getTitle());
+                titleField.setEditable(false);
+                notesBodyArea.setText(newNote.getContent());
+            } else {
+                titleField.clear();
+                notesBodyArea.clear();
+            }
+        });
+    }
     /**
      * When the remove note button is pressed,
      * this sends a command to the server to delete the current note.
@@ -275,10 +305,9 @@ public class HomePageCtrl implements Initializable {
         Note selectedNote = notesListView.getSelectionModel()
                 .getSelectedItem(); // Fetch selected note
         if (selectedNote != null) {
-            Injector injector = createInjector(new MyModule());
-            String status = injector.getInstance(ServerUtils.class).deleteNote(selectedNote);
+            String status = serverUtils.deleteNote(selectedNote);
 
-            if ("Succesful".equals(status)) {
+            if ("Successful".equals(status)) {
                 refreshNotes(); // Refresh the ListView
             } else {
                 System.err.println("Failed to delete the note.");
@@ -294,7 +323,8 @@ public class HomePageCtrl implements Initializable {
      */
     public void addKeyPressed() {
         keyCount++;
-        long noteId = 0; //TODO get current note id
+        Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
+        long noteId = selectedNote.getId();
         if (saveTask != null) {
             saveTask.cancel();
         }
@@ -303,8 +333,7 @@ public class HomePageCtrl implements Initializable {
             String edited = notesBodyArea.getText();
             Map<String, Object> changes = getChanges(original, edited);
             original = edited;
-            Injector injector = createInjector(new MyModule());
-            String status = injector.getInstance(ServerUtils.class).saveChanges(noteId, changes);
+            String status = serverUtils.saveChanges(noteId, changes);
         }
         else {
             saveTask = new TimerTask() {
@@ -314,8 +343,7 @@ public class HomePageCtrl implements Initializable {
                     String edited = notesBodyArea.getText();
                     Map<String, Object> changes = getChanges(original, edited);
                     original = edited;
-                    Injector injector = createInjector(new MyModule());
-                    String status = injector.getInstance(ServerUtils.class)
+                    String status = serverUtils
                             .saveChanges(noteId, changes);
                 }
             };
@@ -375,9 +403,19 @@ public class HomePageCtrl implements Initializable {
             //Saving function
             else if (editButton.getText()
                     .equals(lc.getSaveText())) {
-                pc.editTitle(titleField.getText());
+                Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
+                if(selectedNote != null){
+                    if(serverUtils.updateNoteTitle(selectedNote.getId(), titleField.getText()).equals(titleField.getText())){
+                        selectedNote.setTitle(titleField.getText());
 
-                titleField.setEditable(false); // Disable editing after saving
+                        int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
+                        notesListView.getItems().set(selectedIndex, selectedNote);
+                        notesListView.refresh();
+                    }
+                    else {
+                        System.err.println("Title is a duplicate, not valid");
+                    }
+                }
                 titleField.setEditable(false);
 
                 editButton.setText(lc.getEditText());
@@ -385,13 +423,11 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
-
     /**
      * Refreshes the notes in the ListView.
      */
     public void refreshNotes() {
-        Injector injector = createInjector(new MyModule());
-        List<Note> notes = injector.getInstance(ServerUtils.class).getNotes();
+        List<Note> notes = serverUtils.getNotes();
 
         if (notesListView != null) {
             notesListView.getItems().clear();
