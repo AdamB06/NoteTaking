@@ -1,23 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SplitMenuButton?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.web.WebView?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
     <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="1087.0" style="-fx-background-color: black;" text="NetNoteApplication" textAlignment="CENTER" textFill="WHITE">
         <font>
             <Font name="System Bold" size="18.0" />
@@ -30,14 +19,14 @@
                     <SplitPane dividerPositions="0.8747686613201727" layoutX="1.0" layoutY="1.0" prefHeight="52.0" prefWidth="1083.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="49.0" prefWidth="175.0">
-                            <ComboBox fx:id="languageComboBox" layoutX="-1.0" prefHeight="49.0" prefWidth="133.0"/>
+                            <ComboBox fx:id="languageComboBox" layoutX="-1.0" prefHeight="49.0" prefWidth="133.0" />
                         </AnchorPane>
                     </SplitPane>
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <SplitPane dividerPositions="0.6099137931034483" prefHeight="51.0" prefWidth="1085.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                            <TextField layoutY="-2.0" prefHeight="48.0" prefWidth="657.0" promptText="Search for titles of notes or their content...">
+                            <TextField fx:id="searchBox" layoutY="-2.0" prefHeight="48.0" prefWidth="657.0" promptText="Search for titles of notes or their content...">
                                 <font>
                                     <Font size="13.0" />
                                 </font>
@@ -74,7 +63,7 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="627.0" prefWidth="267.0">
                     <SplitPane dividerPositions="0.8793466807165439" orientation="VERTICAL" prefHeight="635.0" prefWidth="267.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                            <ListView layoutX="3.0" layoutY="1.0" prefHeight="553.0" prefWidth="267.0" />
+                            <ListView fx:id="notesListView" layoutX="3.0" layoutY="1.0" prefHeight="553.0" prefWidth="267.0" />
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="265.0">
                             <ButtonBar layoutX="3.0" layoutY="-0.6666666666666666" prefHeight="81.0" prefWidth="265.0" style="-fx-background-color: black;" AnchorPane.bottomAnchor="-7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-1.0">
