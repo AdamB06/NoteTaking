@@ -1,13 +1,14 @@
 package server;
 
-
 import commons.Note;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import server.api.NoteService;
 import server.database.NoteRepository;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/Note")
@@ -37,8 +38,58 @@ public class NoteController {
      */
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
-        Note savedNote = noteService.saveNote(note);
-        return ResponseEntity.ok(savedNote);
+        if(checkDuplicateTitle(note.getTitle())) {
+            throw new IllegalArgumentException("Note title already exists");
+        }
+        else{
+            Note savedNote = noteService.saveNote(note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * Endpoint to edit the content of a note.
+     * @param title New title for the note
+     * @param id ID of the note to be edited
+     * @return The edited note
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> editNoteTitle (@RequestBody String title,
+                                               @PathVariable("id") long id){
+        Note note = noteService.getNoteById(id);
+        if(checkDuplicateTitle(title)){
+            throw new IllegalArgumentException("Note title already exists");
+        }
+        else{
+            note.setTitle(title);
+            Note savedNote = noteService.saveNote (note);
+            return ResponseEntity.ok(savedNote);
+        }
+    }
+
+    /**
+     * @param title The title of the note
+     * @return True if the title is a duplicate, false otherwise.
+     */
+    @GetMapping("/checkDuplicateTitle/{title}")
+    public ResponseEntity<Boolean> checkDuplicateTitleEndpoint(@PathVariable String title) {
+        boolean isDuplicate = checkDuplicateTitle(title);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
+    /**
+     * Checks if the provided note title is a duplicate from the list of notes.
+     * @param title The title of the note
+     * @return True if the title is a duplicate, false otherwise.
+     */
+    public boolean checkDuplicateTitle(String title) {
+        List<Note> notes = noteService.getAllNotes();
+        for (Note note : notes) {
+            if (note.getTitle().equals(title)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -54,23 +105,62 @@ public class NoteController {
     }
 
     /**
-     * Adds the given note to the database
-     * @param note note to be added to the database
-     * @return returns the added note
-     */
-    @PostMapping("/")
-    @ResponseBody
-    public Note newNote(@RequestBody Note note) {
-        noteRepository.save(note);
-        return note;
-    }
-
-    /**
      * This deletes the note with the given ID.
      * @param id ID of the note that needs to be deleted.
      */
     @DeleteMapping("/{id}")
     public void deleteNote(@PathVariable long id) {
         noteRepository.deleteById(id);
+    }
+
+    /**
+     * Endpoint for patch request to edit content of note
+     * @param id of the to be edited note
+     * @param changes to be added into the contents
+     * @param overrideMethod to use post as patch mapping
+     * @return returns a response of if the method successfully executed
+     */
+    @PostMapping("/{id}")
+    public ResponseEntity<Void> patchNote(@PathVariable("id") long id,
+                                          @RequestBody Map<String, Object> changes,
+                                          @RequestHeader(value = "X-HTTP-Method-Override",
+                                                  required = false) String overrideMethod) {
+        if ("PATCH".equals(overrideMethod)) {
+            String operation = (String) changes.get("operation");
+            int startIndex = (Integer) changes.get("startIndex");
+            int endIndex = (Integer) changes.get("endIndex");
+            String newText = (String) changes.get("newText");
+
+            Note note = noteService.getNoteById(id);
+            String originalContent = note.getContent();
+
+            String updatedContent = applyPatch(originalContent,
+                    operation, startIndex, endIndex, newText);
+
+            noteService.saveNote(note);
+            System.out.println("Updated Content");
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+        }
+    }
+
+    /**
+     * Takes the patch and applies it on the content in the database
+     * @param originalContent the saved content
+     * @param operation what operation to do
+     * @param startIndex from where to place the new text
+     * @param endIndex to where to place the new text
+     * @param newText the text to be added
+     * @return the resulting string
+     */
+    public String applyPatch(String originalContent, String operation,
+                             int startIndex, int endIndex, String newText) {
+        if ("Replace".equals(operation)) {
+            return originalContent.substring(0, startIndex) + newText +
+                    originalContent.substring(endIndex);
+        }
+        throw new UnsupportedOperationException("Unsupported operation: " + operation);
     }
 }

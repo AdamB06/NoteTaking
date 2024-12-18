@@ -1,14 +1,14 @@
 package commons;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -21,8 +21,27 @@ public class Note {
     private String title;
     private String content;
 
+    @ManyToMany
+    @JoinTable(
+            name = "note_tag",
+            joinColumns = @JoinColumn(name = "note_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+
+    /**
+     *
+     * @return the tags linked to a certain note
+     */
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    /**
+     * Default constructor for note
+     */
     @SuppressWarnings("unused")
-    private Note() {
+    public Note() {
         //this is for object mapping
     }
 
@@ -58,6 +77,14 @@ public class Note {
     }
 
     /**
+     * a setter for the content of a note
+     * @param content
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
      * @param obj "random obj that is being compared"
      * @return true if equal else false
      */
@@ -82,6 +109,35 @@ public class Note {
     }
 
 
+    /**
+     * Setter method for the note
+     *
+     * @param title New title of the note
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * @param tag a tag that gets added to the Note if it does not already contain that tag
+     */
+    public void addTag(Tag tag) {
+        tags.add(tag);// does not need contains check as a Set cannot have duplicates
+        tag.getNotes().add(this);
+
+    }
+
+    /**
+     *
+     * @param tag a tag that gets removed from the note
+     */
+    public void removeTag(Tag tag) {
+        tags.remove(tag);
+        tag.getNotes().remove(this);
+    }
+
 }
+
+
 
 

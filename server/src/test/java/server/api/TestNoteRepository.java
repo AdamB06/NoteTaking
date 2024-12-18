@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Note;
+import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,9 @@ import java.util.function.Function;
 
 public class TestNoteRepository implements NoteRepository {
 
+
+    private EntityManager entityManager;
+
     private List<Note> notes = new ArrayList<>();
     private List<String> calledMethods = new ArrayList<>();
 
@@ -23,11 +27,10 @@ public class TestNoteRepository implements NoteRepository {
     }
 
     /**
-     *
      * @param name
      * @return whether the calls list contains said name
      */
-    public  boolean methodIsCalled(String name) {
+    public boolean methodIsCalled(String name) {
         return calledMethods.contains(name);
     }
 
@@ -236,7 +239,7 @@ public class TestNoteRepository implements NoteRepository {
      */
     @Override
     public List<Note> findAll() {
-        return List.of();
+        return notes;
     }
 
     /**
@@ -313,4 +316,20 @@ public class TestNoteRepository implements NoteRepository {
     public Page<Note> findAll(Pageable pageable) {
         return null;
     }
+
+
+    /**
+     * @param tagName name of the tag
+     * @return the notes that have this tag
+     */
+
+    public List<Note> findNotesByTagName(String tagName) {
+        // Using EntityManager to create a custom query
+        String query = "SELECT n FROM Note n JOIN n.tags t WHERE t.name = :tagName";
+        return entityManager.createQuery(query, Note.class)
+                .setParameter("tagName", tagName)
+                .getResultList();
+    }
+
+
 }

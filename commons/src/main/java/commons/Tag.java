@@ -7,66 +7,62 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-public class Collection {
-
+public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     private String name;
 
-    @OneToMany
-    private List<Note> notes;
+    @ManyToMany(mappedBy = "tags")
+    private Set<Note> notes = new HashSet<>();
 
-    /**
-     * Default constructor for collection
-     */
-    @SuppressWarnings("unused")
-    public Collection() {
-        //this is for object mapping
-    }
+
 
     /**
      *
-     * @param list "a list of notes"
-     * @param name "name of the owner of the collection"
+     * @param id id of the tag
+     * @param name name of the tag
      */
-    public Collection(String name, List<Note> list){
-        this.notes = new ArrayList<>(list);
+    public Tag(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
     /**
-     * @return the name (the owner) of the collection
+     *
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     *
+     * @param id id of the tag
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     *
+     * @return the name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return list of notes
-     */
-    public List<Note> getNotes() {
-        return notes;
-    }
-
-    /**
-     * @param name that will be set for the Collection
+     *
+     * @param name name of the tag
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * @param notes that will be set in the Collection
-     */
-    public void setNotes(List<Note> notes) {
-        this.notes = notes;
     }
 
     /**
@@ -92,5 +88,21 @@ public class Collection {
         return ToStringBuilder.reflectionToString(this,
                 ToStringStyle.MULTI_LINE_STYLE);
     }
-}
 
+    /**
+     *
+     * @return the set of notes associated with this tag
+     */
+    public Set<Note> getNotes(){
+        return notes;
+    }
+
+    /**
+     *
+     * @param notes
+     */
+    public void setNotes(Set<Note> notes){
+        this.notes = notes;
+    }
+
+}

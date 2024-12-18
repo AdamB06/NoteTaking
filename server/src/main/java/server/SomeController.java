@@ -13,7 +13,7 @@ import java.util.LinkedList;
 
 public class SomeController {
     private CounterService counterService;
-    public CollectionRepository db;
+    private CollectionRepository db;
 
     /**
      * @param counterService is the counter that keeps track which visitor this is
@@ -22,6 +22,13 @@ public class SomeController {
     public SomeController(CounterService counterService, CollectionRepository db){
         this.counterService = counterService;
         this.db = db;
+    }
+
+    /**
+     * @return the counter service
+     */
+    public CollectionRepository getDb() {
+        return db;
     }
 
     /**
