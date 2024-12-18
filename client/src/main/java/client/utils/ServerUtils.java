@@ -65,7 +65,7 @@ public class ServerUtils {
     public Note sendNote(Note note) {
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note/")
+            Response response = client.target(SERVER + "Note")
                     .request(APPLICATION_JSON)
                     .post(entity);
             System.out.println("Response Status: " + response.getStatus());
@@ -77,6 +77,24 @@ public class ServerUtils {
                 System.out.println("Error: " + response.getStatus());
                 response.close();
                 return null;
+            }
+        }
+    }
+
+    /**
+     * @param title title of the note
+     * @return returns if the title is a duplicate
+     */
+    public boolean isTitleDuplicate(String title) {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(SERVER + "Note/checkDuplicateTitle/" +title)
+                    .request(APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                return response.readEntity(Boolean.class);
+            } else {
+                System.out.println("Error: " + response.getStatus());
+                return false;
             }
         }
     }
@@ -139,6 +157,10 @@ public class ServerUtils {
             return ret;
         }
     }
+
+    /**
+     * @return returns a list of notes
+     */
     public List<Note> getNotes() {
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(SERVER + "Note")
