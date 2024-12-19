@@ -77,7 +77,7 @@ public class HomePageCtrl implements Initializable {
     private List<Note> filteredNotes = new ArrayList<>();
 
     private static int keyCount = 0;
-    private Timer timer = new Timer();
+    private Timer timer = null;
     private TimerTask saveTask = null;
     private String original;
     private Injector injector;
@@ -349,6 +349,7 @@ public class HomePageCtrl implements Initializable {
             String status = serverUtils.saveChanges(noteId, changes);
         }
         else {
+            timer = new Timer(true);
             saveTask = new TimerTask() {
                 @Override
                 public void run() {
