@@ -53,7 +53,7 @@ public class Main extends Application {
             System.err.println(msg);
             return;
         }
-        var overview = FXML.load(HomePageCtrl.class, "client", "scenes", "MainGUI.fxml");
+        var overview = FXML.load(HomePageCtrl.class, "client", "scenes", "NetNoteScene.fxml");
         var mainCtrl = INJECTOR.getInstance(PrimaryCtrl.class);
         mainCtrl.init(primaryStage, overview);
     }
