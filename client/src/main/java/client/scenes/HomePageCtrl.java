@@ -20,6 +20,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.image.Image;
+import org.commonmark.Extension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
+import org.commonmark.ext.autolink.AutolinkExtension;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -29,7 +32,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-
 import static com.google.inject.Guice.createInjector;
 
 public class HomePageCtrl implements Initializable {
@@ -92,12 +94,12 @@ public class HomePageCtrl implements Initializable {
     @Inject
     public HomePageCtrl(PrimaryCtrl pc) {
         this.pc = pc;
-        this.parser = Parser.builder().build();
-        this.renderer = HtmlRenderer.builder().build();
+        List<Extension> extensions = List.of(TablesExtension.create(), AutolinkExtension.create());
+        this.parser = Parser.builder().extensions(extensions).build();
+        this.renderer = HtmlRenderer.builder().extensions(extensions).build();
         this.lc = new LanguageController();
         injector = createInjector(new MyModule());
         this.serverUtils = injector.getInstance(ServerUtils.class);
-
     }
 
     /**
