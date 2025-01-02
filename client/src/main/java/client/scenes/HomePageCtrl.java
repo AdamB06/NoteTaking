@@ -20,12 +20,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.image.Image;
-import javafx.util.Callback;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static com.google.inject.Guice.createInjector;
@@ -110,7 +112,8 @@ public class HomePageCtrl implements Initializable {
 
         titleField.setEditable(false);
         addListener();
-        webView.getEngine().loadContent("");
+        webView.getEngine().setUserStyleSheetLocation(getClass()
+                .getResource("/configuration/WebViewConfig.css").toString());
         initializeEdit();
         original = notesBodyArea.getText();
         refreshNotes();
@@ -126,6 +129,25 @@ public class HomePageCtrl implements Initializable {
         setupNotesListView();
     }
 
+
+    /**
+     * Loads the CSS file from the given path.
+     * @param path The path of the css file
+     * @return The contents of the css file
+     */
+    private String loadCssFile(String path) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(path)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Loads the chosen language from the ComboBox.
+     * @param event the event that triggers the language change
+     */
     private void loadLanguage(ActionEvent event) {
         if (isLoadingLanguage)
             return;
@@ -285,6 +307,10 @@ public class HomePageCtrl implements Initializable {
         }
 
     }
+
+    /**
+     * Sets up the notes ListView.
+     */
     private void setupNotesListView() {
         // Custom cell factory to show only titles
         notesListView.setCellFactory(listView -> new ListCell<Note>() {
@@ -299,16 +325,17 @@ public class HomePageCtrl implements Initializable {
             }
         });
 
-        notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
-            if (newNote != null) {
-                titleField.setText(newNote.getTitle());
-                titleField.setEditable(false);
-                notesBodyArea.setText(newNote.getContent());
-            } else {
-                titleField.clear();
-                notesBodyArea.clear();
-            }
-        });
+        notesListView.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldNote, newNote) -> {
+                    if (newNote != null) {
+                        titleField.setText(newNote.getTitle());
+                        titleField.setEditable(false);
+                        notesBodyArea.setText(newNote.getContent());
+                    } else {
+                        titleField.clear();
+                        notesBodyArea.clear();
+                    }
+                });
     }
     /**
      * When the remove note button is pressed,
@@ -420,7 +447,8 @@ public class HomePageCtrl implements Initializable {
                     .equals(lc.getSaveText())) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 if(selectedNote != null){
-                    if(serverUtils.updateNoteTitle(selectedNote.getId(), titleField.getText()).equals(titleField.getText())){
+                    if(serverUtils.updateNoteTitle(selectedNote.getId(), titleField.getText())
+                            .equals(titleField.getText())){
                         selectedNote.setTitle(titleField.getText());
 
                         int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
