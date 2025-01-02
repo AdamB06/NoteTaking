@@ -35,7 +35,15 @@ import jakarta.ws.rs.client.ClientBuilder;
 
 public class ServerUtils {
 
-    private static final String SERVER = "http://localhost:8080/";
+    private final String serverUrl;
+
+    /**
+     * Constructor of the ServerUtils class
+     * @param serverUrl URL of the server
+     */
+    public ServerUtils(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
 
     /**
      * Checks if the server is available
@@ -45,7 +53,7 @@ public class ServerUtils {
     public boolean isServerAvailable() {
         try {
             ClientBuilder.newClient(new ClientConfig()) //
-                    .target(SERVER) //
+                    .target(serverUrl) //
                     .request(APPLICATION_JSON) //
                     .get();
         } catch (ProcessingException e) {
@@ -65,7 +73,7 @@ public class ServerUtils {
     public Note sendNote(Note note) {
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note")
+            Response response = client.target(serverUrl + "Note")
                     .request(APPLICATION_JSON)
                     .post(entity);
             System.out.println("Response Status: " + response.getStatus());
@@ -87,7 +95,7 @@ public class ServerUtils {
      */
     public boolean isTitleDuplicate(String title) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note/checkDuplicateTitle/" +title)
+            Response response = client.target(serverUrl + "Note/checkDuplicateTitle/" +title)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -107,7 +115,7 @@ public class ServerUtils {
      */
     public String updateNoteTitle(long id, String newTitle) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note/" + id)
+            Response response = client.target(serverUrl + "Note/" + id)
                     .request(APPLICATION_JSON)
                     .put(Entity.entity(newTitle, APPLICATION_JSON));
             if (response.getStatus() == 200) {
@@ -126,7 +134,7 @@ public class ServerUtils {
     public String deleteNote(Note note) {
         try (Client client = ClientBuilder.newClient()) {
             String ret = "Failed";
-            Response response = client.target(SERVER + "Note/" + note.getId())
+            Response response = client.target(serverUrl + "Note/" + note.getId())
                     .request(APPLICATION_JSON)
                     .delete();
             if (response.getStatus() == 200) {
@@ -146,7 +154,7 @@ public class ServerUtils {
     public String saveChanges(long id, Map<String, Object> changes) {
         try (Client client = ClientBuilder.newClient()) {
             String ret = "Failed";
-            Response response = client.target(SERVER + "Note/" + id)
+            Response response = client.target(serverUrl + "Note/" + id)
                     .request()
                     .header("X-HTTP-Method-Override", "PATCH")
                     .post(Entity.entity(changes, APPLICATION_JSON));
@@ -163,7 +171,7 @@ public class ServerUtils {
      */
     public List<Note> getNotes() {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note")
+            Response response = client.target(serverUrl + "Note")
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {

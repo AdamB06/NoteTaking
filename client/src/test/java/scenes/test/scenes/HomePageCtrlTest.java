@@ -25,7 +25,7 @@ public class HomePageCtrlTest {
     @BeforeEach
     public void setUp() {
         notesBodyArea = "";
-        homePageCtrl = new HomePageCtrl(null);
+        homePageCtrl = new HomePageCtrl(null, null);
     }
 
 
