@@ -271,8 +271,12 @@ public class HomePageCtrl implements Initializable {
      * @return the HTML text
      */
     public String markdownConverter(String markdownText) {
-        Node text = parser.parse(markdownText);
-        return renderer.render(text);
+        try{
+            Node text = parser.parse(markdownText);
+            return renderer.render(text);
+        } catch (Exception e){
+            return "<html><body><h2>Error</h2><p>" + e.getMessage() + "</p></body></html>";
+        }
     }
 
     /**
