@@ -1,12 +1,14 @@
 package client.scenes;
 
 import client.LanguageController;
+import client.MnemonicCreator;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Collection;
 import commons.Note;
 import jakarta.inject.Inject;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,7 +22,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.image.Image;
-import javafx.util.Callback;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -39,8 +40,16 @@ public class HomePageCtrl implements Initializable {
     private WebView webView;
     @FXML
     private TextField titleField;
+
     @FXML
     private Button editButton;
+    @FXML
+    private Button addButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button refreshButton;
+
     @FXML
     private ListView<Note> notesListView;
     @FXML
@@ -95,7 +104,6 @@ public class HomePageCtrl implements Initializable {
         this.lc = new LanguageController();
         injector = createInjector(new MyModule());
         this.serverUtils = injector.getInstance(ServerUtils.class);
-
     }
 
     /**
@@ -124,9 +132,17 @@ public class HomePageCtrl implements Initializable {
 
         initializeFilteringOfNotes();
         setupNotesListView();
+
+        Platform.runLater(this::initializeMnemonics);
+    }
+
+    private void initializeMnemonics(){
+        MnemonicCreator mc = new MnemonicCreator();
+        mc.initialize(editButton, addButton, deleteButton, refreshButton);
     }
 
     private void loadLanguage(ActionEvent event) {
+        System.out.println(isLoadingLanguage);
         if (isLoadingLanguage)
             return;
 
@@ -136,11 +152,14 @@ public class HomePageCtrl implements Initializable {
 
         String language = languages[i];
         lc.loadLanguage(language);
+        System.out.println(lc.getEditText());
         editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
 
         loadAllFlags(i);
 
         isLoadingLanguage = false;
+
+        System.out.println(editButton.getText());
     }
 
     /**
