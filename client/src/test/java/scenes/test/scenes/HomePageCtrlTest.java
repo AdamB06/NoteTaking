@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 public class HomePageCtrlTest {
     private String notesBodyArea;
     private HomePageCtrl homePageCtrl;
@@ -22,7 +21,6 @@ public class HomePageCtrlTest {
         notesBodyArea = "";
         homePageCtrl = new HomePageCtrl(null, null);
     }
-
 
     @Test
     public void testHeaderMarkdownConverter() {
@@ -168,5 +166,4 @@ public class HomePageCtrlTest {
         changes.put("newText", "i");
         assertEquals(changes, homePageCtrl.getChanges(original, modified));
     }
-
 }
