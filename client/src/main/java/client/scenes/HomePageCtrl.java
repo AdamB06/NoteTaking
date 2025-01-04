@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.ClientConfig;
 import client.LanguageController;
 import client.MyModule;
 import client.utils.ServerUtils;
@@ -23,6 +24,9 @@ import javafx.scene.image.Image;
 import org.commonmark.Extension;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.ext.autolink.AutolinkExtension;
+import org.commonmark.Extension;
+import org.commonmark.ext.autolink.AutolinkExtension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -65,7 +69,7 @@ public class HomePageCtrl implements Initializable {
 
     private boolean isEditText;
     private final String path = "flags/";
-    private final String defaultLanguage = languages[0];
+    private final String defaultLanguage;
     private boolean isLoadingLanguage = false;
 
     //Collection
@@ -86,20 +90,25 @@ public class HomePageCtrl implements Initializable {
     private String original;
     private Injector injector;
     private ServerUtils serverUtils;
+    private final ClientConfig config;
     /**
      * Constructor for HomePageCtrl.
-     *
      * @param pc the PrimaryCtrl instance to be injected
+     * @param serverUtils the ServerUtils instance to be injected
      */
     @Inject
-    public HomePageCtrl(PrimaryCtrl pc) {
+    public HomePageCtrl(PrimaryCtrl pc, ServerUtils serverUtils) {
         this.pc = pc;
+        this.config = ClientConfig.loadConfig();
         List<Extension> extensions = List.of(TablesExtension.create(), AutolinkExtension.create());
         this.parser = Parser.builder().extensions(extensions).build();
         this.renderer = HtmlRenderer.builder().extensions(extensions).build();
         this.lc = new LanguageController();
         injector = createInjector(new MyModule());
-        this.serverUtils = injector.getInstance(ServerUtils.class);
+        // Load preferred language and server URL from config
+        defaultLanguage = config.getPreferredLanguage();
+        // Use the loaded configuration
+        this.serverUtils = serverUtils;
     }
 
     /**
@@ -124,7 +133,7 @@ public class HomePageCtrl implements Initializable {
         dutchFlag = new Image(path + "nl_flag.png");
         spanishFlag = new Image(path + "es_flag.png");
 
-        loadAllFlags(0);
+        loadAllFlags(Arrays.asList(languages).indexOf(defaultLanguage));
         languageComboBox.setOnAction(this::loadLanguage);
 
         initializeFilteringOfNotes();
@@ -163,6 +172,7 @@ public class HomePageCtrl implements Initializable {
         editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
 
         loadAllFlags(i);
+        config.setPreferredLanguage(language);
 
         isLoadingLanguage = false;
     }
@@ -453,8 +463,8 @@ public class HomePageCtrl implements Initializable {
                     .equals(lc.getSaveText())) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 if(selectedNote != null){
-                    if(serverUtils.updateNoteTitle(selectedNote.getId(), titleField.getText())
-                            .equals(titleField.getText())){
+                    if(serverUtils.updateNoteTitle(selectedNote.getId()
+                            , titleField.getText()).equals(titleField.getText())){
                         selectedNote.setTitle(titleField.getText());
 
                         int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
