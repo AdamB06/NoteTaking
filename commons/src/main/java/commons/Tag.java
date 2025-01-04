@@ -10,6 +10,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Entity
 public class Tag {
     @Id
@@ -25,11 +26,9 @@ public class Tag {
 
     /**
      *
-     * @param id id of the tag
      * @param name name of the tag
      */
-    public Tag(Long id, String name) {
-        this.id = id;
+    public Tag(String name) {
         this.name = name;
     }
 
@@ -104,5 +103,9 @@ public class Tag {
     public void setNotes(Set<Note> notes){
         this.notes = notes;
     }
+
+
+
+
 
 }

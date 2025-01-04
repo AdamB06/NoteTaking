@@ -15,7 +15,7 @@ public class TagTest {
     @BeforeEach
     public void setUp() {
 
-        tag = new Tag(1L, "Test Tag");
+        tag = new Tag( "Test Tag");
         note1 = new Note();
         note2 = new Note();
     }
@@ -24,7 +24,6 @@ public class TagTest {
     public void testTagCreation() {
         // Check if the tag is created with the right name and id
         assertEquals("Test Tag", tag.getName(), "Tag should have the name 'Test Tag'.");
-        assertNotNull(tag.getId(), "Tag ID should not be null.");
     }
 
 
@@ -56,11 +55,11 @@ public class TagTest {
 
     @Test
     public void testTagEqualsAndHashCode() {
-        Tag tag1 = new Tag(1L, "Test Tag");
-        Tag tag2 = new Tag(1L, "Test Tag");
+        Tag tag1 = new Tag( "Test Tag");
+        Tag tag2 = new Tag( "Test Tag");
 
         // Assert that two tags with the same id and name are considered equal
-        assertEquals(tag1, tag2, "Tags with the same id and name should be equal.");
-        assertEquals(tag1.hashcode(), tag2.hashcode(), "Tags with the same id and name should have the same hashcode.");
+        assertEquals(tag1, tag2, "Tags with the same  name should be equal.");
+        assertEquals(tag1.hashcode(), tag2.hashcode(), "Tags with the same  name should have the same hashcode.");
     }
 }
