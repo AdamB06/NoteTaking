@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ClientConfig {
-    private static final String CONFIG_FILE = "config.json";
+    private static final String CONFIG_FILE = "configuration/config.json";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private String preferredLanguage;
