@@ -17,8 +17,10 @@ package client;
 
 import client.scenes.HomePageCtrl;
 import client.scenes.PrimaryCtrl;
+import client.utils.ServerUtils;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
 
 public class MyModule implements Module {
@@ -31,5 +33,15 @@ public class MyModule implements Module {
     public void configure(Binder binder) {
         binder.bind(PrimaryCtrl.class).in(Scopes.SINGLETON);
         binder.bind(HomePageCtrl.class).in(Scopes.SINGLETON);
+    }
+
+    /**
+     * Provides method to create a ServerUtils object
+     * @return ServerUtils object with the specified server URL
+     */
+    @Provides
+    public ServerUtils provideServerUtils() {
+        ClientConfig config = ClientConfig.loadConfig();
+        return new ServerUtils(config.getServerUrl());
     }
 }

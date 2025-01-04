@@ -2,18 +2,13 @@ package scenes.test.scenes;
 
 import client.scenes.HomePageCtrl;
 import commons.Note;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import javafx.application.Platform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +20,7 @@ public class HomePageCtrlTest {
     @BeforeEach
     public void setUp() {
         notesBodyArea = "";
-        homePageCtrl = new HomePageCtrl(null);
+        homePageCtrl = new HomePageCtrl(null, null);
     }
 
 
