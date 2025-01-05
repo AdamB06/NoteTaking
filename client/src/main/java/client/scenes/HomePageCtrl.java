@@ -26,7 +26,7 @@ import javafx.scene.image.Image;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
-import server.api.NoteService;
+
 
 import java.net.URL;
 import java.util.*;
@@ -77,7 +77,7 @@ public class HomePageCtrl implements Initializable {
 
     //Collection
     private Collection currentCollection;
-    private NoteService noteService;
+    //private final NoteService noteService;
     private final Parser parser;
     private final HtmlRenderer renderer;
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
@@ -533,21 +533,24 @@ public class HomePageCtrl implements Initializable {
         tagComboBox.setItems(tagList);
 
 
-        fetchTags();
+        //fetchTags();
 
         // Add listener to refresh button
-        refreshButton.setOnAction(event -> fetchTags());
-        tagComboBox.setOnAction(event -> fetchTags());
+        //refreshButton.setOnAction(event -> fetchTags());
+        //tagComboBox.setOnAction(event -> fetchTags());
     }
 
 
     /**
      * fetches tags from the backend
      */
-    private void fetchTags() {
-        List<String> tags = noteService.getAllTagNames();
-        tagComboBox.getItems().setAll(tags);
-    }
+
+
+    //private void fetchTags() {
+        //List<String> tags = noteService.getAllTagNames();
+        //tagComboBox.getItems().setAll(tags);
+  //  }
+
 
 
 
