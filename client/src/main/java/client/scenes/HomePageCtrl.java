@@ -136,11 +136,18 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(this::initializeMnemonics);
     }
 
+    /**
+     * Initializes the mnemonics
+     */
     private void initializeMnemonics(){
         MnemonicCreator mc = new MnemonicCreator();
         mc.initialize(editButton, addButton, deleteButton, refreshButton);
     }
 
+    /**
+     * Loads the language
+     * @param event an additional but optional event on clicking a button
+     */
     private void loadLanguage(ActionEvent event) {
         System.out.println(isLoadingLanguage);
         if (isLoadingLanguage)

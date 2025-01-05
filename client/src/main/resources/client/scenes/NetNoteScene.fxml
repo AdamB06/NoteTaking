@@ -120,7 +120,7 @@
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="574.0" prefWidth="533.0">
                             <ScrollPane layoutX="-1.0" layoutY="3.0" prefHeight="591.0" prefWidth="533.0">
-                                <TextArea fx:id="notesBodyArea" prefHeight="587.0" prefWidth="515.0" promptText="Enter the note content..." />
+                                <TextArea fx:id="notesBodyArea" focusTraversable="false" prefHeight="587.0" prefWidth="515.0" promptText="Enter the note content..." />
                             </ScrollPane>
                         </AnchorPane>
                     </SplitPane>

@@ -1,10 +1,12 @@
 package client;
 
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyCombination.Modifier;
 import javafx.scene.input.Mnemonic;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -13,8 +15,17 @@ import java.util.Optional;
 
 public class MnemonicCreator {
 
-    public void initialize(Button editSave, Button add, Button delete, Button refresh) {
+    private final Modifier controlKey = KeyCombination.ALT_ANY;
 
+    /**
+     * Initializes all given buttons and assigns them a mnemonic
+     * @param editSave edit and save button
+     * @param add add button
+     * @param delete delete button
+     * @param refresh refresh button
+     */
+    public void initialize(Button editSave, Button add,
+                           Button delete, Button refresh) {
         Optional<Window> optionalWindow = Stage.getWindows().stream()
                 .filter(Window::isShowing)
                 .findFirst();
@@ -40,8 +51,14 @@ public class MnemonicCreator {
         scene.addMnemonic(refreshMN);
     }
 
-    private Mnemonic create(Button b, KeyCode primary){
-        KeyCombination kc = new KeyCodeCombination(primary, KeyCombination.ALT_ANY);
-        return new Mnemonic(b, kc);
+    /**
+     * Creates a specific mnemonic
+     * @param n the Node to create the mnemonic for
+     * @param primary the primary key for the button name (secondary is the alt key by default)
+     * @return the created mnemonic
+     */
+    private Mnemonic create(Node n, KeyCode primary){
+        KeyCombination kc = new KeyCodeCombination(primary, controlKey);
+        return new Mnemonic(n, kc);
     }
 }
