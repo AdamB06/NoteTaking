@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.ClientConfig;
 import client.LanguageController;
+import client.MnemonicCreator;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
@@ -37,7 +38,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-
 import static com.google.inject.Guice.createInjector;
 
 public class HomePageCtrl implements Initializable {
@@ -51,6 +51,18 @@ public class HomePageCtrl implements Initializable {
     private TextField titleField;
     @FXML
     private Button editButton;
+    @FXML
+    private Button addButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button refreshButton;
+
+    @FXML
+    private Label collectionsLabel;
+    @FXML
+    private Label previewTextLabel;
+
     @FXML
     private ListView<Note> notesListView;
     @FXML
@@ -96,7 +108,6 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Constructor for HomePageCtrl.
-     *
      * @param pc          the PrimaryCtrl instance to be injected
      * @param serverUtils the ServerUtils instance to be injected
      */
@@ -145,12 +156,20 @@ public class HomePageCtrl implements Initializable {
         configureAutoSave();
         notesBodyArea.setDisable(true);
         editButton.setDisable(true);
+
+        Platform.runLater(this::initializeMnemonics);
     }
 
+    /**
+     * Initializes the mnemonics
+     */
+    private void initializeMnemonics(){
+        MnemonicCreator mc = new MnemonicCreator();
+        mc.initialize(editButton, addButton, deleteButton, refreshButton);
+    }
 
     /**
      * Loads the CSS file from the given path.
-     *
      * @param path The path of the css file
      * @return The contents of the css file
      */
@@ -165,10 +184,10 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Loads the chosen language from the ComboBox.
-     *
      * @param event the event that triggers the language change
      */
     private void loadLanguage(ActionEvent event) {
+        System.out.println(isLoadingLanguage);
         if (isLoadingLanguage)
             return;
 
@@ -180,10 +199,19 @@ public class HomePageCtrl implements Initializable {
         lc.loadLanguage(language);
         editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
 
+        collectionsLabel.setText(lc.getCollectionsLabelText());
+        previewTextLabel.setText(lc.getPreviewLabelText());
+
+        searchBox.setPromptText(lc.getSearchBoxText());
+        titleField.setPromptText(lc.getTitleFieldText());
+        notesBodyArea.setPromptText(lc.getNotesBodyAreaText());
+
         loadAllFlags(i);
         config.setPreferredLanguage(language);
 
         isLoadingLanguage = false;
+
+        System.out.println(editButton.getText());
     }
 
     /**
@@ -205,7 +233,7 @@ public class HomePageCtrl implements Initializable {
     /**
      * Initializes the filtering of notes.
      */
-    public void initializeFilteringOfNotes() {
+    public void initializeFilteringOfNotes(){
         //TODO: After making the first TODO, we include "the name" to be disableProperty...
 
         //this ensures that the only way to access the searchbar is by clicking on it,
@@ -403,7 +431,6 @@ public class HomePageCtrl implements Initializable {
      */
     public void addKeyPressed() {
         keyCount++;
-        System.out.println("Key pressed: " + keyCount);
         Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
         long noteId = selectedNote.getId();
         if (saveTask != null) {
