@@ -77,7 +77,7 @@ public class HomePageCtrl implements Initializable {
     private List<Note> filteredNotes = new ArrayList<>();
 
     private static int keyCount = 0;
-    private Timer timer = null;
+    private Timer timer = new Timer();
     private TimerTask saveTask = null;
     private String original;
     private Injector injector;
@@ -121,9 +121,11 @@ public class HomePageCtrl implements Initializable {
 
         loadAllFlags(0);
         languageComboBox.setOnAction(this::loadLanguage);
-
         initializeFilteringOfNotes();
         setupNotesListView();
+        configureAutoSave();
+        configureRetryMechanism();
+        notesBodyArea.setOnKeyTyped(event -> addKeyPressed());
     }
 
     private void loadLanguage(ActionEvent event) {
@@ -174,7 +176,11 @@ public class HomePageCtrl implements Initializable {
             if (newValue == null || newValue.trim().isEmpty()) {
                 resetFilteredList();
             } else {
-                filterNotes(newValue, notes);
+                notesListView.getItems().clear();
+                filteredNotes = filterNotes(newValue, notes);
+                for(Note note : filteredNotes){
+                    notesListView.getItems().add(note);
+                }
             }
         });
 
@@ -199,9 +205,9 @@ public class HomePageCtrl implements Initializable {
     private void resetFilteredList() {
         filteredTitles.clear();
         filteredNotes.clear();
+        notesListView.getItems().clear();
         for (Note note : currentCollection != null ? currentCollection.getNotes() : notes) {
-            filteredTitles.add(note.getTitle());
-            filteredNotes.add(note);
+            notesListView.getItems().add(note);
         }
     }
 
@@ -277,6 +283,7 @@ public class HomePageCtrl implements Initializable {
 
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
+            notes = serverUtils.getNotes();
             System.out.println("Note created with ID: " + createdNote.getId());
             return createdNote;
         } else {
@@ -300,13 +307,18 @@ public class HomePageCtrl implements Initializable {
         });
 
         notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
+            if(oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())){
+                saveChanges(oldNote.getId(), notesBodyArea.getText());
+            }
             if (newNote != null) {
                 titleField.setText(newNote.getTitle());
-                titleField.setEditable(false);
                 notesBodyArea.setText(newNote.getContent());
+                original = newNote.getContent();
+                currentNote.set(newNote);
             } else {
                 titleField.clear();
                 notesBodyArea.clear();
+                currentNote.set(null);
             }
         });
     }
@@ -347,9 +359,16 @@ public class HomePageCtrl implements Initializable {
             Map<String, Object> changes = getChanges(original, edited);
             original = edited;
             String status = serverUtils.saveChanges(noteId, changes);
+            if(!status.equals("Successful")){
+                System.err.println("Failed to save changes");
+            }
+            else{
+                System.out.println("Changes saves successfully.");
+                notes = serverUtils.getNotes();
+                original = notesBodyArea.getText();
+            }
         }
         else {
-            timer = new Timer(true);
             saveTask = new TimerTask() {
                 @Override
                 public void run() {
@@ -359,6 +378,14 @@ public class HomePageCtrl implements Initializable {
                     original = edited;
                     String status = serverUtils
                             .saveChanges(noteId, changes);
+                    if(!status.equals("Successful")){
+                        System.err.println("Failed to save changes");
+                    }
+                    else{
+                        System.out.println("Changes saved successfully.");
+                        notes = serverUtils.getNotes();
+                        original = notesBodyArea.getText();
+                    }
                 }
             };
             timer.schedule(saveTask, 5000);
@@ -442,8 +469,7 @@ public class HomePageCtrl implements Initializable {
      * Refreshes the notes in the ListView.
      */
     public void refreshNotes() {
-        List<Note> notes = serverUtils.getNotes();
-
+        notes = serverUtils.getNotes();
         if (notesListView != null) {
             notesListView.getItems().clear();
             notesListView.getItems().addAll(notes);
@@ -489,5 +515,73 @@ public class HomePageCtrl implements Initializable {
         imageView.setFitHeight(25);
 
         return new HBox(10, imageView);
+    }
+
+    private void configureAutoSave() {
+        notesBodyArea.focusedProperty().addListener((obs, oldFocus, newFocus) -> {
+            if (!newFocus && currentNote.get() != null) {
+                saveChanges(currentNote.get().getId(), notesBodyArea.getText());
+            }
+        });
+    }
+
+    private void configureRetryMechanism() {
+        saveTask = new TimerTask() {
+            @Override
+            public void run() {
+                Note current = currentNote.get();
+                if (current != null) {
+                    // Generate changes map for the current note
+                    Map<String, Object> changes = getChanges(original, notesBodyArea.getText());
+                    String status = serverUtils.saveChanges(current.getId(), changes);
+                    if (!"Successful".equals(status)) {
+                        retrySave(current, changes); // Pass changes explicitly
+                    }
+                }
+            }
+        };
+        timer.schedule(saveTask, 5000);
+    }
+
+    private void retrySave(Note note, Map<String, Object> changes) {
+        int retries = 3;
+        while (retries > 0) {
+            String status = serverUtils.saveChanges(note.getId(), changes);
+            if (status.equals("Successful")) {
+                System.out.println("Retry successful.");
+                break;
+            }
+            retries--;
+        }
+        if (retries == 0) {
+            System.err.println("All retries failed. Save aborted.");
+        }
+
+        notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
+            if (oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())) {
+                saveChanges(oldNote.getId(), notesBodyArea.getText());
+            }
+            if (newNote != null) {
+                titleField.setText(newNote.getTitle());
+                notesBodyArea.setText(newNote.getContent());
+            }
+        });
+    }
+
+    private void saveChanges(long noteId, String content) {
+        System.out.println("Saving changes for note ID: " + noteId);
+        Map<String, Object> changes = getChanges(original, content);
+        original = content;
+
+        String status = serverUtils.saveChanges(noteId, changes);
+        System.out.println("Save status: " + status);
+
+        if (!"Successful".equals(status)) {
+            Note note = serverUtils.getNoteById(noteId);
+            retrySave(note, changes);
+        } else {
+            notes = serverUtils.getNotes();
+            refreshNotes();
+        }
     }
 }

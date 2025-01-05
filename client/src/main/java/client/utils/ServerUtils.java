@@ -174,4 +174,22 @@ public class ServerUtils {
             }
         }
     }
+
+    public Note getNoteById(long noteId) {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(SERVER + "Note/" + noteId)
+                    .request(APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == 200) {
+                return response.readEntity(Note.class);
+            } else {
+                logError("getNoteById", response);
+                return null;
+            }
+        }
+    }
+
+    private void logError(String method, Response response) {
+        System.err.println("Error in " + method + ": " + response.getStatus() + " " + response.getStatusInfo());
+    }
 }
