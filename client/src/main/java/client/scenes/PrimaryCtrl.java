@@ -17,6 +17,9 @@ public class PrimaryCtrl {
     public void init(Stage primaryStage, Pair<HomePageCtrl, Parent> home) {
         this.primaryStage = primaryStage;
         this.homeScene = new Scene(home.getValue());
+        this.primaryStage.setOnCloseRequest(event -> {
+            home.getKey().forceSaveBeforeClose();
+        });
         showHome();
         primaryStage.show();
     }
