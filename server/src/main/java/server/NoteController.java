@@ -186,6 +186,11 @@ public class NoteController {
         throw new UnsupportedOperationException("Unsupported operation: " + operation);
     }
 
+    /**
+     *
+     * @param id identification of the note
+     * @return the id of the note
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Note> getNoteById(@PathVariable long id) {
         Note note = noteService.getNoteById(id);

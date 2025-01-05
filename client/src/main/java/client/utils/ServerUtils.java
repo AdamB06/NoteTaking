@@ -184,6 +184,12 @@ public class ServerUtils {
         }
     }
 
+    /**
+     *
+     * @param noteId This is the id of the note
+     * @return the note by id
+     */
+
     public Note getNoteById(long noteId) {
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(SERVER + "Note/" + noteId)
@@ -199,6 +205,7 @@ public class ServerUtils {
     }
 
     private void logError(String method, Response response) {
-        System.err.println("Error in " + method + ": " + response.getStatus() + " " + response.getStatusInfo());
+        System.err.println("Error in " + method + ": " + response.getStatus()
+                + " " + response.getStatusInfo());
     }
 }

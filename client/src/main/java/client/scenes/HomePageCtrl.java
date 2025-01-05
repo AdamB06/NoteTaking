@@ -37,6 +37,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+
 import static com.google.inject.Guice.createInjector;
 
 public class HomePageCtrl implements Initializable {
@@ -354,25 +355,26 @@ public class HomePageCtrl implements Initializable {
             }
         });
 
-        notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
-            if (oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())) {
-                saveChanges(oldNote.getId(), notesBodyArea.getText());
-            }
-            if (newNote != null) {
-                titleField.setText(newNote.getTitle());
-                notesBodyArea.setText(newNote.getContent());
-                original = newNote.getContent();
-                currentNote.set(newNote);
-                notesBodyArea.setDisable(false);
-                editButton.setDisable(false);
-            } else {
-                titleField.clear();
-                notesBodyArea.clear();
-                currentNote.set(null);
-                notesBodyArea.setDisable(true);
-                editButton.setDisable(true);
-            }
-        });
+        notesListView.getSelectionModel().selectedItemProperty().
+                addListener((observable, oldNote, newNote) -> {
+                    if (oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())) {
+                        saveChanges(oldNote.getId(), notesBodyArea.getText());
+                    }
+                    if (newNote != null) {
+                        titleField.setText(newNote.getTitle());
+                        notesBodyArea.setText(newNote.getContent());
+                        original = newNote.getContent();
+                        currentNote.set(newNote);
+                        notesBodyArea.setDisable(false);
+                        editButton.setDisable(false);
+                    } else {
+                        titleField.clear();
+                        notesBodyArea.clear();
+                        currentNote.set(null);
+                        notesBodyArea.setDisable(true);
+                        editButton.setDisable(true);
+                    }
+                });
     }
 
     /**
@@ -520,7 +522,8 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Refreshes the notes in the ListView.
-     * Platform.runLater is used to ensure UI updates occur safely and no race-condition occurs between the UI component and the notes list update.
+     * Platform.runLater is used to ensure UI updates occur safely and no race-condition occurs
+     * between the UI component and the notes list update.
      */
     public void refreshNotes() {
         Platform.runLater(() -> {
@@ -617,25 +620,26 @@ public class HomePageCtrl implements Initializable {
             System.err.println("All retries failed. Save aborted.");
         }
 
-        notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
-            if (oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())) {
-                saveChanges(oldNote.getId(), notesBodyArea.getText());
-            }
+        notesListView.getSelectionModel().selectedItemProperty().
+                addListener((observable, oldNote, newNote) -> {
+                    if (oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())) {
+                        saveChanges(oldNote.getId(), notesBodyArea.getText());
+                    }
 
-            // Use a Platform.runLater to ensure UI updates occur safely
-            Platform.runLater(() -> {
-                if (newNote != null) {
-                    titleField.setText(newNote.getTitle());
-                    notesBodyArea.setText(newNote.getContent());
-                    original = newNote.getContent();
-                    currentNote.set(newNote);
-                } else {
-                    titleField.clear();
-                    notesBodyArea.clear();
-                    currentNote.set(null);
-                }
-            });
-        });
+                    // Use a Platform.runLater to ensure UI updates occur safely
+                    Platform.runLater(() -> {
+                        if (newNote != null) {
+                            titleField.setText(newNote.getTitle());
+                            notesBodyArea.setText(newNote.getContent());
+                            original = newNote.getContent();
+                            currentNote.set(newNote);
+                        } else {
+                            titleField.clear();
+                            notesBodyArea.clear();
+                            currentNote.set(null);
+                        }
+                    });
+                });
 
     }
 
@@ -656,6 +660,10 @@ public class HomePageCtrl implements Initializable {
         }
     }
 
+    /**
+     * This method force saves the text that is typed if the application is
+     * abruptly closed
+     */
     public void forceSaveBeforeClose() {
         Note current = currentNote.get();
         if (current != null) {
