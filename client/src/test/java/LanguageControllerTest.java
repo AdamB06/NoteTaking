@@ -39,6 +39,8 @@ public class LanguageControllerTest {
         assertEquals(expected, actual);
 
         lang = "es";
+
+
         lc.loadLanguage(lang);
 
         actual = lc.getEditText();

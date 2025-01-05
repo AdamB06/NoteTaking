@@ -15,6 +15,7 @@
  */
 package client.utils;
 
+import static com.google.common.net.HttpHeaders.SERVER;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
 import java.util.Map;
@@ -181,5 +182,30 @@ public class ServerUtils {
                 return Collections.emptyList();
             }
         }
+    }
+
+    /**
+     *
+     * @param noteId This is the id of the note
+     * @return the note by id
+     */
+
+    public Note getNoteById(long noteId) {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(SERVER + "Note/" + noteId)
+                    .request(APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == 200) {
+                return response.readEntity(Note.class);
+            } else {
+                logError("getNoteById", response);
+                return null;
+            }
+        }
+    }
+
+    private void logError(String method, Response response) {
+        System.err.println("Error in " + method + ": " + response.getStatus()
+                + " " + response.getStatusInfo());
     }
 }

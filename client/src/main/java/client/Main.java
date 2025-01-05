@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 
 import client.utils.ServerUtils;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -51,6 +52,7 @@ public class Main extends Application {
             var msg = "Server needs to be started before the client, " +
                     "but it does not seem to be available. Shutting down.";
             System.err.println(msg);
+            Platform.exit();
             return;
         }
         var overview = FXML.load(HomePageCtrl.class, "client", "scenes", "NetNoteScene.fxml");

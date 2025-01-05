@@ -137,6 +137,9 @@ public class NoteController {
             String updatedContent = applyPatch(originalContent,
                     operation, startIndex, endIndex, newText);
 
+            note.setContent(updatedContent);
+            noteService.saveNote(note);
+
             noteService.saveNote(note);
             System.out.println("Updated Content");
             return ResponseEntity.ok().build();
@@ -158,9 +161,42 @@ public class NoteController {
     public String applyPatch(String originalContent, String operation,
                              int startIndex, int endIndex, String newText) {
         if ("Replace".equals(operation)) {
+            if (startIndex < 0) {
+                startIndex = 0;
+            }
+            if (endIndex < 0) {
+                endIndex = 0;
+            }
+            if (startIndex > originalContent.length()) {
+                startIndex = originalContent.length();
+            }
+            if (endIndex > originalContent.length()) {
+                endIndex = originalContent.length();
+            }
+            if (startIndex > endIndex) {
+                // handle the case where startIndex is bigger than endIndex
+                // for example, you might swap them or skip the patch
+                int temp = startIndex;
+                startIndex = endIndex;
+                endIndex = temp;
+            }
             return originalContent.substring(0, startIndex) + newText +
                     originalContent.substring(endIndex);
         }
         throw new UnsupportedOperationException("Unsupported operation: " + operation);
+    }
+
+    /**
+     *
+     * @param id identification of the note
+     * @return the id of the note
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Note> getNoteById(@PathVariable long id) {
+        Note note = noteService.getNoteById(id);
+        if (note == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(note);
     }
 }
