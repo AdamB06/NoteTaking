@@ -28,4 +28,39 @@ public class LanguageController {
     public String getSaveText(){
         return bundle.getString("saveButton.text");
     }
+
+    /**
+     * @return collection label text
+     */
+    public String getCollectionsLabelText(){
+        return bundle.getString("collectionsLabel.text");
+    }
+
+    /**
+     * @return preview label text
+     */
+    public String getPreviewLabelText(){
+        return bundle.getString("previewLabel.text");
+    }
+
+    /**
+     * @return search box text
+     */
+    public String getSearchBoxText(){
+        return bundle.getString("searchBox.text");
+    }
+
+    /**
+     * @return search box text
+     */
+    public String getTitleFieldText(){
+        return bundle.getString("titleField.text");
+    }
+
+    /**
+     * @return notes body area text
+     */
+    public String getNotesBodyAreaText(){
+        return bundle.getString("notesBodyArea.text");
+    }
 }

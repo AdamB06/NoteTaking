@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.ClientConfig;
 import client.LanguageController;
+import client.MnemonicCreator;
 import client.MyModule;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
@@ -48,8 +49,21 @@ public class HomePageCtrl implements Initializable {
     private WebView webView;
     @FXML
     private TextField titleField;
+
     @FXML
     private Button editButton;
+    @FXML
+    private Button addButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button refreshButton;
+
+    @FXML
+    private Label collectionsLabel;
+    @FXML
+    private Label previewTextLabel;
+
     @FXML
     private ListView<Note> notesListView;
     @FXML
@@ -146,6 +160,13 @@ public class HomePageCtrl implements Initializable {
         editButton.setDisable(true);
     }
 
+    /**
+     * Initializes the mnemonics
+     */
+    private void initializeMnemonics(){
+        MnemonicCreator mc = new MnemonicCreator();
+        mc.initialize(editButton, addButton, deleteButton, refreshButton);
+    }
 
     /**
      * Loads the CSS file from the given path.
@@ -168,6 +189,7 @@ public class HomePageCtrl implements Initializable {
      * @param event the event that triggers the language change
      */
     private void loadLanguage(ActionEvent event) {
+        System.out.println(isLoadingLanguage);
         if (isLoadingLanguage)
             return;
 
@@ -177,12 +199,22 @@ public class HomePageCtrl implements Initializable {
 
         String language = languages[i];
         lc.loadLanguage(language);
+
         editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
+
+        collectionsLabel.setText(lc.getCollectionsLabelText());
+        previewTextLabel.setText(lc.getPreviewLabelText());
+
+        searchBox.setPromptText(lc.getSearchBoxText());
+        titleField.setPromptText(lc.getTitleFieldText());
+        notesBodyArea.setPromptText(lc.getNotesBodyAreaText());
 
         loadAllFlags(i);
         config.setPreferredLanguage(language);
 
         isLoadingLanguage = false;
+
+        System.out.println(editButton.getText());
     }
 
     /**
