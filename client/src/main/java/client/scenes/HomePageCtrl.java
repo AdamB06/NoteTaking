@@ -6,8 +6,11 @@ import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Collection;
 import commons.Note;
+import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -20,10 +23,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.image.Image;
-import javafx.util.Callback;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import server.api.NoteService;
 
 import java.net.URL;
 import java.util.*;
@@ -47,6 +50,12 @@ public class HomePageCtrl implements Initializable {
     private TextField searchBox;
     @FXML
     private ComboBox<HBox> languageComboBox;
+    @FXML
+    private ComboBox<String> tagComboBox;
+    @FXML
+    private Button refreshButton;
+
+
 
     @FXML
     private Image englishFlag;
@@ -57,6 +66,8 @@ public class HomePageCtrl implements Initializable {
 
     private final String[] languages = {"en", "nl", "es"};
 
+
+
     private final LanguageController lc;
 
     private boolean isEditText;
@@ -66,12 +77,14 @@ public class HomePageCtrl implements Initializable {
 
     //Collection
     private Collection currentCollection;
-
+    private NoteService noteService;
     private final Parser parser;
     private final HtmlRenderer renderer;
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
     //With the variable below, we store the FULL list of notes and never change it
     private List<Note> notes = new ArrayList<>();
+    //This list contains all of the tags that the user has created
+    private List<Tag> tags = new ArrayList<>();
     //The list of titles of notes that are filtered after usage of searchbar
     private List<String> filteredTitles = new ArrayList<>();
     private List<Note> filteredNotes = new ArrayList<>();
@@ -82,6 +95,7 @@ public class HomePageCtrl implements Initializable {
     private String original;
     private Injector injector;
     private ServerUtils serverUtils;
+
     /**
      * Constructor for HomePageCtrl.
      *
@@ -490,4 +504,52 @@ public class HomePageCtrl implements Initializable {
 
         return new HBox(10, imageView);
     }
+
+   @FXML
+    public void showNotesByTag(String tagName) {
+
+        List<Note> notes = serverUtils.getNotes();
+
+        // Filter the notes by the tag name
+        List<Note> filteredNotes = new ArrayList<>();
+        for (Note note : notes) {
+            for (Tag tag : note.getTags()) {
+                if (tag.getName().equals(tagName)) {
+                    filteredNotes.add(note);
+                    break;
+                }
+            }
+        }
+
+
+        // Process the filtered notes (this could be directly rendering them or passing them to the view)
+         notesListView.setItems(FXCollections.observableArrayList(filteredNotes));
+    }
+
+    @FXML
+    public void initialize() {
+        // Set up the ComboBox with an observable list
+        ObservableList<String> tagList = FXCollections.observableArrayList();
+        tagComboBox.setItems(tagList);
+
+
+        fetchTags();
+
+        // Add listener to refresh button
+        refreshButton.setOnAction(event -> fetchTags());
+        tagComboBox.setOnAction(event -> fetchTags());
+    }
+
+
+    /**
+     * fetches tags from the backend
+     */
+    private void fetchTags() {
+        List<String> tags = noteService.getAllTagNames();
+        tagComboBox.getItems().setAll(tags);
+    }
+
+
+
+
 }
