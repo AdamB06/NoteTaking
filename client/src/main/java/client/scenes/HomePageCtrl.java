@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.ClientConfig;
 import client.LanguageController;
 import client.MnemonicCreator;
 import client.MyModule;
@@ -22,13 +23,21 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.image.Image;
+import org.commonmark.Extension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
+import org.commonmark.ext.autolink.AutolinkExtension;
+import org.commonmark.Extension;
+import org.commonmark.ext.autolink.AutolinkExtension;
+import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
-
 import static com.google.inject.Guice.createInjector;
 
 public class HomePageCtrl implements Initializable {
@@ -75,7 +84,7 @@ public class HomePageCtrl implements Initializable {
 
     private boolean isEditText;
     private final String path = "flags/";
-    private final String defaultLanguage = languages[0];
+    private final String defaultLanguage;
     private boolean isLoadingLanguage = false;
 
     //Collection
@@ -96,19 +105,25 @@ public class HomePageCtrl implements Initializable {
     private String original;
     private Injector injector;
     private ServerUtils serverUtils;
+    private final ClientConfig config;
     /**
      * Constructor for HomePageCtrl.
-     *
      * @param pc the PrimaryCtrl instance to be injected
+     * @param serverUtils the ServerUtils instance to be injected
      */
     @Inject
-    public HomePageCtrl(PrimaryCtrl pc) {
+    public HomePageCtrl(PrimaryCtrl pc, ServerUtils serverUtils) {
         this.pc = pc;
-        this.parser = Parser.builder().build();
-        this.renderer = HtmlRenderer.builder().build();
+        this.config = ClientConfig.loadConfig();
+        List<Extension> extensions = List.of(TablesExtension.create(), AutolinkExtension.create());
+        this.parser = Parser.builder().extensions(extensions).build();
+        this.renderer = HtmlRenderer.builder().extensions(extensions).build();
         this.lc = new LanguageController();
         injector = createInjector(new MyModule());
-        this.serverUtils = injector.getInstance(ServerUtils.class);
+        // Load preferred language and server URL from config
+        defaultLanguage = config.getPreferredLanguage();
+        // Use the loaded configuration
+        this.serverUtils = serverUtils;
     }
 
     /**
@@ -123,7 +138,8 @@ public class HomePageCtrl implements Initializable {
 
         titleField.setEditable(false);
         addListener();
-        webView.getEngine().loadContent("");
+        webView.getEngine().setUserStyleSheetLocation(getClass()
+                .getResource("/configuration/WebViewConfig.css").toString());
         initializeEdit();
         original = notesBodyArea.getText();
         refreshNotes();
@@ -132,7 +148,7 @@ public class HomePageCtrl implements Initializable {
         dutchFlag = new Image(path + "nl_flag.png");
         spanishFlag = new Image(path + "es_flag.png");
 
-        loadAllFlags(0);
+        loadAllFlags(Arrays.asList(languages).indexOf(defaultLanguage));
         languageComboBox.setOnAction(this::loadLanguage);
 
         initializeFilteringOfNotes();
@@ -150,8 +166,22 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * Loads the language
-     * @param event an additional but optional event on clicking a button
+     * Loads the CSS file from the given path.
+     * @param path The path of the css file
+     * @return The contents of the css file
+     */
+    private String loadCssFile(String path) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(path)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Loads the chosen language from the ComboBox.
+     * @param event the event that triggers the language change
      */
     private void loadLanguage(ActionEvent event) {
         System.out.println(isLoadingLanguage);
@@ -175,6 +205,7 @@ public class HomePageCtrl implements Initializable {
         notesBodyArea.setPromptText(lc.getNotesBodyAreaText());
 
         loadAllFlags(i);
+        config.setPreferredLanguage(language);
 
         isLoadingLanguage = false;
 
@@ -285,8 +316,12 @@ public class HomePageCtrl implements Initializable {
      * @return the HTML text
      */
     public String markdownConverter(String markdownText) {
-        Node text = parser.parse(markdownText);
-        return renderer.render(text);
+        try{
+            Node text = parser.parse(markdownText);
+            return renderer.render(text);
+        } catch (Exception e){
+            return "<html><body><h2>Error</h2><p>" + e.getMessage() + "</p></body></html>";
+        }
     }
 
     /**
@@ -323,6 +358,10 @@ public class HomePageCtrl implements Initializable {
         }
 
     }
+
+    /**
+     * Sets up the notes ListView.
+     */
     private void setupNotesListView() {
         // Custom cell factory to show only titles
         notesListView.setCellFactory(listView -> new ListCell<Note>() {
@@ -337,16 +376,17 @@ public class HomePageCtrl implements Initializable {
             }
         });
 
-        notesListView.getSelectionModel().selectedItemProperty().addListener((observable, oldNote, newNote) -> {
-            if (newNote != null) {
-                titleField.setText(newNote.getTitle());
-                titleField.setEditable(false);
-                notesBodyArea.setText(newNote.getContent());
-            } else {
-                titleField.clear();
-                notesBodyArea.clear();
-            }
-        });
+        notesListView.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldNote, newNote) -> {
+                    if (newNote != null) {
+                        titleField.setText(newNote.getTitle());
+                        titleField.setEditable(false);
+                        notesBodyArea.setText(newNote.getContent());
+                    } else {
+                        titleField.clear();
+                        notesBodyArea.clear();
+                    }
+                });
     }
     /**
      * When the remove note button is pressed,
@@ -458,7 +498,8 @@ public class HomePageCtrl implements Initializable {
                     .equals(lc.getSaveText())) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 if(selectedNote != null){
-                    if(serverUtils.updateNoteTitle(selectedNote.getId(), titleField.getText()).equals(titleField.getText())){
+                    if(serverUtils.updateNoteTitle(selectedNote.getId()
+                            , titleField.getText()).equals(titleField.getText())){
                         selectedNote.setTitle(titleField.getText());
 
                         int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
