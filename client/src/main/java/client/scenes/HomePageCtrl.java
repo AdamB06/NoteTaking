@@ -51,6 +51,11 @@ public class HomePageCtrl implements Initializable {
     private Button refreshButton;
 
     @FXML
+    private Label collectionsLabel;
+    @FXML
+    private Label previewTextLabel;
+
+    @FXML
     private ListView<Note> notesListView;
     @FXML
     private TextField searchBox;
@@ -159,8 +164,15 @@ public class HomePageCtrl implements Initializable {
 
         String language = languages[i];
         lc.loadLanguage(language);
-        System.out.println(lc.getEditText());
+
         editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
+
+        collectionsLabel.setText(lc.getCollectionsLabelText());
+        previewTextLabel.setText(lc.getPreviewLabelText());
+
+        searchBox.setPromptText(lc.getSearchBoxText());
+        titleField.setPromptText(lc.getTitleFieldText());
+        notesBodyArea.setPromptText(lc.getNotesBodyAreaText());
 
         loadAllFlags(i);
 

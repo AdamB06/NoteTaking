@@ -46,7 +46,7 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                             <SplitPane dividerPositions="0.5792" layoutX="-1.0" prefHeight="45.0" prefWidth="419.0">
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                    <Label alignment="CENTER" layoutX="1.0" layoutY="-2.0" prefHeight="48.0" prefWidth="238.0" style="-fx-background-color: black;" text="Collections:" textFill="WHITE">
+                                    <Label fx:id="collectionsLabel" alignment="CENTER" layoutX="1.0" layoutY="-2.0" prefHeight="48.0" prefWidth="238.0" style="-fx-background-color: black;" text="Collections:" textFill="WHITE">
                                         <font>
                                             <Font size="22.0" />
                                         </font>
@@ -128,7 +128,7 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <SplitPane dividerPositions="0.07639620653319285" layoutX="1.0" orientation="VERTICAL" prefHeight="633.0" prefWidth="265.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="-2.0" prefHeight="47.0" prefWidth="263.0" text="Preview Text:">
+                            <Label fx:id="previewTextLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="-2.0" prefHeight="47.0" prefWidth="263.0" text="Preview Text:">
                                 <font>
                                     <Font size="21.0" />
                                 </font>
