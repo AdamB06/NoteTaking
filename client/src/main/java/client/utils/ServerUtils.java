@@ -15,6 +15,7 @@
  */
 package client.utils;
 
+import static com.google.common.net.HttpHeaders.SERVER;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
 import java.util.Map;
