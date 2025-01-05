@@ -108,6 +108,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Constructor for HomePageCtrl.
+     *
      * @param pc          the PrimaryCtrl instance to be injected
      * @param serverUtils the ServerUtils instance to be injected
      */
@@ -170,6 +171,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Loads the CSS file from the given path.
+     *
      * @param path The path of the css file
      * @return The contents of the css file
      */
@@ -184,6 +186,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Loads the chosen language from the ComboBox.
+     *
      * @param event the event that triggers the language change
      */
     private void loadLanguage(ActionEvent event) {
@@ -197,6 +200,7 @@ public class HomePageCtrl implements Initializable {
 
         String language = languages[i];
         lc.loadLanguage(language);
+
         editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
 
         collectionsLabel.setText(lc.getCollectionsLabelText());
@@ -431,6 +435,7 @@ public class HomePageCtrl implements Initializable {
      */
     public void addKeyPressed() {
         keyCount++;
+        System.out.println("Key pressed: " + keyCount);
         Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
         long noteId = selectedNote.getId();
         if (saveTask != null) {
