@@ -1,12 +1,17 @@
 package server.api;
 
+import commons.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.NoteRepository;
 
 import commons.Note;
 
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class NoteService {
@@ -23,13 +28,13 @@ public class NoteService {
         this.noteRepository = noteRepository;
     }
 
-    /**
-     * Saves a new note or updates an existing one in the database.
-     *
-     * @param note The note object to be saved. The note data is persisted in the database.
-     * @return The saved or updated note, including its generated or existing ID.
-     */
+
+
     public Note saveNote(Note note) {
+
+        // Process tags in the note's text
+        note.initializeTags();
+
         return noteRepository.save(note);
     }
 
@@ -42,6 +47,10 @@ public class NoteService {
         return noteRepository.findAll();
     }
 
+
+
+    //public List<Tag> getAllTags(){return tagRepository.findAll();}
+
     /**
      * Retrieves a note by its ID from the database.
      * @param id The ID of the note to be retrieved.
@@ -50,4 +59,39 @@ public class NoteService {
     public Note getNoteById(long id) {
         return noteRepository.getReferenceById(id);
     }
+
+    /**
+     *
+     * @param tagName name of the tag
+     * @return returns the list of notes with that tag name
+     */
+    public List<Note> findNotesByTagName(String tagName) {
+        return  noteRepository.findNotesByTagName(tagName);
+    }
+
+    /**
+     *
+     * @return returns the list of all the tag names
+     */
+    public List<String> getAllTagNames() {
+        // Fetch all tags from the database, assuming each note can have multiple tags
+        List<Note> notes = noteRepository.findAll();
+        Set<String> tagNames = new HashSet<>();
+
+
+        for (Note note : notes) {
+            for (Tag tag : note.getTags()) {
+                tagNames.add(tag.getName());
+            }
+        }
+
+        return new ArrayList<>(tagNames);
+    }
+
+
+
+
+
+
+
 }

@@ -7,8 +7,11 @@ import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Collection;
 import commons.Note;
+import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -36,6 +39,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+
 import static com.google.inject.Guice.createInjector;
 
 public class HomePageCtrl implements Initializable {
@@ -55,6 +59,12 @@ public class HomePageCtrl implements Initializable {
     private TextField searchBox;
     @FXML
     private ComboBox<HBox> languageComboBox;
+    @FXML
+    private ComboBox<String> tagComboBox;
+    @FXML
+    private Button refreshButton;
+
+
 
     @FXML
     private Image englishFlag;
@@ -80,6 +90,8 @@ public class HomePageCtrl implements Initializable {
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
     //With the variable below, we store the FULL list of notes and never change it
     private List<Note> notes = new ArrayList<>();
+    //This list contains all of the tags that the user has created
+    private List<Tag> tags = new ArrayList<>();
     //The list of titles of notes that are filtered after usage of searchbar
     private List<String> filteredTitles = new ArrayList<>();
     private List<Note> filteredNotes = new ArrayList<>();
@@ -534,4 +546,55 @@ public class HomePageCtrl implements Initializable {
 
         return new HBox(10, imageView);
     }
+
+   @FXML
+    public void showNotesByTag(String tagName) {
+
+        List<Note> notes = serverUtils.getNotes();
+
+        // Filter the notes by the tag name
+        List<Note> filteredNotes = new ArrayList<>();
+        for (Note note : notes) {
+            for (Tag tag : note.getTags()) {
+                if (tag.getName().equals(tagName)) {
+                    filteredNotes.add(note);
+                    break;
+                }
+            }
+        }
+
+
+        // Process the filtered notes (this could be directly rendering them or passing them to the view)
+         notesListView.setItems(FXCollections.observableArrayList(filteredNotes));
+    }
+
+    @FXML
+    public void initialize() {
+        // Set up the ComboBox with an observable list
+        ObservableList<String> tagList = FXCollections.observableArrayList();
+        tagComboBox.setItems(tagList);
+
+
+        //fetchTags();
+
+        // Add listener to refresh button
+        //refreshButton.setOnAction(event -> fetchTags());
+        //tagComboBox.setOnAction(event -> fetchTags());
+    }
+
+
+    /**
+     * fetches tags from the backend
+     */
+
+
+    //private void fetchTags() {
+        //List<String> tags = noteService.getAllTagNames();
+        //tagComboBox.getItems().setAll(tags);
+  //  }
+
+
+
+
+
 }

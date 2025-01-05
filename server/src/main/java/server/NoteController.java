@@ -163,4 +163,15 @@ public class NoteController {
         }
         throw new UnsupportedOperationException("Unsupported operation: " + operation);
     }
+
+    /**
+     *
+     * @param tagName name of the tag
+     * @return returns the list of notes with that specific tagname
+     */
+    @GetMapping("/tags/{tagName}")
+    public ResponseEntity<List<Note>> getNotesByTagName(@PathVariable String tagName) {
+        List<Note> notes = noteService.findNotesByTagName(tagName);
+        return ResponseEntity.ok(notes);
+    }
 }

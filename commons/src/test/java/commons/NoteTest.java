@@ -58,7 +58,7 @@ public class NoteTest {
     }
 @Test
     public void testAddTag() {
-        Tag tag = new Tag(1L, "Java");
+        Tag tag = new Tag( "Java");
         Note note = new Note();
 
         note.addTag(tag);
@@ -72,7 +72,7 @@ public class NoteTest {
 
     @Test
     public void testRemoveTag() {
-        Tag tag = new Tag(1L, "Java");
+        Tag tag = new Tag( "Java");
         Note note = new Note();
 
         note.addTag(tag);
