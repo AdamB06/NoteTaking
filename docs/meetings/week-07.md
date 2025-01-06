@@ -1,8 +1,8 @@
 | Key          | Value                                                    |
 |--------------|----------------------------------------------------------|
 | Date :       | 7/01/2025                                                |
-| Time :       | 13:45 - 14:30                                            |
-| Location :   | DW PC1 Cubicle 10                                        |
+| Time :       | 12:45 - 13:30                                            |
+| Location :   | DW Project Room 1                                        |
 | Chair        | Kevin Moonen                                             |
 | Minute Taker | Kelvin Li                                                |
 | Attendees :  | Adam Bezard, Omer Majeed, Aidan Voskamp, Georgi Yordanov |
