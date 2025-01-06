@@ -17,59 +17,49 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0"
-      prefWidth="1087.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="client.scenes.HomePageCtrl">
-    <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="1087.0"
-           style="-fx-background-color: black;" text="NetNoteApplication" textAlignment="CENTER" textFill="WHITE">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
+    <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="1087.0" style="-fx-background-color: black;" text="NetNoteApplication" textAlignment="CENTER" textFill="WHITE">
         <font>
-            <Font name="System Bold" size="18.0"/>
+            <Font name="System Bold" size="18.0" />
         </font>
     </Label>
-    <SplitPane dividerPositions="0.15362595419847327" orientation="VERTICAL" prefHeight="757.0" prefWidth="1087.0"
-               style="-fx-background-color: black;">
+    <SplitPane dividerPositions="0.15362595419847327" orientation="VERTICAL" prefHeight="757.0" prefWidth="1087.0" style="-fx-background-color: black;">
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-            <SplitPane dividerPositions="0.49831081081081086" layoutY="4.0" orientation="VERTICAL" prefHeight="113.0"
-                       prefWidth="1085.0">
+            <SplitPane dividerPositions="0.49831081081081086" layoutY="4.0" orientation="VERTICAL" prefHeight="113.0" prefWidth="1085.0">
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                    <SplitPane dividerPositions="0.8747686613201727" layoutX="1.0" layoutY="1.0" prefHeight="52.0"
-                               prefWidth="1083.0">
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0"/>
+                    <SplitPane dividerPositions="0.8747686613201727" layoutX="1.0" layoutY="1.0" prefHeight="52.0" prefWidth="1083.0">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="49.0" prefWidth="175.0">
-                            <ComboBox fx:id="languageComboBox" layoutX="-1.0" prefHeight="49.0" prefWidth="133.0"/>
+                            <ComboBox fx:id="languageComboBox" layoutX="-1.0" prefHeight="49.0" prefWidth="133.0" />
                         </AnchorPane>
                     </SplitPane>
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <SplitPane dividerPositions="0.6099137931034483" prefHeight="51.0" prefWidth="1085.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                            <TextField fx:id="searchBox" layoutY="-2.0" prefHeight="48.0" prefWidth="657.0"
-                                       promptText="Search for titles of notes or their content...">
+                            <TextField fx:id="searchBox" layoutY="-2.0" prefHeight="48.0" prefWidth="657.0" promptText="Search for titles of notes or their content...">
                                 <font>
-                                    <Font size="13.0"/>
+                                    <Font size="13.0" />
                                 </font>
                             </TextField>
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                             <SplitPane dividerPositions="0.5792" layoutX="-1.0" prefHeight="45.0" prefWidth="419.0">
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                    <Label alignment="CENTER" layoutX="1.0" layoutY="-2.0" prefHeight="48.0"
-                                           prefWidth="238.0" style="-fx-background-color: black;" text="Collections:"
-                                           textFill="WHITE">
+                                    <Label fx:id="collectionsLabel" alignment="CENTER" layoutX="1.0" layoutY="-2.0" prefHeight="48.0" prefWidth="238.0" style="-fx-background-color: black;" text="Collections:" textFill="WHITE">
                                         <font>
-                                            <Font size="22.0"/>
+                                            <Font size="22.0" />
                                         </font>
                                     </Label>
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                    <SplitMenuButton alignment="CENTER" layoutY="-1.0" mnemonicParsing="false"
-                                                     prefHeight="43.0" prefWidth="172.0" text="SplitMenuButton">
+                                    <SplitMenuButton alignment="CENTER" layoutY="-1.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="172.0" text="SplitMenuButton">
                                         <items>
-                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
-                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 1" />
+                                            <MenuItem mnemonicParsing="false" text="Action 2" />
                                         </items>
                                         <font>
-                                            <Font size="14.0"/>
+                                            <Font size="14.0" />
                                         </font>
                                     </SplitMenuButton>
                                 </AnchorPane>
@@ -80,46 +70,31 @@
             </SplitPane>
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="657.0" prefWidth="1085.0">
-            <SplitPane dividerPositions="0.25, 0.75" focusTraversable="true" layoutX="-1.0" layoutY="-2.0"
-                       prefHeight="635.0" prefWidth="1085.0">
+            <SplitPane dividerPositions="0.25, 0.75" focusTraversable="true" layoutX="-1.0" layoutY="-2.0" prefHeight="635.0" prefWidth="1085.0">
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="627.0" prefWidth="267.0">
-                    <SplitPane dividerPositions="0.8793466807165439" orientation="VERTICAL" prefHeight="635.0"
-                               prefWidth="267.0">
+                    <SplitPane dividerPositions="0.8793466807165439" orientation="VERTICAL" prefHeight="635.0" prefWidth="267.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                            <ListView fx:id="notesListView" layoutX="3.0" layoutY="1.0" prefHeight="553.0"
-                                      prefWidth="267.0"/>
+                            <ListView fx:id="notesListView" layoutX="3.0" layoutY="1.0" prefHeight="553.0" prefWidth="267.0" />
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="265.0">
-                            <ButtonBar layoutX="3.0" layoutY="-0.6666666666666666" prefHeight="81.0" prefWidth="265.0"
-                                       style="-fx-background-color: black;" AnchorPane.bottomAnchor="-7.0"
-                                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                       AnchorPane.topAnchor="-1.0">
+                            <ButtonBar layoutX="3.0" layoutY="-0.6666666666666666" prefHeight="81.0" prefWidth="265.0" style="-fx-background-color: black;" AnchorPane.bottomAnchor="-7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-1.0">
                                 <buttons>
-                                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                                            onAction="#createNote" prefHeight="46.0" style="-fx-background-color: grey;"
-                                            text="+" textAlignment="CENTER" textFill="WHITE" translateX="12.0"
-                                            ButtonBar.buttonData="LEFT">
-
+                                    <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="46.0" style="-fx-background-color: grey;" text="+" textAlignment="CENTER" textFill="WHITE" translateX="12.0" ButtonBar.buttonData="LEFT">
                                         <font>
-                                            <Font size="22.0"/>
+                                            <Font size="22.0" />
                                         </font>
                                     </Button>
-                                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                                            onAction="#deleteNote" prefHeight="51.0" style="-fx-background-color: grey;"
-                                            text="-" textAlignment="CENTER" textFill="#fdfdfd">
+                                    <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="51.0" style="-fx-background-color: grey;" text="-" textAlignment="CENTER" textFill="#fdfdfd">
                                         <font>
-                                            <Font size="22.0"/>
+                                            <Font size="22.0" />
                                         </font>
                                     </Button>
-                                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                                            onAction="#refreshNotes" prefHeight="51.0" prefWidth="102.0"
-                                            style="-fx-background-color: grey;" text="⟳" textAlignment="CENTER"
-                                            textFill="WHITE" translateX="-12.0" ButtonBar.buttonData="RIGHT">
+                                    <Button fx:id="refreshButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="51.0" prefWidth="102.0" style="-fx-background-color: grey;" text="⟳" textAlignment="CENTER" textFill="WHITE" translateX="-12.0" ButtonBar.buttonData="RIGHT">
                                         <opaqueInsets>
-                                            <Insets/>
+                                            <Insets />
                                         </opaqueInsets>
                                         <font>
-                                            <Font name="System Bold" size="22.0"/>
+                                            <Font name="System Bold" size="22.0" />
                                         </font>
                                     </Button>
                                 </buttons>
@@ -128,20 +103,16 @@
                     </SplitPane>
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="635.0" prefWidth="402.0">
-                    <SplitPane dividerPositions="0.05806142034548945" layoutX="2.0" layoutY="-1.0"
-                               orientation="VERTICAL" prefHeight="633.0" prefWidth="535.0">
+                    <SplitPane dividerPositions="0.05806142034548945" layoutX="2.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="633.0" prefWidth="535.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="41.0" prefWidth="533.0">
-                            <SplitPane dividerPositions="0.7928660826032541" layoutX="-3.0" layoutY="2.0"
-                                       prefHeight="37.0" prefWidth="535.0">
+                            <SplitPane dividerPositions="0.7928660826032541" layoutX="-3.0" layoutY="2.0" prefHeight="37.0" prefWidth="535.0">
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                    <TextField fx:id="titleField" layoutX="1.0" layoutY="-3.0" prefHeight="35.0"
-                                               prefWidth="419.0" promptText="Enter the note title..."/>
+                                    <TextField fx:id="titleField" layoutX="1.0" layoutY="-3.0" prefHeight="35.0" prefWidth="419.0" promptText="Enter the note title..." />
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                    <Button fx:id="editButton" layoutX="-2.0" layoutY="-3.0" mnemonicParsing="false"
-                                            prefHeight="37.0" prefWidth="115.0" text="Save">
+                                    <Button fx:id="editButton" layoutX="-2.0" layoutY="-3.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="115.0" text="editButton.text">
                                         <font>
-                                            <Font size="18.0"/>
+                                            <Font size="18.0" />
                                         </font>
                                     </Button>
                                 </AnchorPane>
@@ -149,26 +120,22 @@
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="574.0" prefWidth="533.0">
                             <ScrollPane layoutX="-1.0" layoutY="3.0" prefHeight="591.0" prefWidth="533.0">
-                                <TextArea fx:id="notesBodyArea" prefHeight="587.0" prefWidth="515.0"
-                                          promptText="Enter the note content..."/>
+                                <TextArea fx:id="notesBodyArea" focusTraversable="false" prefHeight="587.0" prefWidth="515.0" promptText="Enter the note content..." />
                             </ScrollPane>
                         </AnchorPane>
                     </SplitPane>
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                    <SplitPane dividerPositions="0.07639620653319285" layoutX="1.0" orientation="VERTICAL"
-                               prefHeight="633.0" prefWidth="265.0">
+                    <SplitPane dividerPositions="0.07639620653319285" layoutX="1.0" orientation="VERTICAL" prefHeight="633.0" prefWidth="265.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="-2.0" prefHeight="47.0"
-                                   prefWidth="263.0" text="Preview Text:">
+                            <Label fx:id="previewTextLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="-2.0" prefHeight="47.0" prefWidth="263.0" text="Preview Text:">
                                 <font>
-                                    <Font size="21.0"/>
+                                    <Font size="21.0" />
                                 </font>
                             </Label>
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                            <WebView fx:id="webView" layoutX="-1.0" layoutY="-2.0" prefHeight="638.0"
-                                     prefWidth="263.0"/>
+                            <WebView fx:id="webView" layoutX="-1.0" layoutY="-2.0" prefHeight="638.0" prefWidth="263.0" />
                         </AnchorPane>
                     </SplitPane>
                 </AnchorPane>
