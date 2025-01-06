@@ -8,12 +8,9 @@ import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import commons.Collection;
 import commons.Note;
-import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -72,12 +69,6 @@ public class HomePageCtrl implements Initializable {
     private TextField searchBox;
     @FXML
     private ComboBox<HBox> languageComboBox;
-    @FXML
-    private ComboBox<String> tagComboBox;
-    @FXML
-    private Button refreshButton;
-
-
 
     @FXML
     private Image englishFlag;
@@ -103,8 +94,6 @@ public class HomePageCtrl implements Initializable {
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
     //With the variable below, we store the FULL list of notes and never change it
     private List<Note> notes = new ArrayList<>();
-    //This list contains all of the tags that the user has created
-    private List<Tag> tags = new ArrayList<>();
     //The list of titles of notes that are filtered after usage of searchbar
     private List<String> filteredTitles = new ArrayList<>();
     private List<Note> filteredNotes = new ArrayList<>();
@@ -116,9 +105,11 @@ public class HomePageCtrl implements Initializable {
     private Injector injector;
     private ServerUtils serverUtils;
     private final ClientConfig config;
+
     /**
      * Constructor for HomePageCtrl.
-     * @param pc the PrimaryCtrl instance to be injected
+     *
+     * @param pc          the PrimaryCtrl instance to be injected
      * @param serverUtils the ServerUtils instance to be injected
      */
     @Inject
@@ -180,6 +171,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Loads the CSS file from the given path.
+     *
      * @param path The path of the css file
      * @return The contents of the css file
      */
@@ -194,6 +186,7 @@ public class HomePageCtrl implements Initializable {
 
     /**
      * Loads the chosen language from the ComboBox.
+     *
      * @param event the event that triggers the language change
      */
     private void loadLanguage(ActionEvent event) {
@@ -207,6 +200,7 @@ public class HomePageCtrl implements Initializable {
 
         String language = languages[i];
         lc.loadLanguage(language);
+
         editButton.setText(isEditText ? lc.getEditText() : lc.getSaveText());
 
         collectionsLabel.setText(lc.getCollectionsLabelText());
@@ -557,6 +551,7 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
+
     /**
      * Refreshes the notes in the ListView.
      * Platform.runLater is used to ensure UI updates occur safely and no race-condition occurs
@@ -618,58 +613,6 @@ public class HomePageCtrl implements Initializable {
 
         return new HBox(10, imageView);
     }
-
-   @FXML
-    public void showNotesByTag(String tagName) {
-
-        List<Note> notes = serverUtils.getNotes();
-
-        // Filter the notes by the tag name
-        List<Note> filteredNotes = new ArrayList<>();
-        for (Note note : notes) {
-            for (Tag tag : note.getTags()) {
-                if (tag.getName().equals(tagName)) {
-                    filteredNotes.add(note);
-                    break;
-                }
-            }
-        }
-
-
-        // Process the filtered notes (this could be directly rendering them or passing them to the view)
-         notesListView.setItems(FXCollections.observableArrayList(filteredNotes));
-    }
-
-    @FXML
-    public void initialize() {
-        // Set up the ComboBox with an observable list
-        ObservableList<String> tagList = FXCollections.observableArrayList();
-        tagComboBox.setItems(tagList);
-
-
-        //fetchTags();
-
-        // Add listener to refresh button
-        //refreshButton.setOnAction(event -> fetchTags());
-        //tagComboBox.setOnAction(event -> fetchTags());
-    }
-
-
-    /**
-     * fetches tags from the backend
-     */
-
-
-    //private void fetchTags() {
-        //List<String> tags = noteService.getAllTagNames();
-        //tagComboBox.getItems().setAll(tags);
-  //  }
-
-
-
-
-
-}
 
     private void configureAutoSave() {
         notesBodyArea.setOnKeyTyped(event -> {
