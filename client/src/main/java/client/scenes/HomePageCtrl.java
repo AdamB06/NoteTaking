@@ -68,7 +68,7 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private TextField searchBox;
     @FXML
-    private ComboBox<HBox> languageComboBox;
+    private ComboBox<Image> languageComboBox;
 
     @FXML
     private Image englishFlag;
@@ -190,7 +190,6 @@ public class HomePageCtrl implements Initializable {
      * @param event the event that triggers the language change
      */
     private void loadLanguage(ActionEvent event) {
-        System.out.println(isLoadingLanguage);
         if (isLoadingLanguage)
             return;
 
@@ -214,8 +213,6 @@ public class HomePageCtrl implements Initializable {
         config.setPreferredLanguage(language);
 
         isLoadingLanguage = false;
-
-        System.out.println(editButton.getText());
     }
 
     /**
@@ -592,26 +589,26 @@ public class HomePageCtrl implements Initializable {
      */
     private void loadAllFlags(int index) {
         languageComboBox.getItems().clear();
-        languageComboBox.getItems().addAll(
-                createFlagItem(englishFlag),
-                createFlagItem(dutchFlag),
-                createFlagItem(spanishFlag)
-        );
+        languageComboBox.getItems().addAll(englishFlag, dutchFlag, spanishFlag);
+        languageComboBox.setCellFactory(unused -> new LanguageSelectCell());
+        languageComboBox.setButtonCell(new LanguageSelectCell());
         languageComboBox.getSelectionModel().select(index);
     }
 
-    /**
-     * Creates a flag item from a given image used in the ComboBox
-     *
-     * @param image the Image to convert
-     * @return the created HBox item containing the ImageView
-     */
-    private HBox createFlagItem(Image image) {
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(50);
-        imageView.setFitHeight(25);
+    private static class LanguageSelectCell extends ListCell<Image> {
+        @Override
+        protected void updateItem(Image image, boolean empty) {
+            super.updateItem(image, empty);
 
-        return new HBox(10, imageView);
+            if (image == null || empty) {
+                setGraphic(null);
+            } else {
+                ImageView imageView = new ImageView(image);
+                imageView.setFitWidth(50);
+                imageView.setFitHeight(25);
+                setGraphic(imageView);
+            }
+        }
     }
 
     private void configureAutoSave() {
