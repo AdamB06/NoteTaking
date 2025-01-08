@@ -18,11 +18,21 @@ public class AutoSaveService {
     private static final int KEY_THRESHOLD = 10;
     private static final long SAVE_DELAY = 5000; // 5 seconds
 
+    /**
+     *
+     * @param serverUtils variable of the serverUtils
+     * @param noteService variable of the noteService
+     */
     public AutoSaveService(ServerUtils serverUtils, NoteService noteService) {
         this.serverUtils = serverUtils;
         this.noteService = noteService;
     }
 
+    /**
+     *
+     * @param currentNote variable of currentNote
+     * @param currentContent variable of the current content
+     */
     public void onKeyPressed(Note currentNote, String currentContent) {
         keyCount++;
         if (saveTask != null) {
@@ -45,6 +55,11 @@ public class AutoSaveService {
         }
     }
 
+    /**
+     *
+     * @param note variable of note
+     * @param content variable of content
+     */
     private void save(Note note, String content) {
         if (note != null) {
             Map<String, Object> changes = getChanges(originalContent, content);
@@ -58,6 +73,12 @@ public class AutoSaveService {
         }
     }
 
+    /**
+     *
+     * @param original String of the original material
+     * @param edited String of the edited material
+     * @return returns the changes that occured
+     */
     public Map<String, Object> getChanges(String original, String edited) {
         int startIndex = 0;
         while (startIndex < original.length() && startIndex < edited.length()
@@ -82,6 +103,11 @@ public class AutoSaveService {
         return changes;
     }
 
+    /**
+     *
+     * @param note variable of note
+     * @param changes variable of the changes
+     */
     public void retrySave(Note note, Map<String, Object> changes) {
         int retries = 3;
         while (retries > 0) {
@@ -95,6 +121,10 @@ public class AutoSaveService {
         System.err.println("All retries failed. Save aborted.");
     }
 
+    /**
+     *
+     * @param content
+     */
     public void setOriginalContent(String content) {
         this.originalContent = content;
     }

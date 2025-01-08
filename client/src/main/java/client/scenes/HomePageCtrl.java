@@ -21,11 +21,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.event.ActionEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.control.ListCell;
 
 import java.net.URL;
 import java.util.*;
+
 
 public class HomePageCtrl implements Initializable {
     @FXML
@@ -65,16 +65,11 @@ public class HomePageCtrl implements Initializable {
     private boolean isLoadingLanguage = false;
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
     private final String[] languages = {"en", "nl", "es"};
-
     private String original;
     private Injector injector;
-
-    // Services
     private NoteService noteService;
     private MarkdownService markdownService;
     private AutoSaveService autoSaveService;
-
-    // Language Controller
     private final LanguageController languageController;
 
     /**
@@ -140,7 +135,7 @@ public class HomePageCtrl implements Initializable {
     /**
      * Adds a listener to the notesBodyArea.
      */
-    private void addListener(){
+    public void addListener(){
         if (notesBodyArea != null) {
             notesBodyArea.textProperty()
                     .addListener((observable, oldValue, markdownText) -> {
@@ -346,14 +341,15 @@ public class HomePageCtrl implements Initializable {
     /**
      * Initializes the filtering of notes.
      */
-    private void initializeFilteringOfNotes(){
+    public void initializeFilteringOfNotes(){
         searchBox.setFocusTraversable(false);
 
         searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.trim().isEmpty()) {
                 resetFilteredList();
             } else {
-                List<Note> filteredNotes = noteService.filterNotes(newValue);
+                // Updated call to filterNotes with 2 parameters
+                List<Note> filteredNotes = noteService.filterNotes(newValue, noteService.getNotes());
                 notesListView.getItems().clear();
                 notesListView.getItems().addAll(filteredNotes);
             }
@@ -373,7 +369,6 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
-
     /**
      * When the search box is empty, reset the filtered list to the full notes list.
      */
