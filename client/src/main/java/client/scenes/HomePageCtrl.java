@@ -95,7 +95,6 @@ public class HomePageCtrl implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Load default language
         String defaultLanguage = ClientConfig.loadConfig().getPreferredLanguage();
         languageController.loadLanguage(defaultLanguage);
 
@@ -215,7 +214,8 @@ public class HomePageCtrl implements Initializable {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 if (selectedNote != null) {
                     String newTitle = titleField.getText();
-                    String updatedTitle = noteService.updateNoteTitle(selectedNote.getId(), newTitle);
+                    String updatedTitle = noteService.updateNoteTitle(
+                            selectedNote.getId(), newTitle);
                     if (updatedTitle.equals(newTitle)) {
                         selectedNote.setTitle(newTitle);
                         int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
@@ -274,7 +274,8 @@ public class HomePageCtrl implements Initializable {
         ClientConfig.loadConfig().setPreferredLanguage(language); // Update config
 
         // Update UI texts based on the selected language
-        editButton.setText(isEditText ? languageController.getEditText() : languageController.getSaveText());
+        editButton.setText(isEditText ? languageController.getEditText() :
+                languageController.getSaveText());
         collectionsLabel.setText(languageController.getCollectionsLabelText());
         previewTextLabel.setText(languageController.getPreviewLabelText());
         searchBox.setPromptText(languageController.getSearchBoxText());
@@ -348,8 +349,8 @@ public class HomePageCtrl implements Initializable {
             if (newValue == null || newValue.trim().isEmpty()) {
                 resetFilteredList();
             } else {
-                // Updated call to filterNotes with 2 parameters
-                List<Note> filteredNotes = noteService.filterNotes(newValue, noteService.getNotes());
+                List<Note> filteredNotes = noteService.filterNotes(
+                        newValue, noteService.getNotes());
                 notesListView.getItems().clear();
                 notesListView.getItems().addAll(filteredNotes);
             }

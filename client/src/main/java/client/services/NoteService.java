@@ -12,6 +12,10 @@ public class NoteService {
     private final ServerUtils serverUtils;
     private List<Note> notes = new ArrayList<>();
 
+    /**
+     *
+     * @param serverUtils makes use of serverutils class in order for some methods to work
+     */
     @Inject
     public NoteService(ServerUtils serverUtils) {
         this.serverUtils = serverUtils;

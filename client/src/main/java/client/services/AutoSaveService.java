@@ -123,7 +123,7 @@ public class AutoSaveService {
 
     /**
      *
-     * @param content
+     * @param content a string of the content
      */
     public void setOriginalContent(String content) {
         this.originalContent = content;

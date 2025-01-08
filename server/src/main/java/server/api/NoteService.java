@@ -29,7 +29,11 @@ public class NoteService {
     }
 
 
-
+    /**
+     *
+     * @param note note attribute
+     * @return returns saved note
+     */
     public Note saveNote(Note note) {
 
         // Process tags in the note's text
