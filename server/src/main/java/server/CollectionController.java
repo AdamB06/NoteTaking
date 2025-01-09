@@ -21,7 +21,8 @@ public class CollectionController {
      * @param collectionRepository The collectionRepository to interact with the database
      */
     @Autowired
-    public CollectionController(CollectionService collectionService, CollectionRepository collectionRepository) {
+    public CollectionController(CollectionService collectionService,
+                                CollectionRepository collectionRepository) {
         this.collectionService = collectionService;
         this.collectionRepository = collectionRepository;
     }
@@ -49,7 +50,8 @@ public class CollectionController {
      * @return A ResponseEntity containing the new edited collection
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Collection> editCollectionName(@RequestBody String name, @PathVariable long id) {
+    public ResponseEntity<Collection> editCollectionName(
+            @RequestBody String name, @PathVariable long id) {
         Collection collection = collectionService.getCollectionById(id);
         if(collectionService.checkDuplicateName(collection.getName())) {
             throw new IllegalArgumentException("Collection name already exists");
