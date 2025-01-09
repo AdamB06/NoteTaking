@@ -89,7 +89,8 @@ public class WebSocketClient {
     public void closeConnection() {
         if (session != null && session.isOpen()) {
             try {
-                session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Client closed"));
+                session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE,
+                        "Client closed"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -7,6 +7,10 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
+    /**
+     * Register the WebSocket handler
+     * @param registry the WebSocketHandlerRegistry
+     */
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new SimpleWebSocketHandler(), "/chat");

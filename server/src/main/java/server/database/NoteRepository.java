@@ -13,6 +13,11 @@ import java.util.List;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
+    /**
+     * Find notes by tag name
+     * @param tagName tag name
+     * @return list of notes with the given tag name
+     */
     @Query("SELECT n FROM Note n JOIN n.tags t WHERE t.name = :tagName")
     List<Note> findNotesByTagName(@Param("tagName") String tagName);
 
