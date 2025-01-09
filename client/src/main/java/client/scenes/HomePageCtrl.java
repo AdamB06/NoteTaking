@@ -71,16 +71,20 @@ public class HomePageCtrl implements Initializable {
     private MarkdownService markdownService;
     private AutoSaveService autoSaveService;
     private final LanguageController languageController;
+    private final MnemonicCreator mnemonicCreator;
 
     /**
      * Constructor for HomePageCtrl.
      *
      * @param languageController the LanguageController instance to be injected
+     * @param mnemonicCreator    the MnemonicCreator instance to be injected
      * @param serverUtils        the ServerUtils instance to be injected
      */
     @Inject
-    public HomePageCtrl(LanguageController languageController, ServerUtils serverUtils) {
+    public HomePageCtrl(LanguageController languageController,
+                        MnemonicCreator mnemonicCreator, ServerUtils serverUtils) {
         this.languageController = languageController;
+        this.mnemonicCreator = mnemonicCreator;
         injector = Guice.createInjector(new MyModule());
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
@@ -126,15 +130,14 @@ public class HomePageCtrl implements Initializable {
     /**
      * Initializes the mnemonics
      */
-    private void initializeMnemonics(){
-        MnemonicCreator mc = new MnemonicCreator();
-        mc.initialize(editButton, addButton, deleteButton, refreshButton);
+    private void initializeMnemonics() {
+        mnemonicCreator.initialize(editButton, addButton, deleteButton, refreshButton, searchBox, notesListView);
     }
 
     /**
      * Adds a listener to the notesBodyArea.
      */
-    public void addListener(){
+    public void addListener() {
         if (notesBodyArea != null) {
             notesBodyArea.textProperty()
                     .addListener((observable, oldValue, markdownText) -> {
@@ -342,7 +345,7 @@ public class HomePageCtrl implements Initializable {
     /**
      * Initializes the filtering of notes.
      */
-    public void initializeFilteringOfNotes(){
+    public void initializeFilteringOfNotes() {
         searchBox.setFocusTraversable(false);
 
         searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -370,6 +373,7 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
+
     /**
      * When the search box is empty, reset the filtered list to the full notes list.
      */
@@ -387,6 +391,7 @@ public class HomePageCtrl implements Initializable {
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);
+            mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
             System.out.println("Note created with ID: " + createdNote.getId());
         } else {
             System.err.println("Failed to create note.");

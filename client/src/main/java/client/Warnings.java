@@ -17,13 +17,12 @@ public class Warnings {
     /**
      * Gives a prompt to the user asking for confirmation
      * @param title the title
-     * @param content the content
      * @param header the header
      * @return true if the OK button is clicked, false otherwise
      */
-    public  boolean askOkCancel(String title, String content, String header){
+    public  boolean askOkCancel(String title, String header){
 
-        Alert alert = alertBuilder(title, content, header, AlertType.CONFIRMATION);
+        Alert alert = alertBuilder(title, "", header, AlertType.CONFIRMATION);
 
         Optional<ButtonType> result = alert.showAndWait();
         return result
