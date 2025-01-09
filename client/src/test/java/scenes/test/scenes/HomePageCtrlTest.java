@@ -25,7 +25,7 @@ public class HomePageCtrlTest {
     @BeforeEach
     public void setUp() {
         notesBodyArea = "";
-        homePageCtrl = new HomePageCtrl(null, null, null);
+        homePageCtrl = new HomePageCtrl(null, null, null, null);
         markdownService = new MarkdownService();
         noteService = new NoteService(null);
         autoSaveService = new AutoSaveService(null,noteService);

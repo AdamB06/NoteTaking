@@ -54,6 +54,10 @@ public class MnemonicCreator {
         setKeyEvents(searchBar);
     }
 
+    /**
+     * Updates the index whenever a new note gets added
+     * @param index the index
+     */
     public void updateIndex(int index){
         currentNoteIndex = index;
     }

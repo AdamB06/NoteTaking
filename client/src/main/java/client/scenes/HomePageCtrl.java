@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.ClientConfig;
-import client.LanguageController;
-import client.MnemonicCreator;
-import client.MyModule;
+import client.*;
 import client.services.AutoSaveService;
 import client.services.MarkdownService;
 import client.services.NoteService;
@@ -72,20 +69,25 @@ public class HomePageCtrl implements Initializable {
     private AutoSaveService autoSaveService;
     private final LanguageController languageController;
     private final MnemonicCreator mnemonicCreator;
+    private final Warnings warnings;
 
     /**
      * Constructor for HomePageCtrl.
      *
      * @param languageController the LanguageController instance to be injected
      * @param mnemonicCreator    the MnemonicCreator instance to be injected
+     * @param warnings           the Warnings instance to be injected
      * @param serverUtils        the ServerUtils instance to be injected
      */
     @Inject
-    public HomePageCtrl(LanguageController languageController,
-                        MnemonicCreator mnemonicCreator, ServerUtils serverUtils) {
+    public HomePageCtrl(LanguageController languageController, MnemonicCreator mnemonicCreator,
+                        Warnings warnings, ServerUtils serverUtils) {
         this.languageController = languageController;
         this.mnemonicCreator = mnemonicCreator;
+        this.warnings = warnings;
+
         injector = Guice.createInjector(new MyModule());
+
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
         this.autoSaveService = new AutoSaveService(serverUtils, noteService);
@@ -100,6 +102,7 @@ public class HomePageCtrl implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         String defaultLanguage = ClientConfig.loadConfig().getPreferredLanguage();
+        System.out.println(defaultLanguage);
         languageController.loadLanguage(defaultLanguage);
 
         titleField.setEditable(false);
@@ -124,14 +127,16 @@ public class HomePageCtrl implements Initializable {
         notesBodyArea.setDisable(true);
         editButton.setDisable(true);
 
-        Platform.runLater(this::initializeMnemonics);
+        Platform.runLater(this::initializeMnemonicsAndLanguage);
     }
 
     /**
      * Initializes the mnemonics
      */
-    private void initializeMnemonics() {
-        mnemonicCreator.initialize(editButton, addButton, deleteButton, refreshButton, searchBox, notesListView);
+    private void initializeMnemonicsAndLanguage() {
+        loadLanguage(null);
+        mnemonicCreator.initialize(editButton, addButton, deleteButton,
+                refreshButton, searchBox, notesListView);
     }
 
     /**
@@ -225,7 +230,16 @@ public class HomePageCtrl implements Initializable {
                         notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
                     } else {
-                        System.err.println("Title is a duplicate, not valid");
+                        String header, content;
+                        if(selectedNote.getTitle().isEmpty()){
+                            header = "Title is empty";
+                            content = "Please provide a valid title";
+                        }
+                        else{
+                            header = "Title is a duplicate, not valid";
+                            content = "Please choose a different title for this note";
+                        }
+                        warnings.error("Error", content, header);
                         // Optionally, revert the titleField to the original title
                         titleField.setText(selectedNote.getTitle());
                     }
@@ -394,7 +408,9 @@ public class HomePageCtrl implements Initializable {
             mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
             System.out.println("Note created with ID: " + createdNote.getId());
         } else {
-            System.err.println("Failed to create note.");
+            warnings.error("Error",
+                    "An error occurred while creating this note, please try again later",
+                    "Failed to create a note");
         }
     }
 
@@ -405,14 +421,22 @@ public class HomePageCtrl implements Initializable {
     private void handleDeleteNote(ActionEvent event) {
         Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
         if (selectedNote != null) {
+            boolean confirm = warnings.askOkCancel("Confirmation",
+                    "Are you sure you want to delete this note?");
+            if(!confirm)
+                return;
+
             String status = noteService.deleteNote(selectedNote);
             if ("Successful".equals(status)) {
                 refreshNotesInternal();
             } else {
-                System.err.println("Failed to delete the note.");
+                warnings.error("Error",
+                        "There was an error while deleting this note, please try again later",
+                        "Failed to delete the note");
             }
         } else {
-            System.out.println("No note selected for deletion.");
+            warnings.inform("Notice",
+                    "Please select a note before deleting it","No note selected to delete");
         }
     }
 

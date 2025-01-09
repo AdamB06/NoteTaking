@@ -16,11 +16,12 @@ public class Warnings {
 
     /**
      * Gives a prompt to the user asking for confirmation
-     * @param title the title
+     *
+     * @param title  the title
      * @param header the header
      * @return true if the OK button is clicked, false otherwise
      */
-    public  boolean askOkCancel(String title, String header){
+    public boolean askOkCancel(String title, String header) {
 
         Alert alert = alertBuilder(title, "", header, AlertType.CONFIRMATION);
 
@@ -32,43 +33,50 @@ public class Warnings {
 
     /**
      * Informative prompt, to give a confirmation of an action
-     * @param title the title
+     *
+     * @param title   the title
      * @param content the content
-     * @param header the header
+     * @param header  the header
      */
-    public void inform(String title, String content, String header){
-        alertBuilder(title, content, header, AlertType.INFORMATION);
+    public void inform(String title, String content, String header) {
+        Alert alert = alertBuilder(title, content, header, AlertType.INFORMATION);
+        alert.showAndWait();
     }
 
     /**
      * Warning prompt, to give a warning for a performed action
-     * @param title the title
+     *
+     * @param title   the title
      * @param content the content
-     * @param header the header
+     * @param header  the header
      */
-    public void warn(String title, String content, String header){
-        alertBuilder(title, content, header, AlertType.WARNING);
+    public void warn(String title, String content, String header) {
+        Alert alert = alertBuilder(title, content, header, AlertType.WARNING);
+        alert.showAndWait();
     }
 
     /**
      * Error prompt, to give an error whenever something fails to inform the user about the error
-     * @param title the title
+     *
+     * @param title   the title
      * @param content the content
-     * @param header the header
+     * @param header  the header
      */
-    public void error(String title, String content, String header){
-        alertBuilder(title, content, header, AlertType.ERROR);
+    public void error(String title, String content, String header) {
+        Alert alert = alertBuilder(title, content, header, AlertType.ERROR);
+        alert.showAndWait();
     }
 
     /**
      * Informative prompt, to give a confirmation of an action
-     * @param title the title
+     *
+     * @param title   the title
      * @param content the content
-     * @param header the header
-     * @param e the exception that has occurred
+     * @param header  the header
+     * @param e       the exception that has occurred
      */
     public void exception(String title, String content,
-                          String header, Exception e){
+                          String header, Exception e) {
 
         Alert alert = alertBuilder(title, content, header, AlertType.ERROR);
 
@@ -101,21 +109,15 @@ public class Warnings {
 
     /**
      * Creates an Alert class item with the following parameters
-     * @param title the title
+     *
+     * @param title   the title
      * @param content the content
-     * @param header the header
-     * @param type the alert type
+     * @param header  the header
+     * @param type    the alert type
      * @return the constructed Alert instance with the given arguments
      */
     private Alert alertBuilder(String title, String content,
-                               String header, AlertType type){
-        if(title.isEmpty())
-            title = "title";
-        if(content.isEmpty())
-            content = "content";
-        if(header.isEmpty())
-            content = "header";
-
+                               String header, AlertType type) {
         Alert alert = new Alert(type);
 
         alert.setTitle(title);
