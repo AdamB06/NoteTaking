@@ -127,7 +127,37 @@ public class HomePageCtrl implements Initializable {
         notesBodyArea.setDisable(true);
         editButton.setDisable(true);
 
+        Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
+    }
+
+    /**
+     * Initializes the button graphics
+     */
+    private void initializeButtonsGraphics(){
+        int size = 20;
+
+        Image add = new Image("icons/add.png");
+        ImageView addV = new ImageView(add);
+        addV.setFitHeight(size);
+        addV.setFitWidth(size);
+        addV.setPreserveRatio(true);
+
+        Image refresh = new Image("icons/refresh.png");
+        ImageView refreshV = new ImageView(refresh);
+        refreshV.setFitHeight(size);
+        refreshV.setFitWidth(size);
+        refreshV.setPreserveRatio(true);
+
+        Image remove = new Image("icons/remove.png");
+        ImageView removeV = new ImageView(remove);
+        removeV.setFitHeight(size);
+        removeV.setFitWidth(size);
+        removeV.setPreserveRatio(true);
+
+        refreshButton.setGraphic(refreshV);
+        addButton.setGraphic(addV);
+        deleteButton.setGraphic(removeV);
     }
 
     /**
@@ -236,7 +266,7 @@ public class HomePageCtrl implements Initializable {
                             content = "Please provide a valid title";
                         }
                         else{
-                            header = "Title is a duplicate, not valid";
+                            header = "Duplicate title!";
                             content = "Please choose a different title for this note";
                         }
                         warnings.error("Error", content, header);
@@ -407,6 +437,7 @@ public class HomePageCtrl implements Initializable {
             notesListView.getSelectionModel().select(createdNote);
             mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
             System.out.println("Note created with ID: " + createdNote.getId());
+            warnings.inform("Notice", "Note was added successfully!", "Note added");
         } else {
             warnings.error("Error",
                     "An error occurred while creating this note, please try again later",
@@ -429,6 +460,7 @@ public class HomePageCtrl implements Initializable {
             String status = noteService.deleteNote(selectedNote);
             if ("Successful".equals(status)) {
                 refreshNotesInternal();
+                warnings.inform("Notice", "Note was added successfully!", "Note added");
             } else {
                 warnings.error("Error",
                         "There was an error while deleting this note, please try again later",

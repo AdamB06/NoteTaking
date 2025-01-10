@@ -79,17 +79,17 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="265.0">
                             <ButtonBar focusTraversable="false" layoutX="3.0" layoutY="-0.6666666666666666" prefHeight="81.0" prefWidth="265.0" style="-fx-background-color: black;" AnchorPane.bottomAnchor="-7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-1.0">
                                 <buttons>
-                                    <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="46.0" style="-fx-background-color: grey;" text="+" textAlignment="CENTER" textFill="WHITE" translateX="12.0" ButtonBar.buttonData="LEFT">
+                                    <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="50.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="WHITE" translateX="12.0" ButtonBar.buttonData="LEFT">
                                         <font>
                                             <Font size="22.0" />
                                         </font>
                                     </Button>
-                                    <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="51.0" style="-fx-background-color: grey;" text="-" textAlignment="CENTER" textFill="#fdfdfd">
+                                    <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="50.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="#fdfdfd">
                                         <font>
                                             <Font size="22.0" />
                                         </font>
                                     </Button>
-                                    <Button fx:id="refreshButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleRefreshNotes" prefHeight="51.0" prefWidth="102.0" style="-fx-background-color: grey;" text="⟳" textAlignment="CENTER" textFill="WHITE" translateX="-12.0" ButtonBar.buttonData="RIGHT">
+                                    <Button fx:id="refreshButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleRefreshNotes" prefHeight="50.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="WHITE" translateX="-12.0" ButtonBar.buttonData="RIGHT">
                                         <opaqueInsets>
                                             <Insets />
                                         </opaqueInsets>
