@@ -33,6 +33,7 @@ public class MyModule implements Module {
     public void configure(Binder binder) {
         binder.bind(PrimaryCtrl.class).in(Scopes.SINGLETON);
         binder.bind(HomePageCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(WebSocketClient.class).in(Scopes.SINGLETON);
     }
 
     /**
