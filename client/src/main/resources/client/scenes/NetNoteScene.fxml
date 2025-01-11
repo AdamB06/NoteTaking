@@ -105,7 +105,7 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="635.0" prefWidth="402.0">
                     <SplitPane dividerPositions="0.05806142034548945" layoutX="2.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="633.0" prefWidth="535.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="41.0" prefWidth="533.0">
-                            <SplitPane dividerPositions="0.5" layoutX="-3.0" layoutY="2.0" prefHeight="37.0" prefWidth="535.0">
+                            <SplitPane dividerPositions="0.7928660826032541" layoutX="-3.0" layoutY="2.0" prefHeight="37.0" prefWidth="535.0">
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                     <TextField fx:id="titleField" layoutX="1.0" layoutY="-3.0" prefHeight="35.0" prefWidth="355.0" promptText="Enter the note title..." />
                                 </AnchorPane>
