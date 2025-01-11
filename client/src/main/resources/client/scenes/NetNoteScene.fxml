@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.web.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
     <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="1087.0" style="-fx-background-color: black;" text="NetNoteApplication" textAlignment="CENTER" textFill="WHITE">
         <font>
             <Font name="System Bold" size="18.0" />
@@ -94,18 +105,31 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="635.0" prefWidth="402.0">
                     <SplitPane dividerPositions="0.05806142034548945" layoutX="2.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="633.0" prefWidth="535.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="41.0" prefWidth="533.0">
-                            <SplitPane dividerPositions="0.6727158948685857" layoutX="-3.0" layoutY="2.0" prefHeight="37.0" prefWidth="535.0">
+                            <SplitPane dividerPositions="0.5" layoutX="-3.0" layoutY="2.0" prefHeight="37.0" prefWidth="535.0">
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                     <TextField fx:id="titleField" layoutX="1.0" layoutY="-3.0" prefHeight="35.0" prefWidth="355.0" promptText="Enter the note title..." />
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="170.0">
                            <children>
-                              <SplitMenuButton fx:id="noteCollectionMenuButton" mnemonicParsing="false" prefHeight="33.0" prefWidth="172.0" text="SplitMenuButton">
+                              <SplitPane dividerPositions="0.5" layoutX="-6.0" layoutY="-4.0" prefHeight="37.0" prefWidth="275.0">
                                 <items>
-                                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                                  <MenuItem mnemonicParsing="false" text="Action 2" />
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <Button fx:id="editButton" layoutX="4.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="125.0" text="Button" />
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <SplitMenuButton fx:id="noteCollectionMenuButton" layoutY="-2.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="133.0" text="SplitMenuButton">
+                                            <items>
+                                              <MenuItem mnemonicParsing="false" text="Action 1" />
+                                              <MenuItem mnemonicParsing="false" text="Action 2" />
+                                            </items>
+                                          </SplitMenuButton>
+                                       </children>
+                                    </AnchorPane>
                                 </items>
-                              </SplitMenuButton>
+                              </SplitPane>
                            </children>
                                 </AnchorPane>
                             </SplitPane>
