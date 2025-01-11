@@ -105,16 +105,19 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="635.0" prefWidth="402.0">
                     <SplitPane dividerPositions="0.05806142034548945" layoutX="2.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="633.0" prefWidth="535.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="41.0" prefWidth="533.0">
-                            <SplitPane dividerPositions="0.7928660826032541" layoutX="-3.0" layoutY="2.0" prefHeight="37.0" prefWidth="535.0">
+                            <SplitPane dividerPositions="0.6727158948685857" layoutX="-3.0" layoutY="2.0" prefHeight="37.0" prefWidth="535.0">
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                    <TextField fx:id="titleField" layoutX="1.0" layoutY="-3.0" prefHeight="35.0" prefWidth="419.0" promptText="Enter the note title..." />
+                                    <TextField fx:id="titleField" layoutX="1.0" layoutY="-3.0" prefHeight="35.0" prefWidth="355.0" promptText="Enter the note title..." />
                                 </AnchorPane>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                    <Button fx:id="editButton" layoutX="-2.0" layoutY="-3.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="115.0" text="editButton.text">
-                                        <font>
-                                            <Font size="18.0" />
-                                        </font>
-                                    </Button>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="170.0">
+                           <children>
+                              <SplitMenuButton mnemonicParsing="false" prefHeight="33.0" prefWidth="172.0" text="SplitMenuButton">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                                  <MenuItem mnemonicParsing="false" text="Action 2" />
+                                </items>
+                              </SplitMenuButton>
+                           </children>
                                 </AnchorPane>
                             </SplitPane>
                         </AnchorPane>
