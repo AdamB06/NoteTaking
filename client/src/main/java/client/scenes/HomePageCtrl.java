@@ -134,7 +134,7 @@ public class HomePageCtrl implements Initializable {
     /**
      * Initializes the button graphics
      */
-    private void initializeButtonsGraphics(){
+    private void initializeButtonsGraphics() {
         int size = 20;
 
         Image add = new Image("icons/add.png");
@@ -260,16 +260,23 @@ public class HomePageCtrl implements Initializable {
                         notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
                     } else {
+                        System.out.println(" new+ " + newTitle);
+                        System.out.println("lold  " + updatedTitle);
                         String header, content;
-                        if(selectedNote.getTitle().isEmpty()){
+                        boolean set = true;
+                        if (selectedNote.getTitle().isEmpty()) {
                             header = "Title is empty";
                             content = "Please provide a valid title";
-                        }
-                        else{
+                        } else if (updatedTitle == "Error: 500") {
                             header = "Duplicate title!";
                             content = "Please choose a different title for this note";
                         }
-                        warnings.error("Error", content, header);
+                        else {
+                            set = false;
+                            content = header = "";
+                        }
+                        if(set)
+                            warnings.error("Error", content, header);
                         // Optionally, revert the titleField to the original title
                         titleField.setText(selectedNote.getTitle());
                     }
@@ -454,13 +461,13 @@ public class HomePageCtrl implements Initializable {
         if (selectedNote != null) {
             boolean confirm = warnings.askOkCancel("Confirmation",
                     "Are you sure you want to delete this note?");
-            if(!confirm)
+            if (!confirm)
                 return;
 
             String status = noteService.deleteNote(selectedNote);
             if ("Successful".equals(status)) {
                 refreshNotesInternal();
-                warnings.inform("Notice", "Note was added successfully!", "Note added");
+                warnings.inform("Notice", "Note was removed successfully!", "Note removed");
             } else {
                 warnings.error("Error",
                         "There was an error while deleting this note, please try again later",
@@ -468,7 +475,7 @@ public class HomePageCtrl implements Initializable {
             }
         } else {
             warnings.inform("Notice",
-                    "Please select a note before deleting it","No note selected to delete");
+                    "Please select a note before deleting it", "No note selected to delete");
         }
     }
 
