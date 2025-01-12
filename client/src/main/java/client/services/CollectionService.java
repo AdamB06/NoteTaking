@@ -10,14 +10,12 @@ import java.util.List;
 public class CollectionService{
 
     private final ServerUtils serverUtils;
-    private final CollectionService collectionService;
     private List<Collection> collections = new ArrayList<>();
 
 
     @Inject
-    public CollectionService(ServerUtils serverUtils, CollectionService collectionService) {
+    public CollectionService(ServerUtils serverUtils) {
         this.serverUtils = serverUtils;
-        this.collectionService = collectionService;
     }
 
     /**
