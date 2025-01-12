@@ -2,6 +2,10 @@ package client;
 
 import commons.Note;
 import commons.Tag;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListView;
 
 
 import java.util.regex.Matcher;
@@ -9,6 +13,7 @@ import java.util.regex.Pattern;
 
 
 public class TagController {
+    private ObservableList<Tag> globalTagList = FXCollections.observableArrayList();
 
 
     /**
@@ -83,4 +88,30 @@ public class TagController {
             }
         }
     }
+
+    public ObservableList<Tag> getGlobalTagList() {
+        return globalTagList;
+    }
+
+    /**
+     *
+     * @param tagComboBox combobox for tag
+     * @param noteListView view of notes that has to pop up after selecting a tag
+     * @param noteList original list of all the notes
+     */
+    public void filterNotesByTag(ComboBox<Tag> tagComboBox, ListView<Note> noteListView, ObservableList<Note> noteList) {
+        Tag selectedTag = tagComboBox.getSelectionModel().getSelectedItem();
+        if (selectedTag != null) {
+            ObservableList<Note> filteredNotes = FXCollections.observableArrayList();
+            for (Note note : noteList) {
+                if (note.getTags().contains(selectedTag)) {
+                    filteredNotes.add(note);
+                }
+            }
+
+            noteListView.setItems(filteredNotes);
+        }
+    }
+
+
 }
