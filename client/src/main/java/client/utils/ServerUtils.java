@@ -135,9 +135,27 @@ public class ServerUtils {
      * @param title title of the note
      * @return returns if the title is a duplicate
      */
-    public boolean isTitleDuplicate(String title) {
+    public boolean isTitleNoteDuplicate(String title) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Note/checkDuplicateTitle/" +title)
+            Response response = client.target(serverUrl + "Note/checkDuplicateNoteTitle/" + title)
+                    .request(APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                return response.readEntity(Boolean.class);
+            } else {
+                System.out.println("Error: " + response.getStatus());
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @param title title of the collection
+     * @return returns if the title is a duplicate
+     */
+    public boolean isTitleCollectionDuplicate(String title) {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(serverUrl + "Note/checkDuplicateCollectionTitle/" + title)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {

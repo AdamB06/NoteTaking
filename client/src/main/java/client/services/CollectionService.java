@@ -6,9 +6,8 @@ import commons.Collection;
 
 import java.util.ArrayList;
 import java.util.List;
-import server.api.CollectionService;
 
-public class CollectionServiceC{
+public class CollectionService{
 
     private final ServerUtils serverUtils;
     private final CollectionService collectionService;
@@ -16,7 +15,7 @@ public class CollectionServiceC{
 
 
     @Inject
-    public CollectionServiceC(ServerUtils serverUtils, CollectionService collectionService) {
+    public CollectionService(ServerUtils serverUtils, CollectionService collectionService) {
         this.serverUtils = serverUtils;
         this.collectionService = collectionService;
     }
@@ -37,7 +36,7 @@ public class CollectionServiceC{
         int counter = 1;
         String uniqueTitle = "New Collection Title" + counter;
         //TODO
-        while(collectionService.checkDuplicateName(uniqueTitle)){
+        while(serverUtils.isTitleCollectionDuplicate(uniqueTitle)){
             counter++;
             uniqueTitle = "New Collection Title" + counter;
         }

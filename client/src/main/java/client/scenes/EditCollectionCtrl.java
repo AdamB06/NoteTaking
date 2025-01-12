@@ -1,7 +1,7 @@
 package client.scenes;
 
-import client.ClientConfig;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import client.MyModule;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import commons.Collection;
 import client.services.*;
@@ -15,7 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.ListView;
 import javafx.scene.input.*;
 import javafx.event.ActionEvent;
-import java.io.File;
 import java.net.URL;
 import java.util.*;
 
@@ -40,7 +39,7 @@ public class EditCollectionCtrl implements Initializable {
     private Button removeCollection;
 
 
-    private CollectionServiceC collectionService;
+    private final CollectionService collectionService;
     private Injector injector;
 
     private final SimpleObjectProperty<Collection> currentCollection = new SimpleObjectProperty<>();
@@ -48,7 +47,8 @@ public class EditCollectionCtrl implements Initializable {
     @Inject
     public EditCollectionCtrl(PrimaryCtrl primaryCtrl) {
         this.primaryCtrl = primaryCtrl;
-        collectionService = injector.getInstance(CollectionServiceC.class);
+        injector = Guice.createInjector(new MyModule());
+        collectionService = injector.getInstance(CollectionService.class);
     }
 
     @Override
