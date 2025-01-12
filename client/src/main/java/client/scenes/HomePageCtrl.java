@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.ClientConfig;
-import client.LanguageController;
-import client.MnemonicCreator;
-import client.MyModule;
+import client.*;
 import client.services.AutoSaveService;
 import client.services.MarkdownService;
 import client.services.NoteService;
@@ -11,9 +8,12 @@ import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
 import commons.Note;
+import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -52,6 +52,10 @@ public class HomePageCtrl implements Initializable {
     private TextField searchBox;
     @FXML
     private ComboBox<Image> languageComboBox;
+    @FXML
+    private ComboBox<Tag> tagComboBox;
+    @FXML
+    private ListView<Note> noteListView;
 
     @FXML
     private Image englishFlag;
@@ -71,6 +75,9 @@ public class HomePageCtrl implements Initializable {
     private MarkdownService markdownService;
     private AutoSaveService autoSaveService;
     private final LanguageController languageController;
+    private final TagController tagController = new TagController();
+    private ObservableList<Tag> tagList = FXCollections.observableArrayList();
+    private ObservableList<Note> noteList = FXCollections.observableArrayList();
 
     /**
      * Constructor for HomePageCtrl.
@@ -126,7 +133,7 @@ public class HomePageCtrl implements Initializable {
     /**
      * Initializes the mnemonics
      */
-    private void initializeMnemonics(){
+    private void initializeMnemonics() {
         MnemonicCreator mc = new MnemonicCreator();
         mc.initialize(editButton, addButton, deleteButton, refreshButton);
     }
@@ -134,7 +141,7 @@ public class HomePageCtrl implements Initializable {
     /**
      * Adds a listener to the notesBodyArea.
      */
-    public void addListener(){
+    public void addListener() {
         if (notesBodyArea != null) {
             notesBodyArea.textProperty()
                     .addListener((observable, oldValue, markdownText) -> {
@@ -310,6 +317,8 @@ public class HomePageCtrl implements Initializable {
         languageComboBox.getSelectionModel().select(index);
     }
 
+
+
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override
         protected void updateItem(Image image, boolean empty) {
@@ -334,6 +343,7 @@ public class HomePageCtrl implements Initializable {
             Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
             if (selectedNote != null) {
                 String currentContent = notesBodyArea.getText();
+                tagController.checkForCorrectUserInput(currentContent, event.getCharacter(), selectedNote);
                 autoSaveService.onKeyPressed(selectedNote, currentContent);
             }
         });
@@ -342,7 +352,7 @@ public class HomePageCtrl implements Initializable {
     /**
      * Initializes the filtering of notes.
      */
-    public void initializeFilteringOfNotes(){
+    public void initializeFilteringOfNotes() {
         searchBox.setFocusTraversable(false);
 
         searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -370,6 +380,7 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
+
     /**
      * When the search box is empty, reset the filtered list to the full notes list.
      */
@@ -461,4 +472,5 @@ public class HomePageCtrl implements Initializable {
             }
         }
     }
+
 }
