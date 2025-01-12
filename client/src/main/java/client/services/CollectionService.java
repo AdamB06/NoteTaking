@@ -38,7 +38,7 @@ public class CollectionService {
             counter++;
             uniqueTitle = "New Collection Title" + counter;
         }
-        Collection collection = new Collection(uniqueTitle, new ArrayList<>(), false);
+        Collection collection = new Collection(uniqueTitle, new ArrayList<>());
         Collection createdCollection = serverUtils.sendCollection(collection);
 
         if(createdCollection != null) {
