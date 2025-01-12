@@ -136,25 +136,6 @@ public class ServerUtils {
     }
 
     /**
-     * @param title title of the collection
-     * @return returns if the title is a duplicate
-     */
-    public boolean isTitleCollectionDuplicate(String title) {
-        try(Client client = ClientBuilder.newClient()){
-            Response response = client.target(serverUrl + "Collection/checkDuplicateTitle/" + title)
-                    .request(APPLICATION_JSON)
-                    .get();
-            if(response.getStatus() == Response.Status.OK.getStatusCode()){
-                return response.readEntity(Boolean.class);
-            }else{
-                System.out.println("Error: " + response.getStatus());
-                return false;
-            }
-        }
-    }
-
-
-    /**
      * Sends the ID of a note to be updated to the database
      * @param id ID of the note to be updated
      * @param newTitle New title for the note
