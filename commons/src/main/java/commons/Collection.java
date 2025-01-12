@@ -42,6 +42,7 @@ public class Collection {
     }
 
     /**
+     *
      * @return the id of the collection
      */
     public long getId() {
