@@ -103,9 +103,9 @@ public class CollectionController {
      * @param note The Note to be deleted
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
-    @DeleteMapping("/NoteDelete/{id}/{note}")
-    public ResponseEntity<Void> deleteNote(@PathVariable long id, @PathVariable long note) {
-        collectionService.deleteNoteFromCollection(id, note);
+    @DeleteMapping("/NoteDelete/{collectionId}/{noteId}")
+    public ResponseEntity<Void> deleteNote(@PathVariable long collectionId, @PathVariable long noteId) {
+        collectionService.deleteNoteFromCollection(collectionId, noteId);
         return ResponseEntity.ok().build();
     }
 
@@ -118,5 +118,16 @@ public class CollectionController {
     public ResponseEntity<List<Note>> getNotes(@PathVariable long id) {
         List<Note> notes = collectionService.getNotes(id);
         return ResponseEntity.ok(notes);
+    }
+
+    /**
+     * Endpoint to get a specific note by id
+     * @param collectionId id of the collection to get the note from
+     * @param noteId id of the note to get
+     * @return A ResponseEntity containing the note
+     */
+    @GetMapping("/NoteGetById/{collectionId}/{noteId}")
+    public ResponseEntity<Note> getNoteById(@PathVariable long collectionId, @PathVariable long noteId) {
+        return ResponseEntity.ok(collectionService.getNoteById(collectionId, noteId));
     }
 }

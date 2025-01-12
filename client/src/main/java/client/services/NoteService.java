@@ -99,7 +99,7 @@ public class NoteService {
      * @return The Note object if found, otherwise null.
      */
     public Note getNoteById(long noteId) {
-        return serverUtils.getNoteById(noteId);
+        return serverUtils.getNoteById(noteId, currentCollectionId);
     }
 
     /**

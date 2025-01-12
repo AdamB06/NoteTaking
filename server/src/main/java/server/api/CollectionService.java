@@ -74,16 +74,32 @@ public class CollectionService {
      */
     public void deleteNoteFromCollection(long id, long noteId) {
         Collection collection = getCollectionById(id);
-        Note noteToRemove = collection.getNotes().stream()
-                        .filter(note -> note.getId() == noteId)
-                        .findFirst()
-                        .orElseThrow(() -> new EntityNotFoundException("Note not found in the collection"));
+        Note noteToRemove = getNoteById(id, noteId);
         collection.getNotes().remove(noteToRemove);
         collectionRepository.save(collection);
     }
 
+    /**
+     * Get a list of all notes in a collection
+     * @param id id of the collection to get the notes from
+     * @return the list of the notes
+     */
     public List<Note> getNotes(long id) {
         return collectionRepository.getReferenceById(id).getNotes();
+    }
+
+    /**
+     * Get a note with a specific id
+     * @param collectionId id of the collection to get the note from
+     * @param noteId id of the note to get
+     * @return the note
+     */
+    public Note getNoteById(long collectionId, long noteId) {
+        Collection collection = getCollectionById(collectionId);
+        return collection.getNotes().stream()
+                .filter(note -> note.getId() == noteId)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Note not found in the collection"));
     }
 
     /**

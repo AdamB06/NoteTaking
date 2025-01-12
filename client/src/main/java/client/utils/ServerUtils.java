@@ -151,17 +151,19 @@ public class ServerUtils {
         try (Client client = ClientBuilder.newClient()) {
             String ret = "Failed";
             Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
-            Response collectionResponse = client.target(serverUrl + "Collection/NoteDelete/" + collectionId)
+            Response collectionResponse = client.target(serverUrl + "Collection/NoteDelete/" + collectionId + "/" + note.getId())
                     .request(APPLICATION_JSON)
                     .delete();
-            Response noteResponse = client.target(serverUrl + "Note/" + note.getId())
-                    .request(APPLICATION_JSON)
-                    .delete();
-            if (noteResponse.getStatus() == 200) {
-                ret = "Successful";
-
+            if (collectionResponse.getStatus() == Response.Status.OK.getStatusCode()) {
+                Response noteResponse = client.target(serverUrl + "Note/" + note.getId())
+                        .request(APPLICATION_JSON)
+                        .delete();
+                if (noteResponse.getStatus() == Response.Status.OK.getStatusCode()) {
+                    ret = "Successful";
+                }
+                noteResponse.close();
             }
-            noteResponse.close();
+            collectionResponse.close();
             return ret;
         }
     }
@@ -208,12 +210,13 @@ public class ServerUtils {
     /**
      *
      * @param noteId This is the id of the note
+     * @param collectionId id of the collection to get the note from
      * @return the note by id
      */
 
-    public Note getNoteById(long noteId) {
+    public Note getNoteById(long noteId, long collectionId) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note/" + noteId)
+            Response response = client.target(SERVER + "Collection/NoteGetById/" + collectionId + "/" + noteId)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {
