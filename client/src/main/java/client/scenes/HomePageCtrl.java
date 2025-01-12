@@ -7,6 +7,7 @@ import client.services.NoteService;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
+import commons.Collection;
 import commons.Note;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
@@ -61,6 +62,7 @@ public class HomePageCtrl implements Initializable {
     private boolean isEditText;
     private boolean isLoadingLanguage = false;
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<Collection> currentCollection = new SimpleObjectProperty<>();
     private final String[] languages = {"en", "nl", "es"};
     private String original;
     private Injector injector;
@@ -294,8 +296,8 @@ public class HomePageCtrl implements Initializable {
      */
     private void refreshNotesInternal() {
         Platform.runLater(() -> {
-            noteService.refreshNotes();
-            List<Note> notes = noteService.getNotes();
+            noteService.refreshNotes(currentCollection.get().getId());
+            List<Note> notes = noteService.getNotes(currentCollection.get().getId());
             if (notesListView != null) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 notesListView.getItems().clear();
@@ -404,7 +406,7 @@ public class HomePageCtrl implements Initializable {
                 resetFilteredList();
             } else {
                 List<Note> filteredNotes = noteService.filterNotes(
-                        newValue, noteService.getNotes());
+                        newValue, noteService.getNotes(currentCollection.get().getId()));
                 notesListView.getItems().clear();
                 notesListView.getItems().addAll(filteredNotes);
             }
@@ -430,7 +432,7 @@ public class HomePageCtrl implements Initializable {
      */
     private void resetFilteredList() {
         notesListView.getItems().clear();
-        notesListView.getItems().addAll(noteService.getNotes());
+        notesListView.getItems().addAll(noteService.getNotes(currentCollection.get().getId()));
     }
 
     /**
@@ -438,7 +440,7 @@ public class HomePageCtrl implements Initializable {
      */
     @FXML
     private void handleAddNote(ActionEvent event) {
-        Note createdNote = noteService.createNote();
+        Note createdNote = noteService.createNote(currentCollection.get().getId());
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);
@@ -464,7 +466,7 @@ public class HomePageCtrl implements Initializable {
             if (!confirm)
                 return;
 
-            String status = noteService.deleteNote(selectedNote);
+            String status = noteService.deleteNote(selectedNote, currentCollection.get().getId());
             if ("Successful".equals(status)) {
                 refreshNotesInternal();
                 warnings.inform("Notice", "Note was removed successfully!", "Note removed");
@@ -507,7 +509,7 @@ public class HomePageCtrl implements Initializable {
             Note note = noteService.getNoteById(noteId);
             autoSaveService.retrySave(note, changes);
         } else {
-            noteService.refreshNotes();
+            noteService.refreshNotes(currentCollection.get().getId());
             refreshNotesInternal();
         }
     }

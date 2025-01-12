@@ -71,7 +71,7 @@ public class ServerUtils {
      * @param note note to be sent to the database
      * @return returns the note sent to the database
      */
-    public Note sendNote(Note note) {
+    public Note sendNote(Note note, long collectionId) {
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(serverUrl + "Note")
@@ -81,7 +81,20 @@ public class ServerUtils {
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 Note returnedNote = response.readEntity(Note.class);
                 response.close();
-                return returnedNote;
+                Entity<Note> collectionEntity = Entity.entity(returnedNote, APPLICATION_JSON);
+                Response collectionResponse = client.target(serverUrl + "Collection/NoteAdd/" + collectionId)
+                        .request(APPLICATION_JSON)
+                        .put(collectionEntity);
+                if (collectionResponse.getStatus() == Response.Status.OK.getStatusCode()) {
+                    collectionResponse.close();
+                    return returnedNote;
+                }
+                else {
+                    System.out.println("Error: " + collectionResponse.getStatus());
+                    collectionResponse.close();
+                    return null;
+                }
+
             } else {
                 System.out.println("Error: " + response.getStatus());
                 response.close();
@@ -132,16 +145,21 @@ public class ServerUtils {
      * @param note note to be deleted from the database
      * @return returns the status of the deletion
      */
-    public String deleteNote(Note note) {
+    public String deleteNote(Note note, long collectionId) {
         try (Client client = ClientBuilder.newClient()) {
             String ret = "Failed";
-            Response response = client.target(serverUrl + "Note/" + note.getId())
+            Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
+            Response collectionResponse = client.target(serverUrl + "Collection/NoteDelete/" + collectionId)
                     .request(APPLICATION_JSON)
                     .delete();
-            if (response.getStatus() == 200) {
+            Response noteResponse = client.target(serverUrl + "Note/" + note.getId())
+                    .request(APPLICATION_JSON)
+                    .delete();
+            if (noteResponse.getStatus() == 200) {
                 ret = "Successful";
+
             }
-            response.close();
+            noteResponse.close();
             return ret;
         }
     }
@@ -170,9 +188,9 @@ public class ServerUtils {
     /**
      * @return returns a list of notes
      */
-    public List<Note> getNotes() {
+    public List<Note> getNotes(long collectionId) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Note")
+            Response response = client.target(serverUrl + "Collection/NoteGet/" + collectionId)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {

@@ -26,9 +26,9 @@ public class NoteService {
      *
      * @return List of notes.
      */
-    public List<Note> getNotes() {
+    public List<Note> getNotes(long collectionId) {
         if (notes.isEmpty()) {
-            notes = serverUtils.getNotes();
+            notes = serverUtils.getNotes(collectionId);
         }
         return notes;
     }
@@ -38,7 +38,7 @@ public class NoteService {
      *
      * @return The created Note object.
      */
-    public Note createNote() {
+    public Note createNote(long collectionId) {
         int counter = 1;
         String uniqueTitle = "New Note Title " + counter;
         while (serverUtils.isTitleDuplicate(uniqueTitle)) {
@@ -46,7 +46,7 @@ public class NoteService {
             uniqueTitle = "New Note Title " + counter;
         }
         Note note = new Note(uniqueTitle, "New Note Content");
-        Note createdNote = serverUtils.sendNote(note);
+        Note createdNote = serverUtils.sendNote(note, collectionId);
 
         if (createdNote != null) {
             notes.add(createdNote);
@@ -60,8 +60,8 @@ public class NoteService {
      * @param note The note to be deleted.
      * @return Status of the deletion ("Successful" or "Failed").
      */
-    public String deleteNote(Note note) {
-        String status = serverUtils.deleteNote(note);
+    public String deleteNote(Note note, long collectionId) {
+        String status = serverUtils.deleteNote(note, collectionId);
         if ("Successful".equals(status)) {
             notes.remove(note);
         }
@@ -125,7 +125,7 @@ public class NoteService {
     /**
      * Refreshes the internal list of notes by fetching from the server.
      */
-    public void refreshNotes() {
-        notes = serverUtils.getNotes();
+    public void refreshNotes(long collectionId) {
+        notes = serverUtils.getNotes(collectionId);
     }
 }
