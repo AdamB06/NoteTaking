@@ -99,8 +99,8 @@ public class CollectionController {
 
     /**
      * Endpoint to delete a note from a collection
-     * @param id The id of the collection
-     * @param note The Note to be deleted
+     * @param collectionId The id of the collection
+     * @param noteId The id of the Note to be deleted
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
     @DeleteMapping("/NoteDelete/{collectionId}/{noteId}")
