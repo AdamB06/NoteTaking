@@ -40,7 +40,7 @@ public class EditCollectionCtrl implements Initializable {
     private Button removeCollection;
 
 
-    private CollectionService collectionService;
+    private CollectionServiceC collectionService;
     private Injector injector;
 
     private final SimpleObjectProperty<Collection> currentCollection = new SimpleObjectProperty<>();
@@ -48,7 +48,7 @@ public class EditCollectionCtrl implements Initializable {
     @Inject
     public EditCollectionCtrl(PrimaryCtrl primaryCtrl) {
         this.primaryCtrl = primaryCtrl;
-        collectionService = injector.getInstance(CollectionService.class);
+        collectionService = injector.getInstance(CollectionServiceC.class);
     }
 
     @Override

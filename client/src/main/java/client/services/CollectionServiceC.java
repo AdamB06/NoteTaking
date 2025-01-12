@@ -3,20 +3,22 @@ package client.services;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Collection;
-import commons.Note;
 
 import java.util.ArrayList;
 import java.util.List;
+import server.api.CollectionService;
 
-public class CollectionService {
+public class CollectionServiceC{
 
     private final ServerUtils serverUtils;
+    private final CollectionService collectionService;
     private List<Collection> collections = new ArrayList<>();
 
 
     @Inject
-    public CollectionService(ServerUtils serverUtils) {
+    public CollectionServiceC(ServerUtils serverUtils, CollectionService collectionService) {
         this.serverUtils = serverUtils;
+        this.collectionService = collectionService;
     }
 
     /**
@@ -34,7 +36,8 @@ public class CollectionService {
     public Collection createCollection() {
         int counter = 1;
         String uniqueTitle = "New Collection Title" + counter;
-        while(serverUtils.isTitleCollectionDuplicate(uniqueTitle)){
+        //TODO
+        while(collectionService.checkDuplicateName(uniqueTitle)){
             counter++;
             uniqueTitle = "New Collection Title" + counter;
         }
@@ -68,4 +71,5 @@ public class CollectionService {
         collections = serverUtils.getCollections();
     }
 }
+
 

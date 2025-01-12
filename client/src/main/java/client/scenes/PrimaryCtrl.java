@@ -15,6 +15,7 @@ public class PrimaryCtrl {
      * Initialize the UI controller
      * @param primaryStage Variable for the stage
      * @param home Pair of UI and Controller
+     * @param edit Pair of EditCollection UI and its Controller
      */
     public void init(Stage primaryStage, Pair<HomePageCtrl, Parent> home, Pair<EditCollectionCtrl, Parent> edit) {
         this.primaryStage = primaryStage;
@@ -36,6 +37,8 @@ public class PrimaryCtrl {
         primaryStage.setScene(homeScene);
     }
 
+
+    //TODO this will be used in the HomePageCtrl in the next MR
     /**
      * Displays the Edit Collection UI
      * If the key "ESCAPE" is pressed then we exit the scene
