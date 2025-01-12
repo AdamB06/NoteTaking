@@ -24,8 +24,8 @@
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                     <children>
-                                        <Button fx:id="addCollection" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" prefHeight="49.0" prefWidth="68.0" text="+" />
-                                        <Button fx:id="removeCollection" layoutX="104.0" layoutY="5.0" mnemonicParsing="false" prefHeight="49.0" prefWidth="68.0" text="-" />
+                                        <Button fx:id="addCollection" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#handleAddCollection" prefHeight="49.0" prefWidth="68.0" text="+" />
+                                        <Button fx:id="removeCollection" layoutX="104.0" layoutY="5.0" mnemonicParsing="false" onAction="#handleDeleteCollection" prefHeight="49.0" prefWidth="68.0" text="-" />
                                     </children>
                                 </AnchorPane>
                             </items>
