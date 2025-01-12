@@ -69,6 +69,7 @@ public class ServerUtils {
      * Sends a note to the database.
      *
      * @param note note to be sent to the database
+     * @param collectionId id of the collection to add the note to
      * @return returns the note sent to the database
      */
     public Note sendNote(Note note, long collectionId) {
@@ -143,6 +144,7 @@ public class ServerUtils {
     /**
      * Sends the ID of a note to be deleted to the database
      * @param note note to be deleted from the database
+     * @param collectionId id of the collection to delete the note from
      * @return returns the status of the deletion
      */
     public String deleteNote(Note note, long collectionId) {
@@ -186,6 +188,7 @@ public class ServerUtils {
     }
 
     /**
+     * @param collectionId id of the collection to get the notes from
      * @return returns a list of notes
      */
     public List<Note> getNotes(long collectionId) {
