@@ -11,6 +11,7 @@ import java.util.Map;
 public class NoteService {
     private final ServerUtils serverUtils;
     private List<Note> notes = new ArrayList<>();
+    private long currentCollectionId; //TODO setup initialize and refresh of collection id
 
     /**
      *
@@ -26,9 +27,9 @@ public class NoteService {
      *
      * @return List of notes.
      */
-    public List<Note> getNotes(long collectionId) {
+    public List<Note> getNotes() {
         if (notes.isEmpty()) {
-            notes = serverUtils.getNotes(collectionId);
+            notes = serverUtils.getNotes(currentCollectionId);
         }
         return notes;
     }
@@ -38,7 +39,7 @@ public class NoteService {
      *
      * @return The created Note object.
      */
-    public Note createNote(long collectionId) {
+    public Note createNote() {
         int counter = 1;
         String uniqueTitle = "New Note Title " + counter;
         while (serverUtils.isTitleDuplicate(uniqueTitle)) {
@@ -46,7 +47,7 @@ public class NoteService {
             uniqueTitle = "New Note Title " + counter;
         }
         Note note = new Note(uniqueTitle, "New Note Content");
-        Note createdNote = serverUtils.sendNote(note, collectionId);
+        Note createdNote = serverUtils.sendNote(note, currentCollectionId);
 
         if (createdNote != null) {
             notes.add(createdNote);
@@ -60,8 +61,8 @@ public class NoteService {
      * @param note The note to be deleted.
      * @return Status of the deletion ("Successful" or "Failed").
      */
-    public String deleteNote(Note note, long collectionId) {
-        String status = serverUtils.deleteNote(note, collectionId);
+    public String deleteNote(Note note) {
+        String status = serverUtils.deleteNote(note, currentCollectionId);
         if ("Successful".equals(status)) {
             notes.remove(note);
         }
@@ -125,7 +126,7 @@ public class NoteService {
     /**
      * Refreshes the internal list of notes by fetching from the server.
      */
-    public void refreshNotes(long collectionId) {
-        notes = serverUtils.getNotes(collectionId);
+    public void refreshNotes() {
+        notes = serverUtils.getNotes(currentCollectionId);
     }
 }
