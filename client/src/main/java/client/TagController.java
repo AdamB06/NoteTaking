@@ -1,19 +1,23 @@
 package client;
 
+import client.services.NoteService;
 import commons.Note;
 import commons.Tag;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class TagController {
-    private ObservableList<Tag> globalTagList = FXCollections.observableArrayList();
+    private NoteService noteService;
+
 
 
     /**
@@ -21,8 +25,9 @@ public class TagController {
      *
      * @param content content of the note
      * @param note    current note
+     * @param universalList list of all the tags that are in notes for the combobox;
      */
-    public void initializeTags(String content, Note note) {
+    public void initializeTags(String content, Note note, Set<Tag> universalList) {
         System.out.println("Initializing tags...");
 
         if (content == null || content.isEmpty()) {
@@ -46,8 +51,11 @@ public class TagController {
                 System.out.println("Extracted tag: " + tagName);
 
                 if (!(note.getTags().contains(tagName))) {
-                    note.addTag(new Tag(tagName));
+                    Tag newTag = new Tag(tagName);
+                    note.getTags().add(newTag);
+                    universalList.add(newTag);
                     System.out.println(note.getTags());
+                    System.out.println(universalList);
 
                 }
 
@@ -73,8 +81,10 @@ public class TagController {
      * @param content   the entire content of the note
      * @param character final input of the user
      * @param note      current note that we are looking at
+     * @param universalList list of universal tags  across all notes for the combobox
      */
-    public void checkForCorrectUserInput(String content, String character, Note note) {
+    public void checkForCorrectUserInput(String content, String character,
+                                         Note note, Set<Tag> universalList) {
 
 
         if (character.equals(" ") || character.equals("\n")) {
@@ -84,34 +94,44 @@ public class TagController {
             if (lastWord.startsWith("#") && lastWord.length() > 1 &&
                     lastWord.substring(1).matches("\\w+")) {
                 System.out.println("Valid tag detected: " + lastWord);
-                initializeTags(content, note);
+                initializeTags(content, note, universalList);
             }
         }
-    }
-
-    public ObservableList<Tag> getGlobalTagList() {
-        return globalTagList;
     }
 
     /**
      *
-     * @param tagComboBox combobox for tag
-     * @param noteListView view of notes that has to pop up after selecting a tag
-     * @param noteList original list of all the notes
+     * @param selectedTag tag that has been selected from the combobox by the user
+     * @param notesListView listview of notes
      */
-    public void filterNotesByTag(ComboBox<Tag> tagComboBox, ListView<Note> noteListView, ObservableList<Note> noteList) {
-        Tag selectedTag = tagComboBox.getSelectionModel().getSelectedItem();
-        if (selectedTag != null) {
-            ObservableList<Note> filteredNotes = FXCollections.observableArrayList();
-            for (Note note : noteList) {
-                if (note.getTags().contains(selectedTag)) {
-                    filteredNotes.add(note);
-                }
+    public void filterNotesByTag(Tag selectedTag, ListView<Note> notesListView) {
+        List<Note> filteredNotes = new ArrayList<>();
+        for (Note note : noteService.getNotes()) {
+            System.out.println("Checking note: " + note.getTitle());
+            System.out.println("Tags: " + note.getTags());
+            if (note.getTags().contains(selectedTag)) {
+                filteredNotes.add(note);
             }
-
-            noteListView.setItems(filteredNotes);
         }
+
+        System.out.println("Filtered notes count: " + filteredNotes.size());
+
+        updateNotesListView(filteredNotes, notesListView);
     }
+
+    /**
+     *
+     * @param filteredNotes notes that have been filtered on a tag
+     * @param notesListView listview of notes
+     */
+    public void updateNotesListView(List<Note> filteredNotes, ListView<Note> notesListView) {
+        ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
+        notesListView.setItems(observableNotes);
+    }
+
+
+
+
 
 
 }

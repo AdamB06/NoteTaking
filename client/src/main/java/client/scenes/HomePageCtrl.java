@@ -12,8 +12,6 @@ import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -43,6 +41,8 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private Button refreshButton;
     @FXML
+    private Button clearFilterButton;
+    @FXML
     private Label collectionsLabel;
     @FXML
     private Label previewTextLabel;
@@ -55,7 +55,7 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private ComboBox<Tag> tagComboBox;
     @FXML
-    private ListView<Note> noteListView;
+    private Set<Tag> universalTags = new HashSet<>();
 
     @FXML
     private Image englishFlag;
@@ -76,8 +76,7 @@ public class HomePageCtrl implements Initializable {
     private AutoSaveService autoSaveService;
     private final LanguageController languageController;
     private final TagController tagController = new TagController();
-    private ObservableList<Tag> tagList = FXCollections.observableArrayList();
-    private ObservableList<Note> noteList = FXCollections.observableArrayList();
+
 
     /**
      * Constructor for HomePageCtrl.
@@ -126,6 +125,7 @@ public class HomePageCtrl implements Initializable {
         configureAutoSave();
         notesBodyArea.setDisable(true);
         editButton.setDisable(true);
+        clearFilterButton.setOnAction(event -> clearFilter());
 
         Platform.runLater(this::initializeMnemonics);
     }
@@ -318,7 +318,6 @@ public class HomePageCtrl implements Initializable {
     }
 
 
-
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override
         protected void updateItem(Image image, boolean empty) {
@@ -343,7 +342,10 @@ public class HomePageCtrl implements Initializable {
             Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
             if (selectedNote != null) {
                 String currentContent = notesBodyArea.getText();
-                tagController.checkForCorrectUserInput(currentContent, event.getCharacter(), selectedNote);
+                tagController.checkForCorrectUserInput(currentContent, event.getCharacter(),
+                        selectedNote, universalTags);
+                updateTagComboBox();
+
                 autoSaveService.onKeyPressed(selectedNote, currentContent);
             }
         });
@@ -471,6 +473,27 @@ public class HomePageCtrl implements Initializable {
                 System.out.println("No changes detected; skipping final save.");
             }
         }
+    }
+
+    /**
+     * updates the comboBox to contain the new tags that were added to notes
+     */
+    public void updateTagComboBox() {
+        tagComboBox.getItems().setAll(universalTags);
+        tagComboBox.setOnAction(event -> {
+            Tag selectedTag = tagComboBox.getSelectionModel().getSelectedItem();
+            if (selectedTag != null) {
+                tagController.filterNotesByTag(selectedTag, notesListView);
+            }
+        });
+    }
+
+    /**
+     * Reset the ListView to show all notes
+     */
+    private void clearFilter() {
+        tagController.updateNotesListView(new ArrayList<>(noteService.getNotes()), notesListView);
+        tagComboBox.getSelectionModel().clearSelection();
     }
 
 }
