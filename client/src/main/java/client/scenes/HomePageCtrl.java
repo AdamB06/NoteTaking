@@ -5,6 +5,7 @@ import client.services.AutoSaveService;
 import client.services.MarkdownService;
 import client.services.NoteService;
 import client.utils.ServerUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
 import commons.Note;
@@ -70,6 +71,8 @@ public class HomePageCtrl implements Initializable {
     private final LanguageController languageController;
     private final MnemonicCreator mnemonicCreator;
     private final Warnings warnings;
+    private final WebSocketClient webSocketClient;
+
 
     /**
      * Constructor for HomePageCtrl.
@@ -91,6 +94,9 @@ public class HomePageCtrl implements Initializable {
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
         this.autoSaveService = new AutoSaveService(serverUtils, noteService);
+        webSocketClient = injector.getInstance(WebSocketClient.class);
+        webSocketClient.setHomePageCtrl(this);
+        webSocketClient.connect();
     }
 
     /**
@@ -364,6 +370,14 @@ public class HomePageCtrl implements Initializable {
         languageComboBox.getSelectionModel().select(index);
     }
 
+    public void incomingNote(Note note) {
+        Platform.runLater(() -> {
+            if(!noteService.noteExists(note)){
+                notesListView.getItems().add(note);
+            }
+        });
+    }
+
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override
         protected void updateItem(Image image, boolean empty) {
@@ -443,6 +457,13 @@ public class HomePageCtrl implements Initializable {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);
             mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
+            ObjectMapper om = new ObjectMapper();
+            try{
+                String noteJson = om.writeValueAsString(createdNote);
+                webSocketClient.sendMessage(noteJson, "create");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             System.out.println("Note created with ID: " + createdNote.getId());
             warnings.inform("Notice", "Note was added successfully!", "Note added");
         } else {

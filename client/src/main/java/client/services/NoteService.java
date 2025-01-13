@@ -122,6 +122,15 @@ public class NoteService {
         return returnNotes;
     }
 
+    public boolean noteExists(Note note) {
+        for(Note n : notes) {
+            if(n.equals(note)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Refreshes the internal list of notes by fetching from the server.
      */

@@ -192,7 +192,7 @@ public class ServerUtils {
 
     public Note getNoteById(long noteId) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note/" + noteId)
+            Response response = client.target(serverUrl + "Note/" + noteId)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {

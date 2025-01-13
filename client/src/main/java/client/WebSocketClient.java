@@ -1,5 +1,10 @@
 package client;
 import javax.websocket.*;
+
+import client.scenes.HomePageCtrl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
+import commons.Note;
 import javafx.application.Platform;
 import java.net.URI;
 import org.eclipse.jetty.client.HttpClient;
@@ -8,17 +13,26 @@ import org.eclipse.jetty.client.HttpClient;
 public class WebSocketClient {
     private Session session;
     private HttpClient httpClient;
+    private String messageType;
+    private ObjectMapper om;
+    private HomePageCtrl hpc;
 
     /**
      * Constructor for WebSocketClient
      */
+    @Inject
     public WebSocketClient() {
         httpClient = new HttpClient();
+        om = new ObjectMapper();
         try {
             httpClient.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setHomePageCtrl(HomePageCtrl hpc) {
+        this.hpc = hpc;
     }
 
     /**
@@ -29,7 +43,7 @@ public class WebSocketClient {
     public void onOpen(Session session) {
         this.session = session;
         System.out.println("Connected to server");
-        sendMessage("Hello from client!");
+        sendMessage("Hello from client!", "default");
     }
 
     /**
@@ -38,7 +52,34 @@ public class WebSocketClient {
      */
     @OnMessage
     public void onMessage(String message) {
+        switch(messageType) {
+            case "create":
+                System.out.println("Note received: " + message);
+                Note note = convertToNote(message);
+                hpc.incomingNote(note);
+                break;
+            case "delete":
+                System.out.println("Note ID received: " + message);
+                break;
+            case "editTitle":
+                System.out.println("Title received: " + message);
+                break;
+            case "editContent":
+                System.out.println("Content received: " + message);
+                break;
+            default:
+                System.out.println("(Other type) Message received: " + message);
+        }
         System.out.println("Message from server: " + message);
+    }
+
+    public Note convertToNote(String message) {
+        try {
+            return om.readValue(message, Note.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -65,9 +106,18 @@ public class WebSocketClient {
     /**
      * Send a message to the server
      * @param message the message to send
+     * @param messageType the type of message
      */
-    public void sendMessage(String message) {
-        session.getAsyncRemote().sendText(message);
+    public void sendMessage(String message, String messageType) {
+        this.messageType = messageType;
+        if (session != null && session.isOpen()) {
+            Platform.runLater(() -> {
+                System.out.println("Sending message: " + message);
+                session.getAsyncRemote().sendText(message);
+            });
+        } else {
+            System.err.println("Session is null or not open");
+        }
     }
 
     /**
