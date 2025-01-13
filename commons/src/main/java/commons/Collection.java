@@ -42,14 +42,6 @@ public class Collection {
     }
 
     /**
-     *
-     * @return the id of the collection
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
      * @return the name (the owner) of the collection
      */
     public String getName() {

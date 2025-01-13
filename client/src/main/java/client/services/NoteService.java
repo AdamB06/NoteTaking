@@ -11,7 +11,6 @@ import java.util.Map;
 public class NoteService {
     private final ServerUtils serverUtils;
     private List<Note> notes = new ArrayList<>();
-    private long currentCollectionId; //TODO setup initialize and refresh of collection id
 
     /**
      *
@@ -29,7 +28,7 @@ public class NoteService {
      */
     public List<Note> getNotes() {
         if (notes.isEmpty()) {
-            notes = serverUtils.getNotes(currentCollectionId);
+            notes = serverUtils.getNotes();
         }
         return notes;
     }
@@ -47,7 +46,7 @@ public class NoteService {
             uniqueTitle = "New Note Title " + counter;
         }
         Note note = new Note(uniqueTitle, "New Note Content");
-        Note createdNote = serverUtils.sendNote(note, currentCollectionId);
+        Note createdNote = serverUtils.sendNote(note);
 
         if (createdNote != null) {
             notes.add(createdNote);
@@ -62,7 +61,7 @@ public class NoteService {
      * @return Status of the deletion ("Successful" or "Failed").
      */
     public String deleteNote(Note note) {
-        String status = serverUtils.deleteNote(note, currentCollectionId);
+        String status = serverUtils.deleteNote(note);
         if ("Successful".equals(status)) {
             notes.remove(note);
         }
@@ -99,7 +98,7 @@ public class NoteService {
      * @return The Note object if found, otherwise null.
      */
     public Note getNoteById(long noteId) {
-        return serverUtils.getNoteById(noteId, currentCollectionId);
+        return serverUtils.getNoteById(noteId);
     }
 
     /**
@@ -127,6 +126,6 @@ public class NoteService {
      * Refreshes the internal list of notes by fetching from the server.
      */
     public void refreshNotes() {
-        notes = serverUtils.getNotes(currentCollectionId);
+        notes = serverUtils.getNotes();
     }
 }
