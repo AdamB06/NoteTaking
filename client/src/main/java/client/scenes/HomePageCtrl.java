@@ -75,6 +75,8 @@ public class HomePageCtrl implements Initializable {
     private MarkdownService markdownService;
     private AutoSaveService autoSaveService;
     private final LanguageController languageController;
+    private final MnemonicCreator mnemonicCreator;
+    private final Warnings warnings;
     private final TagController tagController = new TagController();
 
 
@@ -82,12 +84,19 @@ public class HomePageCtrl implements Initializable {
      * Constructor for HomePageCtrl.
      *
      * @param languageController the LanguageController instance to be injected
+     * @param mnemonicCreator    the MnemonicCreator instance to be injected
+     * @param warnings           the Warnings instance to be injected
      * @param serverUtils        the ServerUtils instance to be injected
      */
     @Inject
-    public HomePageCtrl(LanguageController languageController, ServerUtils serverUtils) {
+    public HomePageCtrl(LanguageController languageController, MnemonicCreator mnemonicCreator,
+                        Warnings warnings, ServerUtils serverUtils) {
         this.languageController = languageController;
+        this.mnemonicCreator = mnemonicCreator;
+        this.warnings = warnings;
+
         injector = Guice.createInjector(new MyModule());
+
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
         this.autoSaveService = new AutoSaveService(serverUtils, noteService);
@@ -102,6 +111,7 @@ public class HomePageCtrl implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         String defaultLanguage = ClientConfig.loadConfig().getPreferredLanguage();
+        System.out.println(defaultLanguage);
         languageController.loadLanguage(defaultLanguage);
 
         titleField.setEditable(false);
@@ -127,15 +137,46 @@ public class HomePageCtrl implements Initializable {
         editButton.setDisable(true);
         clearFilterButton.setOnAction(event -> clearFilter());
 
-        Platform.runLater(this::initializeMnemonics);
+        Platform.runLater(this::initializeButtonsGraphics);
+        Platform.runLater(this::initializeMnemonicsAndLanguage);
+    }
+
+    /**
+     * Initializes the button graphics
+     */
+    private void initializeButtonsGraphics() {
+        int size = 20;
+
+        Image add = new Image("icons/add.png");
+        ImageView addV = new ImageView(add);
+        addV.setFitHeight(size);
+        addV.setFitWidth(size);
+        addV.setPreserveRatio(true);
+
+        Image refresh = new Image("icons/refresh.png");
+        ImageView refreshV = new ImageView(refresh);
+        refreshV.setFitHeight(size);
+        refreshV.setFitWidth(size);
+        refreshV.setPreserveRatio(true);
+
+        Image remove = new Image("icons/remove.png");
+        ImageView removeV = new ImageView(remove);
+        removeV.setFitHeight(size);
+        removeV.setFitWidth(size);
+        removeV.setPreserveRatio(true);
+
+        refreshButton.setGraphic(refreshV);
+        addButton.setGraphic(addV);
+        deleteButton.setGraphic(removeV);
     }
 
     /**
      * Initializes the mnemonics
      */
-    private void initializeMnemonics() {
-        MnemonicCreator mc = new MnemonicCreator();
-        mc.initialize(editButton, addButton, deleteButton, refreshButton);
+    private void initializeMnemonicsAndLanguage() {
+        loadLanguage(null);
+        mnemonicCreator.initialize(editButton, addButton, deleteButton,
+                refreshButton, searchBox, notesListView);
     }
 
     /**
@@ -229,7 +270,23 @@ public class HomePageCtrl implements Initializable {
                         notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
                     } else {
-                        System.err.println("Title is a duplicate, not valid");
+                        System.out.println(" new+ " + newTitle);
+                        System.out.println("lold  " + updatedTitle);
+                        String header, content;
+                        boolean set = true;
+                        if (selectedNote.getTitle().isEmpty()) {
+                            header = "Title is empty";
+                            content = "Please provide a valid title";
+                        } else if (updatedTitle == "Error: 500") {
+                            header = "Duplicate title!";
+                            content = "Please choose a different title for this note";
+                        }
+                        else {
+                            set = false;
+                            content = header = "";
+                        }
+                        if(set)
+                            warnings.error("Error", content, header);
                         // Optionally, revert the titleField to the original title
                         titleField.setText(selectedNote.getTitle());
                     }
@@ -317,7 +374,6 @@ public class HomePageCtrl implements Initializable {
         languageComboBox.getSelectionModel().select(index);
     }
 
-
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override
         protected void updateItem(Image image, boolean empty) {
@@ -400,9 +456,13 @@ public class HomePageCtrl implements Initializable {
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);
+            mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
             System.out.println("Note created with ID: " + createdNote.getId());
+            warnings.inform("Notice", "Note was added successfully!", "Note added");
         } else {
-            System.err.println("Failed to create note.");
+            warnings.error("Error",
+                    "An error occurred while creating this note, please try again later",
+                    "Failed to create a note");
         }
     }
 
@@ -413,14 +473,23 @@ public class HomePageCtrl implements Initializable {
     private void handleDeleteNote(ActionEvent event) {
         Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
         if (selectedNote != null) {
+            boolean confirm = warnings.askOkCancel("Confirmation",
+                    "Are you sure you want to delete this note?");
+            if (!confirm)
+                return;
+
             String status = noteService.deleteNote(selectedNote);
             if ("Successful".equals(status)) {
                 refreshNotesInternal();
+                warnings.inform("Notice", "Note was removed successfully!", "Note removed");
             } else {
-                System.err.println("Failed to delete the note.");
+                warnings.error("Error",
+                        "There was an error while deleting this note, please try again later",
+                        "Failed to delete the note");
             }
         } else {
-            System.out.println("No note selected for deletion.");
+            warnings.inform("Notice",
+                    "Please select a note before deleting it", "No note selected to delete");
         }
     }
 

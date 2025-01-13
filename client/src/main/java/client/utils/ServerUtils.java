@@ -51,7 +51,7 @@ public class ServerUtils {
      *
      * @return Whether the server is available
      */
-    public boolean isServerAvailable() {
+    public boolean isServerAvailable(){
         try {
             ClientBuilder.newClient(new ClientConfig()) //
                     .target(serverUrl) //
@@ -71,7 +71,7 @@ public class ServerUtils {
      * @param note note to be sent to the database
      * @return returns the note sent to the database
      */
-    public Note sendNote(Note note) {
+    public Note sendNote(Note note){
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(serverUrl + "Note")
@@ -170,7 +170,7 @@ public class ServerUtils {
     /**
      * @return returns a list of notes
      */
-    public List<Note> getNotes() {
+    public List<Note> getNotes(){
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(serverUrl + "Note")
                     .request(APPLICATION_JSON)
@@ -190,10 +190,9 @@ public class ServerUtils {
      * @return the note by id
      */
 
-    public Note getNoteById(long noteId) {
+    public Note getNoteById(long noteId){
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Note/" + noteId)
-                    .request(APPLICATION_JSON)
+            Response response = client.target(SERVER + "Note/" + noteId)                    .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {
                 return response.readEntity(Note.class);
