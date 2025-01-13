@@ -134,6 +134,7 @@ public class Note {
      */
     public void removeTag(Tag tag) {
         tags.remove(tag);
+        tag.getNotes().remove(this);
 
     }
 
