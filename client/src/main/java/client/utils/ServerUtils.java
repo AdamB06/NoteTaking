@@ -51,7 +51,7 @@ public class ServerUtils {
      *
      * @return Whether the server is available
      */
-    public boolean isServerAvailable() {
+    public boolean isServerAvailable(){
         try {
             ClientBuilder.newClient(new ClientConfig()) //
                     .target(serverUrl) //
@@ -69,10 +69,9 @@ public class ServerUtils {
      * Sends a note to the database.
      *
      * @param note note to be sent to the database
-     * @param collectionId id of the collection to add the note to
      * @return returns the note sent to the database
      */
-    public Note sendNote(Note note, long collectionId) {
+    public Note sendNote(Note note){
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(serverUrl + "Note")
@@ -82,20 +81,7 @@ public class ServerUtils {
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 Note returnedNote = response.readEntity(Note.class);
                 response.close();
-                Entity<Note> collectionEntity = Entity.entity(returnedNote, APPLICATION_JSON);
-                Response collectionResponse = client.target(serverUrl + "Collection/NoteAdd/" + collectionId)
-                        .request(APPLICATION_JSON)
-                        .put(collectionEntity);
-                if (collectionResponse.getStatus() == Response.Status.OK.getStatusCode()) {
-                    collectionResponse.close();
-                    return returnedNote;
-                }
-                else {
-                    System.out.println("Error: " + collectionResponse.getStatus());
-                    collectionResponse.close();
-                    return null;
-                }
-
+                return returnedNote;
             } else {
                 System.out.println("Error: " + response.getStatus());
                 response.close();
@@ -144,26 +130,18 @@ public class ServerUtils {
     /**
      * Sends the ID of a note to be deleted to the database
      * @param note note to be deleted from the database
-     * @param collectionId id of the collection to delete the note from
      * @return returns the status of the deletion
      */
-    public String deleteNote(Note note, long collectionId) {
+    public String deleteNote(Note note) {
         try (Client client = ClientBuilder.newClient()) {
             String ret = "Failed";
-            Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
-            Response collectionResponse = client.target(serverUrl + "Collection/NoteDelete/" + collectionId + "/" + note.getId())
+            Response response = client.target(serverUrl + "Note/" + note.getId())
                     .request(APPLICATION_JSON)
                     .delete();
-            if (collectionResponse.getStatus() == Response.Status.OK.getStatusCode()) {
-                Response noteResponse = client.target(serverUrl + "Note/" + note.getId())
-                        .request(APPLICATION_JSON)
-                        .delete();
-                if (noteResponse.getStatus() == Response.Status.OK.getStatusCode()) {
-                    ret = "Successful";
-                }
-                noteResponse.close();
+            if (response.getStatus() == 200) {
+                ret = "Successful";
             }
-            collectionResponse.close();
+            response.close();
             return ret;
         }
     }
@@ -190,12 +168,11 @@ public class ServerUtils {
     }
 
     /**
-     * @param collectionId id of the collection to get the notes from
      * @return returns a list of notes
      */
-    public List<Note> getNotes(long collectionId) {
+    public List<Note> getNotes(){
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Collection/NoteGet/" + collectionId)
+            Response response = client.target(serverUrl + "Note")
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {
@@ -210,14 +187,12 @@ public class ServerUtils {
     /**
      *
      * @param noteId This is the id of the note
-     * @param collectionId id of the collection to get the note from
      * @return the note by id
      */
 
-    public Note getNoteById(long noteId, long collectionId) {
+    public Note getNoteById(long noteId){
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(SERVER + "Collection/NoteGetById/" + collectionId + "/" + noteId)
-                    .request(APPLICATION_JSON)
+            Response response = client.target(SERVER + "Note/" + noteId)                    .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {
                 return response.readEntity(Note.class);

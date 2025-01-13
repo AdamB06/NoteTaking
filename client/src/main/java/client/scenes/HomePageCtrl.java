@@ -7,7 +7,6 @@ import client.services.NoteService;
 import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
-import commons.Collection;
 import commons.Note;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
@@ -62,7 +61,6 @@ public class HomePageCtrl implements Initializable {
     private boolean isEditText;
     private boolean isLoadingLanguage = false;
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<Collection> currentCollection = new SimpleObjectProperty<>();//TODO setup initialize and refreshing of current collection
     private final String[] languages = {"en", "nl", "es"};
     private String original;
     private Injector injector;
