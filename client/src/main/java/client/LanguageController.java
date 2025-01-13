@@ -63,4 +63,9 @@ public class LanguageController {
     public String getNotesBodyAreaText(){
         return bundle.getString("notesBodyArea.text");
     }
+
+
+    public String getByTag(String s){
+        return bundle.getString(s);
+    }
 }
