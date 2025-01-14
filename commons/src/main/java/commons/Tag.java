@@ -2,12 +2,8 @@ package commons;
 
 
 import jakarta.persistence.*;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -65,27 +61,33 @@ public class Tag {
     }
 
     /**
-     * @param obj "random obj that is being compared"
+     * @param o  "random obj that is being compared"
      * @return true if equal else false
      */
     @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return Objects.equals(name, tag.name);
     }
 
     /**
+     *
      * @return hashcode
      */
-    public int hashcode() {
-        return HashCodeBuilder.reflectionHashCode(this);
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
+
+
 
     /**
      * @return human-readable string format
      */
     public String toString() {
-        return ToStringBuilder.reflectionToString(this,
-                ToStringStyle.MULTI_LINE_STYLE);
+        return this.name;
     }
 
     /**
@@ -98,11 +100,13 @@ public class Tag {
 
     /**
      *
-     * @param notes
+     * @param notes set of notes associated with this tag
      */
     public void setNotes(Set<Note> notes){
         this.notes = notes;
     }
+
+
 
 
 
