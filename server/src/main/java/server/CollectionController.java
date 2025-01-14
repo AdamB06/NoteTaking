@@ -76,10 +76,10 @@ public class CollectionController {
 
     /**
      * Endpoint to delete a collection by id
-     * @param id Id of the collection to be deleted
+     * @param id id of the collection to be deleted
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCollection(@PathVariable long id) {
         collectionService.deleteCollectionById(id);
         return ResponseEntity.ok().build();
