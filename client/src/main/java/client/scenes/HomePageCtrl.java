@@ -345,6 +345,8 @@ public class HomePageCtrl implements Initializable {
         searchBox.setPromptText(languageController.getSearchBoxText());
         titleField.setPromptText(languageController.getTitleFieldText());
         notesBodyArea.setPromptText(languageController.getNotesBodyAreaText());
+        tagComboBox.setPromptText(languageController.getFilterButtonText());
+        clearFilterButton.setText(languageController.getClearFilterButtonText());
 
         loadAllFlags(i);
 
