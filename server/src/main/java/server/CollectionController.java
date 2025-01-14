@@ -84,4 +84,15 @@ public class CollectionController {
         collectionService.deleteCollectionById(id);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Endpoint to getting a collection by id
+     * @param id id of the collection to get
+     * @return A ResponseEntity containing the collection
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Collection> getCollectionById(long id) {
+        Collection collection = collectionService.getCollectionById(id);
+        return ResponseEntity.ok(collection);
+    }
 }
