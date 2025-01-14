@@ -123,7 +123,7 @@ public class ServerUtils {
      */
     public boolean isTitleNoteDuplicate(String title) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Note/checkDuplicateNoteTitle/" + title)
+            Response response = client.target(serverUrl + "Note/checkDuplicateTitle/" + title)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
