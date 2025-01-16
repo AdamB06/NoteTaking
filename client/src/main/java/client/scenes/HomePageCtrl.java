@@ -132,7 +132,6 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
 
-        shortcutsButton.setText(languageController.getByTag("showShortcuts.text"));
         shortcutsButton.setOnAction(action -> shortcutsHint());
     }
 
@@ -160,9 +159,16 @@ public class HomePageCtrl implements Initializable {
         removeV.setFitWidth(size);
         removeV.setPreserveRatio(true);
 
+        Image info = new Image("icons/information.png");
+        ImageView infoV = new ImageView(info);
+        infoV.setFitHeight(size);
+        infoV.setFitWidth(size);
+        infoV.setPreserveRatio(true);
+
         refreshButton.setGraphic(refreshV);
         addButton.setGraphic(addV);
         deleteButton.setGraphic(removeV);
+        shortcutsButton.setGraphic(infoV);
     }
 
     private void shortcutsHint(){
@@ -345,6 +351,7 @@ public class HomePageCtrl implements Initializable {
         addButton.setText("\n" + languageController.getAddButtonText());
         deleteButton.setText("\n" + languageController.getDeleteButtonText());
 
+        shortcutsButton.setText(languageController.getByTag("showShortcuts.text"));
         collectionsLabel.setText(languageController.getCollectionsLabelText());
         previewTextLabel.setText(languageController.getPreviewLabelText());
         searchBox.setPromptText(languageController.getSearchBoxText());

@@ -30,10 +30,10 @@
                     <SplitPane dividerPositions="0.8747686613201727" layoutX="1.0" layoutY="1.0" prefHeight="52.0" prefWidth="1083.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                      <children>
-                        <Button fx:id="shortcutsButton" layoutY="2.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="223.0" text="Show shortcuts">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
+                        <Button fx:id="shortcutsButton" layoutY="2.0" maxWidth="1000.0" minWidth="50.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="150.0" text="Show shortcuts">
+                           <padding>
+                              <Insets left="-30.0" />
+                           </padding>
                         </Button>
                      </children></AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="49.0" prefWidth="175.0">
@@ -77,7 +77,7 @@
             </SplitPane>
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="657.0" prefWidth="1085.0">
-            <SplitPane dividerPositions="0.25, 0.75" focusTraversable="true" layoutX="-1.0" layoutY="-2.0" prefHeight="635.0" prefWidth="1085.0">
+            <SplitPane dividerPositions="0.25, 0.75" focusTraversable="false" layoutX="-1.0" layoutY="-2.0" prefHeight="635.0" prefWidth="1085.0">
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="627.0" prefWidth="267.0">
                     <SplitPane dividerPositions="0.8793466807165439" orientation="VERTICAL" prefHeight="635.0" prefWidth="267.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
