@@ -65,16 +65,31 @@ public class LanguageController {
     }
 
     /**
-     *
-     * @return filter button text
+     * @return add button testx
      */
-    public String getFilterButtonText(){return bundle.getString("filterButton.text");}
-
+    public String getAddButtonText(){
+        return bundle.getString("addButton.text");
+    }
 
     /**
-     *
-     * @return clear filter button text
+     * @return delete button text
      */
-    public String getClearFilterButtonText(){return bundle.getString("clearFilters.text");}
+    public String getDeleteButtonText(){
+        return bundle.getString("deleteButton.text");
+    }
 
+    /**
+     * @return refresh button text
+     */
+    public String getRefreshButtonText(){
+        return bundle.getString("refreshButton.text");
+    }
+
+    /**
+     * @param s the tag
+     * @return the value
+     */
+    public String getByTag(String s){
+        return bundle.getString(s);
+    }
 }
