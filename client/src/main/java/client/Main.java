@@ -2,6 +2,7 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
+import client.scenes.EditCollectionCtrl;
 import client.scenes.HomePageCtrl;
 import client.scenes.PrimaryCtrl;
 import com.google.inject.Injector;
@@ -42,8 +43,13 @@ public class Main extends Application {
             return;
         }
         var overview = FXML.load(HomePageCtrl.class, "client", "scenes", "NetNoteScene.fxml");
+        var editCollection = FXML.load(EditCollectionCtrl.class, "client", "scenes", "EditCollection.fxml");
         var mainCtrl = INJECTOR.getInstance(PrimaryCtrl.class);
-        mainCtrl.init(primaryStage, overview);
+        mainCtrl.init(primaryStage, overview, editCollection);
+
+        // Create and connect to WebSocket server
+        webSocketClient = INJECTOR.getInstance(WebSocketClient.class);
+        webSocketClient.connect();
     }
 
     /**

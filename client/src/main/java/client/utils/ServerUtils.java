@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 
+import commons.Collection;
 import commons.Note;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
@@ -51,7 +52,7 @@ public class ServerUtils {
      *
      * @return Whether the server is available
      */
-    public boolean isServerAvailable() {
+    public boolean isServerAvailable(){
         try {
             ClientBuilder.newClient(new ClientConfig()) //
                     .target(serverUrl) //
@@ -71,7 +72,7 @@ public class ServerUtils {
      * @param note note to be sent to the database
      * @return returns the note sent to the database
      */
-    public Note sendNote(Note note) {
+    public Note sendNote(Note note){
         Entity<Note> entity = Entity.entity(note, APPLICATION_JSON);
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(serverUrl + "Note")
@@ -91,12 +92,56 @@ public class ServerUtils {
     }
 
     /**
+     * Sends a collection to the database.
+     * @param collection to be sent to the database
+     * @return returns the collection sent to the database
+     */
+    public Collection sendCollection(Collection collection) {
+        Entity<Collection> entity = Entity.entity(collection, APPLICATION_JSON);
+        try(Client client = ClientBuilder.newClient()) {
+            Response response = client.target(serverUrl + "Collection")
+                    .request(APPLICATION_JSON)
+                    .post(entity);
+            System.out.println("Response Status: " + response.getStatus());
+            if(response.getStatus() == Response.Status.OK.getStatusCode()) {
+                Collection returnedCollection = response.readEntity(Collection.class);
+                response.close();
+                return returnedCollection;
+
+            }
+            else{
+                System.out.println("Error: " + response.getStatus());
+                response.close();
+                return null;
+            }
+        }
+    }
+
+    /**
      * @param title title of the note
      * @return returns if the title is a duplicate
      */
-    public boolean isTitleDuplicate(String title) {
+    public boolean isTitleNoteDuplicate(String title) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Note/checkDuplicateTitle/" +title)
+            Response response = client.target(serverUrl + "Note/checkDuplicateTitle/" + title)
+                    .request(APPLICATION_JSON)
+                    .get();
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                return response.readEntity(Boolean.class);
+            } else {
+                System.out.println("Error: " + response.getStatus());
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @param title title of the collection
+     * @return returns if the title is a duplicate
+     */
+    public boolean isTitleCollectionDuplicate(String title) {
+        try (Client client = ClientBuilder.newClient()) {
+            Response response = client.target(serverUrl + "Note/checkDuplicateCollectionTitle/" + title)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -147,6 +192,25 @@ public class ServerUtils {
     }
 
     /**
+     * Sends the ID of a note to be deleted to the database
+     * @param collection collection to be deleted from the database
+     * @return returns the status of the deletion
+     */
+    public String deleteCollection(Collection collection) {
+        try(Client client = ClientBuilder.newClient()){
+            String ret = "Failed";
+            Response response = client.target(serverUrl + "Collection/" + collection.getId())
+                    .request(APPLICATION_JSON)
+                    .delete();
+            if(response.getStatus() == 200){
+                ret = "Successful";
+            }
+            response.close();
+            return ret;
+        }
+    }
+
+    /**
      * Takes a map of the changes and the id of the note and sends it to the server
      * @param id id of the edited note
      * @param changes map of the changes and their location
@@ -170,7 +234,7 @@ public class ServerUtils {
     /**
      * @return returns a list of notes
      */
-    public List<Note> getNotes() {
+    public List<Note> getNotes(){
         try (Client client = ClientBuilder.newClient()) {
             Response response = client.target(serverUrl + "Note")
                     .request(APPLICATION_JSON)
@@ -185,15 +249,32 @@ public class ServerUtils {
     }
 
     /**
+     * @return the list of collections
+     */
+    public List<Collection> getCollections() {
+        try(Client client = ClientBuilder.newClient()) {
+            Response response = client.target(serverUrl + "Collection")
+                    .request(APPLICATION_JSON)
+                    .get();
+
+            if(response.getStatus() == 200) {
+                return response.readEntity(new GenericType<List<Collection>>() {});
+            }else{
+                System.out.println("Error fetching collections: " + response.getStatus());
+                return Collections.emptyList();
+            }
+        }
+    }
+
+    /**
      *
      * @param noteId This is the id of the note
      * @return the note by id
      */
 
-    public Note getNoteById(long noteId) {
+    public Note getNoteById(long noteId){
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Note/" + noteId)
-                    .request(APPLICATION_JSON)
+            Response response = client.target(SERVER + "Note/" + noteId)                    .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {
                 return response.readEntity(Note.class);

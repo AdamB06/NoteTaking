@@ -9,8 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 
 @Entity
@@ -136,42 +135,9 @@ public class Note {
     public void removeTag(Tag tag) {
         tags.remove(tag);
         tag.getNotes().remove(this);
+
     }
 
-    /**
-     *
-     * @param text variable for the text from the note
-     * @return returns the text with a replacement of all the #'s
-     */
-    public String processTagsForMarkdown(String text) {
-        return text.replaceAll("#(\\w+)", "<tag>$1</tag>");
-    }
-
-    /**
-     * Method for initializing tags and being able to identify them by the #
-     */
-    public void initializeTags() {
-        Set<Tag> extractedTags = new HashSet<>();
-        String content = this.content;
-        content = processTagsForMarkdown(content);
-
-
-        Pattern pattern = Pattern.compile("#(\\w+)");
-        Matcher matcher = pattern.matcher(content);
-
-        while (matcher.find()) {
-            String tagName = matcher.group(1); // Extract the tag name without the # symbol
-
-            // Checks if the tag exists in the database or create a new one
-            Tag tag = tags.stream()
-                    .filter(existingTag -> existingTag.getName().equals(tagName))
-                    .findFirst()
-                    .orElseGet(() -> createTag(tagName));
-
-            // Add tag to the note
-            addTag(tag);
-        }
-    }
 
     /**
      *

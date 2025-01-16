@@ -63,4 +63,18 @@ public class LanguageController {
     public String getNotesBodyAreaText(){
         return bundle.getString("notesBodyArea.text");
     }
+
+    /**
+     *
+     * @return filter button text
+     */
+    public String getFilterButtonText(){return bundle.getString("filterButton.text");}
+
+
+    /**
+     *
+     * @return clear filter button text
+     */
+    public String getClearFilterButtonText(){return bundle.getString("clearFilters.text");}
+
 }
