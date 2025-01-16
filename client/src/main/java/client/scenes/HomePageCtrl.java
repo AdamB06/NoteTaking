@@ -271,8 +271,6 @@ public class HomePageCtrl implements Initializable {
                         notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
                     } else {
-                        System.out.println(" new+ " + newTitle);
-                        System.out.println("lold  " + updatedTitle);
                         String header, content;
                         boolean set = true;
                         if (selectedNote.getTitle().isEmpty()) {
@@ -341,6 +339,12 @@ public class HomePageCtrl implements Initializable {
         // Update UI texts based on the selected language
         editButton.setText(isEditText ? languageController.getEditText() :
                 languageController.getSaveText());
+
+        // newline for spacing because text is glued to the graphic
+        refreshButton.setText("\n" + languageController.getRefreshButtonText());
+        addButton.setText("\n" + languageController.getAddButtonText());
+        deleteButton.setText("\n" + languageController.getDeleteButtonText());
+
         collectionsLabel.setText(languageController.getCollectionsLabelText());
         previewTextLabel.setText(languageController.getPreviewLabelText());
         searchBox.setPromptText(languageController.getSearchBoxText());
