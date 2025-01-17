@@ -63,4 +63,33 @@ public class LanguageController {
     public String getNotesBodyAreaText(){
         return bundle.getString("notesBodyArea.text");
     }
+
+    /**
+     * @return add button testx
+     */
+    public String getAddButtonText(){
+        return bundle.getString("addButton.text");
+    }
+
+    /**
+     * @return delete button text
+     */
+    public String getDeleteButtonText(){
+        return bundle.getString("deleteButton.text");
+    }
+
+    /**
+     * @return refresh button text
+     */
+    public String getRefreshButtonText(){
+        return bundle.getString("refreshButton.text");
+    }
+
+    /**
+     * @param s the tag
+     * @return the value
+     */
+    public String getByTag(String s){
+        return bundle.getString(s);
+    }
 }

@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.web.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="789.0" prefWidth="1087.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.HomePageCtrl">
     <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="1087.0" style="-fx-background-color: black;" text="NetNoteApplication" textAlignment="CENTER" textFill="WHITE">
         <font>
             <Font name="System Bold" size="18.0" />
@@ -17,7 +28,14 @@
             <SplitPane dividerPositions="0.49831081081081086" layoutY="4.0" orientation="VERTICAL" prefHeight="113.0" prefWidth="1085.0">
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <SplitPane dividerPositions="0.8747686613201727" layoutX="1.0" layoutY="1.0" prefHeight="52.0" prefWidth="1083.0">
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <Button fx:id="shortcutsButton" layoutY="2.0" maxWidth="1000.0" minWidth="50.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="150.0" text="Show shortcuts">
+                           <padding>
+                              <Insets left="-30.0" />
+                           </padding>
+                        </Button>
+                     </children></AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="49.0" prefWidth="175.0">
                             <ComboBox fx:id="languageComboBox" layoutX="-1.0" prefHeight="49.0" prefWidth="133.0" />
                         </AnchorPane>
@@ -59,7 +77,7 @@
             </SplitPane>
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="657.0" prefWidth="1085.0">
-            <SplitPane dividerPositions="0.25, 0.75" focusTraversable="true" layoutX="-1.0" layoutY="-2.0" prefHeight="635.0" prefWidth="1085.0">
+            <SplitPane dividerPositions="0.25, 0.75" focusTraversable="false" layoutX="-1.0" layoutY="-2.0" prefHeight="635.0" prefWidth="1085.0">
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="627.0" prefWidth="267.0">
                     <SplitPane dividerPositions="0.8793466807165439" orientation="VERTICAL" prefHeight="635.0" prefWidth="267.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -68,23 +86,12 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="265.0">
                             <ButtonBar layoutX="3.0" layoutY="-0.6666666666666666" prefHeight="81.0" prefWidth="265.0" style="-fx-background-color: black;" AnchorPane.bottomAnchor="-7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-1.0">
                                 <buttons>
-                                    <Button fx:id="addButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="46.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="WHITE" translateX="12.0" ButtonBar.buttonData="LEFT">
-                                        <font>
-                                            <Font size="22.0" />
-                                        </font>
-                                    </Button>
-                                    <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="51.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="#fdfdfd">
-                                        <font>
-                                            <Font size="22.0" />
-                                        </font>
-                                    </Button>
+                                    <Button fx:id="addButton" alignment="TOP_CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddNote" prefHeight="46.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="WHITE" translateX="12.0" ButtonBar.buttonData="LEFT" />
+                                    <Button fx:id="deleteButton" alignment="TOP_CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteNote" prefHeight="51.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="WHITE" />
                                     <Button fx:id="refreshButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleRefreshNotes" prefHeight="51.0" prefWidth="102.0" style="-fx-background-color: grey;" textAlignment="CENTER" textFill="WHITE" translateX="-12.0" ButtonBar.buttonData="RIGHT">
                                         <opaqueInsets>
                                             <Insets />
                                         </opaqueInsets>
-                                        <font>
-                                            <Font name="System Bold" size="22.0" />
-                                        </font>
                                     </Button>
                                 </buttons>
                             </ButtonBar>

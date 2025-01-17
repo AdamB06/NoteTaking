@@ -40,6 +40,8 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private Button refreshButton;
     @FXML
+    private Button shortcutsButton;
+    @FXML
     private Label collectionsLabel;
     @FXML
     private Label previewTextLabel;
@@ -129,6 +131,8 @@ public class HomePageCtrl implements Initializable {
 
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
+
+        shortcutsButton.setOnAction(action -> shortcutsHint());
     }
 
     /**
@@ -155,9 +159,22 @@ public class HomePageCtrl implements Initializable {
         removeV.setFitWidth(size);
         removeV.setPreserveRatio(true);
 
+        Image info = new Image("icons/information.png");
+        ImageView infoV = new ImageView(info);
+        infoV.setFitHeight(size);
+        infoV.setFitWidth(size);
+        infoV.setPreserveRatio(true);
+
         refreshButton.setGraphic(refreshV);
         addButton.setGraphic(addV);
         deleteButton.setGraphic(removeV);
+        shortcutsButton.setGraphic(infoV);
+    }
+
+    private void shortcutsHint(){
+        warnings.inform(languageController.getByTag("shortcutsTitle.text"),
+                languageController.getByTag("shortcutsInfo.text"),
+                languageController.getByTag("shortcutsHeader.text"));
     }
 
     /**
@@ -260,23 +277,21 @@ public class HomePageCtrl implements Initializable {
                         notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
                     } else {
-                        System.out.println(" new+ " + newTitle);
-                        System.out.println("lold  " + updatedTitle);
                         String header, content;
                         boolean set = true;
                         if (selectedNote.getTitle().isEmpty()) {
-                            header = "Title is empty";
-                            content = "Please provide a valid title";
-                        } else if (updatedTitle == "Error: 500") {
-                            header = "Duplicate title!";
-                            content = "Please choose a different title for this note";
+                            header = languageController.getByTag("emptyTitleHeader.text");
+                            content = languageController.getByTag("emptyTitleContent.text");
+                        } else if (updatedTitle.equals("Error: 500")) {
+                            header = languageController.getByTag("duplicateTitleHeader.text");
+                            content = languageController.getByTag("duplicateTitleContent.text");
                         }
                         else {
                             set = false;
                             content = header = "";
                         }
                         if(set)
-                            warnings.error("Error", content, header);
+                            warnings.error(languageController.getByTag("errorText.text"), content, header);
                         // Optionally, revert the titleField to the original title
                         titleField.setText(selectedNote.getTitle());
                     }
@@ -330,6 +345,13 @@ public class HomePageCtrl implements Initializable {
         // Update UI texts based on the selected language
         editButton.setText(isEditText ? languageController.getEditText() :
                 languageController.getSaveText());
+
+        // newline for spacing because text is glued to the graphic
+        refreshButton.setText("\n" + languageController.getRefreshButtonText());
+        addButton.setText("\n" + languageController.getAddButtonText());
+        deleteButton.setText("\n" + languageController.getDeleteButtonText());
+
+        shortcutsButton.setText(languageController.getByTag("showShortcuts.text"));
         collectionsLabel.setText(languageController.getCollectionsLabelText());
         previewTextLabel.setText(languageController.getPreviewLabelText());
         searchBox.setPromptText(languageController.getSearchBoxText());
@@ -444,11 +466,13 @@ public class HomePageCtrl implements Initializable {
             notesListView.getSelectionModel().select(createdNote);
             mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
             System.out.println("Note created with ID: " + createdNote.getId());
-            warnings.inform("Notice", "Note was added successfully!", "Note added");
+            warnings.inform(languageController.getByTag("noticeText.text"),
+                    languageController.getByTag("noteAddedContent.text"),
+                    languageController.getByTag("noteAddedHeader.text"));
         } else {
-            warnings.error("Error",
-                    "An error occurred while creating this note, please try again later",
-                    "Failed to create a note");
+            warnings.error(languageController.getByTag("errorText.text"),
+                    languageController.getByTag("noteFailedContent.text"),
+                    languageController.getByTag("noteFailedHeader.text"));
         }
     }
 
@@ -459,24 +483,37 @@ public class HomePageCtrl implements Initializable {
     private void handleDeleteNote(ActionEvent event) {
         Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
         if (selectedNote != null) {
-            boolean confirm = warnings.askOkCancel("Confirmation",
-                    "Are you sure you want to delete this note?");
+            boolean confirm = warnings.askOkCancel(
+                    languageController.getByTag("confirmationText.text"),
+                    languageController.getByTag("confirmationText.message")
+            );
+
             if (!confirm)
                 return;
 
             String status = noteService.deleteNote(selectedNote);
             if ("Successful".equals(status)) {
                 refreshNotesInternal();
-                warnings.inform("Notice", "Note was removed successfully!", "Note removed");
+                warnings.inform(
+                        languageController.getByTag("noticeText.text"),
+                        languageController.getByTag("notice.noteRemoved.message"),
+                        languageController.getByTag("notice.noteRemoved.details")
+                );
             } else {
-                warnings.error("Error",
-                        "There was an error while deleting this note, please try again later",
-                        "Failed to delete the note");
+                warnings.error(
+                        languageController.getByTag("errorText.text"),
+                        languageController.getByTag("error.deletionFailed.message"),
+                        languageController.getByTag("error.deletionFailed.details")
+                );
             }
         } else {
-            warnings.inform("Notice",
-                    "Please select a note before deleting it", "No note selected to delete");
+            warnings.inform(
+                    languageController.getByTag("noticeText.text"),
+                    languageController.getByTag("notice.noNoteSelected.message"),
+                    languageController.getByTag("notice.noNoteSelected.details")
+            );
         }
+
     }
 
     /**
