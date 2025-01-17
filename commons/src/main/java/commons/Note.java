@@ -23,6 +23,9 @@ public class Note {
     private String title;
     private String content;
 
+    @ManyToOne
+    private Collection collection;
+
     @ManyToMany
     @JoinTable(
             name = "note_tag",
@@ -76,6 +79,21 @@ public class Note {
      */
     public String getContent() {
         return content;
+    }
+
+    /**
+     * @return collection
+     */
+    public Collection getCollection() {
+        return collection;
+    }
+
+    /**
+     * A setter for the collection the note is in
+     * @param collection collection the note is in
+     */
+    public void setCollection(Collection collection) {
+        this.collection = collection;
     }
 
     /**
