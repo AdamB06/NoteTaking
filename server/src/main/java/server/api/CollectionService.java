@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Collection;
+import commons.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.database.CollectionRepository;
@@ -52,6 +53,31 @@ public class CollectionService {
      */
     public void deleteCollectionById(long id) {
         collectionRepository.deleteById(id);
+    }
+
+    /**
+     * Adds a note to the list of the collection
+     * @param id the id of the collection
+     * @param note the note to be added
+     */
+    public void addNoteToCollection(long id, Note note) {
+        Collection collection = getCollectionById(id);
+        collection.getNotes().add(note);
+        collectionRepository.save(collection);
+    }
+
+    /**
+     * Deletes a note from the list of the collection
+     * @param id the id of the collection
+     * @param noteId the id of the note to be deleted
+     */
+    public void deleteNoteFromCollection(long id, long noteId) {
+        Collection collection = getCollectionById(id);
+        collection.getNotes().stream()
+                .filter(note -> note.getId() == noteId)
+                .findFirst()
+                .ifPresent(note -> collection.getNotes().remove(note));
+        collectionRepository.save(collection);
     }
 
     /**
