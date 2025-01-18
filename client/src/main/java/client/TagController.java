@@ -128,10 +128,4 @@ public class TagController {
         ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
         notesListView.setItems(observableNotes);
     }
-
-
-
-
-
-
 }

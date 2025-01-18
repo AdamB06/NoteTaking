@@ -36,6 +36,9 @@ public class NoteService {
      */
     public Note saveNote(Note note) {
 
+        // Process tags in the note's text
+        note.initializeTags();
+
         return noteRepository.save(note);
     }
 

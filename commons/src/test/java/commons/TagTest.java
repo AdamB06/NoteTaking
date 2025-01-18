@@ -60,6 +60,6 @@ public class TagTest {
 
         // Assert that two tags with the same id and name are considered equal
         assertEquals(tag1, tag2, "Tags with the same  name should be equal.");
-        assertEquals(tag1.hashCode(), tag2.hashCode(), "Tags with the same  name should have the same hashcode.");
+        assertEquals(tag1.hashcode(), tag2.hashcode(), "Tags with the same  name should have the same hashcode.");
     }
 }

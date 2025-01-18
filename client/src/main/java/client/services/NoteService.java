@@ -41,7 +41,7 @@ public class NoteService {
     public Note createNote() {
         int counter = 1;
         String uniqueTitle = "New Note Title " + counter;
-        while (serverUtils.isTitleNoteDuplicate(uniqueTitle)) {
+        while (serverUtils.isTitleDuplicate(uniqueTitle)) {
             counter++;
             uniqueTitle = "New Note Title " + counter;
         }
