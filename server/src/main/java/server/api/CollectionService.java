@@ -43,7 +43,7 @@ public class CollectionService {
      * @return The retrieved collection
      */
     public Collection getCollectionById(long id) {
-        return collectionRepository.getReferenceById(id);
+        return collectionRepository.getById(id);
     }
 
     /**

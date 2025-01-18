@@ -56,6 +56,13 @@ public class Collection {
     }
 
     /**
+     * @return id
+     */
+    public long getId(){
+        return id;
+    }
+
+    /**
      * @param name that will be set for the Collection
      */
     public void setName(String name) {
