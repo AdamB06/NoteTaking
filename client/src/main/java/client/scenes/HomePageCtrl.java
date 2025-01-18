@@ -268,12 +268,12 @@ public class HomePageCtrl implements Initializable {
                 if (selectedNote != null) {
                     String newTitle = titleField.getText();
                     String updatedTitle = noteService.updateNoteTitle(
-                            selectedNote.getId(), newTitle);
+                            selectedNote, newTitle);
                     if (updatedTitle.equals(newTitle)) {
+                        webSocketClient.sendMessage(selectedNote, "updateTitle");
                         selectedNote.setTitle(newTitle);
-                        int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
-                        notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
+                        notesListView.getSelectionModel().select(selectedNote);
                     } else {
                         System.out.println(" new+ " + newTitle);
                         System.out.println("lold  " + updatedTitle);
@@ -282,7 +282,7 @@ public class HomePageCtrl implements Initializable {
                         if (selectedNote.getTitle().isEmpty()) {
                             header = "Title is empty";
                             content = "Please provide a valid title";
-                        } else if (updatedTitle == "Error: 500") {
+                        } else if (updatedTitle.equals("Error: 500")) {
                             header = "Duplicate title!";
                             content = "Please choose a different title for this note";
                         }
@@ -385,6 +385,29 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(() -> {
             if(!noteService.noteExists(note)){
                 notesListView.getItems().add(note);
+                System.out.println("Note added: " + note.getTitle());
+            }
+        });
+    }
+
+    public void incomingDeletion(Note note) {
+        Platform.runLater(() -> {
+            notesListView.getItems().remove(note);
+            System.out.println("Note removed: " + note.getTitle());
+        });
+    }
+
+    public void incomingTitleUpdate(Note note){
+        Platform.runLater(() -> {
+            int index = noteService.findNoteIndex(note, notesListView.getItems());
+            if (index != -1) {
+                notesListView.getItems().set(index, note);
+                notesListView.refresh();
+                notesListView.getSelectionModel().select(currentNote.get());
+            }
+            System.out.println("Note title updated: " + note.getTitle());
+            if(currentNote.get() != null && currentNote.get().getId() == note.getId()){
+                titleField.setText(note.getTitle());
             }
         });
     }
@@ -472,13 +495,7 @@ public class HomePageCtrl implements Initializable {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);
             mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
-            ObjectMapper om = new ObjectMapper();
-            try{
-                String noteJson = om.writeValueAsString(createdNote);
-                webSocketClient.sendMessage(noteJson, "create");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            webSocketClient.sendMessage(createdNote, "create");
             System.out.println("Note created with ID: " + createdNote.getId());
             warnings.inform("Notice", "Note was added successfully!", "Note added");
         } else {
@@ -502,6 +519,7 @@ public class HomePageCtrl implements Initializable {
 
             String status = noteService.deleteNote(selectedNote);
             if ("Successful".equals(status)) {
+                webSocketClient.sendMessage(selectedNote, "delete");
                 refreshNotesInternal();
                 warnings.inform("Notice", "Note was removed successfully!", "Note removed");
             } else {

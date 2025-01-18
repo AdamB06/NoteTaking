@@ -71,13 +71,15 @@ public class NoteService {
     /**
      * Updates the title of a note on the server.
      *
-     * @param noteId   The ID of the note to be updated.
+     * @param note   The ID of the note to be updated.
      * @param newTitle The new title for the note.
      * @return The updated title if successful, otherwise an error message.
      */
-    public String updateNoteTitle(long noteId, String newTitle) {
-        String updatedTitle = serverUtils.updateNoteTitle(noteId, newTitle);
-        return updatedTitle;
+    public String updateNoteTitle(Note note, String newTitle) {
+        if(note.getTitle().equals(newTitle)) {
+            return newTitle;
+        }
+        return serverUtils.updateNoteTitle(note.getId(), newTitle);
     }
 
     /**
@@ -136,5 +138,14 @@ public class NoteService {
      */
     public void refreshNotes() {
         notes = serverUtils.getNotes();
+    }
+
+    public int findNoteIndex(Note note, List<Note> notes) {
+        for(int i = 0; i < notes.size(); i++) {
+            if(notes.get(i).equals(note)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

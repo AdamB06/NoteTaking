@@ -2,18 +2,21 @@ package client;
 import javax.websocket.*;
 
 import client.scenes.HomePageCtrl;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import commons.Note;
 import javafx.application.Platform;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jetty.client.HttpClient;
 
 @ClientEndpoint
 public class WebSocketClient {
     private Session session;
     private HttpClient httpClient;
-    private String messageType;
     private ObjectMapper om;
     private HomePageCtrl hpc;
 
@@ -43,7 +46,6 @@ public class WebSocketClient {
     public void onOpen(Session session) {
         this.session = session;
         System.out.println("Connected to server");
-        sendMessage("Hello from client!", "default");
     }
 
     /**
@@ -52,26 +54,36 @@ public class WebSocketClient {
      */
     @OnMessage
     public void onMessage(String message) {
-        switch(messageType) {
-            case "create":
-                System.out.println("Note received: " + message);
-                Note note = convertToNote(message);
-                hpc.incomingNote(note);
-                break;
-            case "delete":
-                System.out.println("Note ID received: " + message);
-                break;
-            case "editTitle":
-                System.out.println("Title received: " + message);
-                break;
-            case "editContent":
-                System.out.println("Content received: " + message);
-                break;
-            default:
-                System.out.println("(Other type) Message received: " + message);
-        }
-        System.out.println("Message from server: " + message);
+        Platform.runLater(() -> {
+            try {
+                // Parse the JSON payload
+                Map<String, Object> payload = om.readValue(message, new TypeReference<>() {});
+                String type = (String) payload.get("type");
+                Note note = om.convertValue(payload.get("note"), Note.class);
+
+                // Process based on message type
+                switch (type) {
+                    case "create":
+                        hpc.incomingNote(note);
+                        break;
+                    case "delete":
+                        System.out.println("Note deletion received: " + note);
+                        hpc.incomingDeletion(note);
+                        break;
+                    case "updateTitle":
+                        System.out.println("Note title update received: " + note);
+                        hpc.incomingTitleUpdate(note);
+                        break;
+                    default:
+                        System.out.println("(Other type) Message received: " + message);
+                }
+            } catch (Exception e) {
+                System.err.println("Error processing message: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
+
 
     public Note convertToNote(String message) {
         try {
@@ -105,20 +117,27 @@ public class WebSocketClient {
 
     /**
      * Send a message to the server
-     * @param message the message to send
+     * @param note the note to send
      * @param messageType the type of message
      */
-    public void sendMessage(String message, String messageType) {
-        this.messageType = messageType;
-        if (session != null && session.isOpen()) {
-            Platform.runLater(() -> {
-                System.out.println("Sending message: " + message);
-                session.getAsyncRemote().sendText(message);
-            });
-        } else {
-            System.err.println("Session is null or not open");
+    public void sendMessage(Note note, String messageType) {
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("type", messageType);
+            payload.put("note", note);
+
+            String jsonPayload = om.writeValueAsString(payload);
+            if (session != null && session.isOpen()) {
+                session.getAsyncRemote().sendText(jsonPayload);
+                System.out.println("Message sent: " + jsonPayload);
+            } else {
+                System.err.println("Session is not open or null.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
 
     /**
      * Connect to the server

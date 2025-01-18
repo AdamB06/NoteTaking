@@ -43,13 +43,10 @@ public class Main extends Application {
             return;
         }
         var overview = FXML.load(HomePageCtrl.class, "client", "scenes", "NetNoteScene.fxml");
-        var editCollection = FXML.load(EditCollectionCtrl.class, "client", "scenes", "EditCollection.fxml");
+        var editCollection = FXML.load(EditCollectionCtrl.class,
+                "client", "scenes", "EditCollection.fxml");
         var mainCtrl = INJECTOR.getInstance(PrimaryCtrl.class);
         mainCtrl.init(primaryStage, overview, editCollection);
-
-        // Create and connect to WebSocket server
-        webSocketClient = INJECTOR.getInstance(WebSocketClient.class);
-        webSocketClient.connect();
     }
 
     /**
@@ -58,6 +55,9 @@ public class Main extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
+        if (webSocketClient != null) {
+            webSocketClient.closeConnection();
+        }
         System.exit(0);
     }
 }
