@@ -80,7 +80,7 @@ public class HomePageCtrl implements Initializable {
     private final Warnings warnings;
     private final TagController tagController = new TagController();
     private final WebSocketClient webSocketClient;
-
+    private boolean suppressUpdates = false;
 
     /**
      * Constructor for HomePageCtrl.
@@ -412,6 +412,26 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
+    public void incomingContentUpdate(Note note) {
+        Platform.runLater(() -> {
+            if (currentNote.get() != null && currentNote.get().getId() == note.getId()) {
+                String incomingContent = note.getContent();
+                String currentContent = notesBodyArea.getText();
+
+                if (!suppressUpdates) {
+                    int caretPosition = notesBodyArea.getCaretPosition();
+
+                    notesBodyArea.setText(incomingContent);
+                    notesBodyArea.positionCaret(caretPosition);
+
+                    String html = markdownService.convertToHtml(incomingContent);
+                    updateWebView(html);
+                }
+                suppressUpdates = false;
+            }
+        });
+    }
+
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override
         protected void updateItem(Image image, boolean empty) {
@@ -433,13 +453,15 @@ public class HomePageCtrl implements Initializable {
      */
     private void configureAutoSave() {
         notesBodyArea.setOnKeyTyped(event -> {
+            suppressUpdates = true;
             Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
             if (selectedNote != null) {
                 String currentContent = notesBodyArea.getText();
                 tagController.checkForCorrectUserInput(currentContent, event.getCharacter(),
                         selectedNote, universalTags);
                 updateTagComboBox();
-
+                selectedNote.setContent(currentContent);
+                webSocketClient.sendMessage(selectedNote, "updateContent");
                 autoSaveService.onKeyPressed(selectedNote, currentContent);
             }
         });

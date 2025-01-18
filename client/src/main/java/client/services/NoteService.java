@@ -142,7 +142,7 @@ public class NoteService {
 
     public int findNoteIndex(Note note, List<Note> notes) {
         for(int i = 0; i < notes.size(); i++) {
-            if(notes.get(i).equals(note)) {
+            if(notes.get(i).getId() == note.getId()) {
                 return i;
             }
         }

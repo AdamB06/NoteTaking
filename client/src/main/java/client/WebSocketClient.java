@@ -74,6 +74,10 @@ public class WebSocketClient {
                         System.out.println("Note title update received: " + note);
                         hpc.incomingTitleUpdate(note);
                         break;
+                    case "updateContent":
+                        System.out.println("Note content update received: " + note);
+                        hpc.incomingContentUpdate(note);
+                        break;
                     default:
                         System.out.println("(Other type) Message received: " + message);
                 }
