@@ -34,6 +34,10 @@ public class WebSocketClient {
         }
     }
 
+    /**
+     * Set the home page controller
+     * @param hpc the home page controller
+     */
     public void setHomePageCtrl(HomePageCtrl hpc) {
         this.hpc = hpc;
     }
@@ -75,7 +79,6 @@ public class WebSocketClient {
                         hpc.incomingTitleUpdate(note);
                         break;
                     case "updateContent":
-                        System.out.println("Note content update received: " + note);
                         hpc.incomingContentUpdate(note);
                         break;
                     default:
@@ -86,16 +89,6 @@ public class WebSocketClient {
                 e.printStackTrace();
             }
         });
-    }
-
-
-    public Note convertToNote(String message) {
-        try {
-            return om.readValue(message, Note.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     /**
@@ -133,7 +126,6 @@ public class WebSocketClient {
             String jsonPayload = om.writeValueAsString(payload);
             if (session != null && session.isOpen()) {
                 session.getAsyncRemote().sendText(jsonPayload);
-                System.out.println("Message sent: " + jsonPayload);
             } else {
                 System.err.println("Session is not open or null.");
             }

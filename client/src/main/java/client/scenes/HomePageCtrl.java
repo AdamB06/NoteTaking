@@ -5,7 +5,6 @@ import client.services.AutoSaveService;
 import client.services.MarkdownService;
 import client.services.NoteService;
 import client.utils.ServerUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
 import commons.Note;
@@ -81,6 +80,7 @@ public class HomePageCtrl implements Initializable {
     private final TagController tagController = new TagController();
     private final WebSocketClient webSocketClient;
     private boolean suppressUpdates = false;
+    private boolean isSaving = false;
 
     /**
      * Constructor for HomePageCtrl.
@@ -225,16 +225,21 @@ public class HomePageCtrl implements Initializable {
             }
         });
 
-        notesListView.getSelectionModel().selectedItemProperty().
-                addListener((observable, oldNote, newNote) -> {
-                    if (oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())) {
+        notesListView.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldNote, newNote) -> {
+                    if (oldNote != null) {
+                        // Save changes for the old note
+                        suppressUpdates = true; // Suppress incoming updates
                         saveChanges(oldNote.getId(), notesBodyArea.getText());
                     }
+
                     if (newNote != null) {
+                        // Load content for the new note
                         titleField.setText(newNote.getTitle());
                         notesBodyArea.setText(newNote.getContent());
                         original = newNote.getContent();
                         currentNote.set(newNote);
+
                         notesBodyArea.setDisable(false);
                         editButton.setDisable(false);
                         autoSaveService.setOriginalContent(original);
@@ -242,10 +247,14 @@ public class HomePageCtrl implements Initializable {
                         titleField.clear();
                         notesBodyArea.clear();
                         currentNote.set(null);
+
                         notesBodyArea.setDisable(true);
                         editButton.setDisable(true);
                     }
+
+                    suppressUpdates = false; // Re-enable updates
                 });
+
     }
 
     /**
@@ -381,6 +390,10 @@ public class HomePageCtrl implements Initializable {
         languageComboBox.getSelectionModel().select(index);
     }
 
+    /**
+     * Handles incoming notes.
+     * @param note the note to be added
+     */
     public void incomingNote(Note note) {
         Platform.runLater(() -> {
             if(!noteService.noteExists(note)){
@@ -390,6 +403,10 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
+    /**
+     * Handles incoming deletions.
+     * @param note the note to be updated
+     */
     public void incomingDeletion(Note note) {
         Platform.runLater(() -> {
             notesListView.getItems().remove(note);
@@ -397,6 +414,10 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
+    /**
+     * Handles incoming title updates.
+     * @param note the note to be updated
+     */
     public void incomingTitleUpdate(Note note){
         Platform.runLater(() -> {
             int index = noteService.findNoteIndex(note, notesListView.getItems());
@@ -412,25 +433,33 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
-    public void incomingContentUpdate(Note note) {
+    /**
+     * Handles incoming content updates.
+     * @param note the note to be updated
+     */
+    public synchronized void incomingContentUpdate(Note note) {
         Platform.runLater(() -> {
             if (currentNote.get() != null && currentNote.get().getId() == note.getId()) {
                 String incomingContent = note.getContent();
                 String currentContent = notesBodyArea.getText();
 
-                if (!suppressUpdates) {
+                if (!suppressUpdates && !incomingContent.equals(currentContent)) {
                     int caretPosition = notesBodyArea.getCaretPosition();
 
+                    // Apply the incoming content carefully
                     notesBodyArea.setText(incomingContent);
-                    notesBodyArea.positionCaret(caretPosition);
+                    notesBodyArea.positionCaret(Math.min(caretPosition, incomingContent.length()));
 
                     String html = markdownService.convertToHtml(incomingContent);
                     updateWebView(html);
+
+                    System.out.println("Applied incoming update: " + incomingContent);
                 }
                 suppressUpdates = false;
             }
         });
     }
+
 
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override
@@ -462,7 +491,9 @@ public class HomePageCtrl implements Initializable {
                 updateTagComboBox();
                 selectedNote.setContent(currentContent);
                 webSocketClient.sendMessage(selectedNote, "updateContent");
-                autoSaveService.onKeyPressed(selectedNote, currentContent);
+                if(autoSaveService.onKeyPressed(selectedNote, currentContent)){
+                    original = notesBodyArea.getText();
+                }
             }
         });
     }
@@ -571,22 +602,36 @@ public class HomePageCtrl implements Initializable {
      * @param noteId  The ID of the note to save changes for.
      * @param content The new content of the note.
      */
-    private void saveChanges(long noteId, String content) {
-        System.out.println("Saving changes for note ID: " + noteId);
-        Map<String, Object> changes = autoSaveService.getChanges(original, content);
-        original = content;
+    private synchronized void saveChanges(long noteId, String content) {
+        if (isSaving) {
+            System.out.println("Save in progress. Skipping...");
+            return;
+        }
 
-        String status = noteService.saveChanges(noteId, changes);
-        System.out.println("Save status: " + status);
+        isSaving = true;
+        try {
+            if (content.equals(original)) {
+                System.out.println("No changes detected; skipping save.");
+                return;
+            }
 
-        if (!"Successful".equals(status)) {
-            Note note = noteService.getNoteById(noteId);
-            autoSaveService.retrySave(note, changes);
-        } else {
-            noteService.refreshNotes();
-            refreshNotesInternal();
+            System.out.println("Saving changes for note ID: " + noteId);
+            Map<String, Object> changes = autoSaveService.getChanges(original, content);
+
+            String status = noteService.saveChanges(noteId, changes);
+            if ("Successful".equals(status)) {
+                original = content; // Update original only after a successful save
+                System.out.println("Save successful. Updated original content.\n\n");
+            } else {
+                System.err.println("Save failed. Retrying...");
+                Note note = noteService.getNoteById(noteId);
+                autoSaveService.retrySave(note, changes);
+            }
+        } finally {
+            isSaving = false;
         }
     }
+
 
     /**
      * This method force saves the text that is typed if the application is
@@ -596,13 +641,7 @@ public class HomePageCtrl implements Initializable {
         Note current = currentNote.get();
         if (current != null) {
             String content = notesBodyArea.getText();
-
-            // Compare content vs. original
-            if (!content.equals(original)) {
-                saveChanges(current.getId(), content);
-            } else {
-                System.out.println("No changes detected; skipping final save.");
-            }
+            saveChanges(current.getId(), content);
         }
     }
 

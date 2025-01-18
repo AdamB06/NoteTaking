@@ -58,6 +58,6 @@ public class Main extends Application {
         if (webSocketClient != null) {
             webSocketClient.closeConnection();
         }
-        System.exit(0);
+        Platform.runLater(() -> System.exit(0));
     }
 }

@@ -15,7 +15,6 @@
  */
 package client.utils;
 
-import static com.google.common.net.HttpHeaders.SERVER;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
 import java.util.Map;
@@ -141,7 +140,8 @@ public class ServerUtils {
      */
     public boolean isTitleCollectionDuplicate(String title) {
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Note/checkDuplicateCollectionTitle/" + title)
+            Response response = client.target(serverUrl + "Note/checkDuplicateCollectionTitle/"
+                            + title)
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
@@ -274,8 +274,8 @@ public class ServerUtils {
 
     public Note getNoteById(long noteId){
         try (Client client = ClientBuilder.newClient()) {
-            Response response = client.target(serverUrl + "Note/" + noteId).request(APPLICATION_JSON)
-                    .get();
+            Response response = client.target(serverUrl + "Note/" + noteId)
+                    .request(APPLICATION_JSON).get();
             if (response.getStatus() == 200) {
                 return response.readEntity(Note.class);
             } else {
