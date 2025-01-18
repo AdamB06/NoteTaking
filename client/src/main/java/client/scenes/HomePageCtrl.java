@@ -77,7 +77,7 @@ public class HomePageCtrl implements Initializable {
     private final LanguageController languageController;
     private final MnemonicCreator mnemonicCreator;
     private final Warnings warnings;
-    private final TagController tagController = new TagController();
+    private final TagController tagController = new TagController(noteService);
 
 
     /**

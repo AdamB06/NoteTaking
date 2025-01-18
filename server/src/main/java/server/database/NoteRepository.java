@@ -21,5 +21,4 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     @Query("SELECT n FROM Note n JOIN n.tags t WHERE t.name = :tagName")
     List<Note> findNotesByTagName(@Param("tagName") String tagName);
 
-
 }

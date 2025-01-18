@@ -6,6 +6,7 @@ import commons.Tag;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
+import javafx.scene.web.WebView;
 
 
 import java.util.ArrayList;
@@ -14,17 +15,18 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class TagController {
     private NoteService noteService;
 
-
+    public TagController(NoteService noteService) {
+        this.noteService = noteService;
+    }
 
     /**
      * Process tags in the note text and save them to the current note.
      *
-     * @param content content of the note
-     * @param note    current note
+     * @param content       content of the note
+     * @param note          current note
      * @param universalList list of all the tags that are in notes for the combobox;
      */
     public void initializeTags(String content, Note note, Set<Tag> universalList) {
@@ -56,8 +58,9 @@ public class TagController {
                     universalList.add(newTag);
                     System.out.println(note.getTags());
                     System.out.println(universalList);
-
                 }
+                String link = "<a href='/tags/" + tagName + "'>#" + tagName + "</a>";
+                content = content.replace("#" + tagName, link);
 
 
                /* for (Tag tag : note.getTags()) {
@@ -78,9 +81,9 @@ public class TagController {
     }
 
     /**
-     * @param content   the entire content of the note
-     * @param character final input of the user
-     * @param note      current note that we are looking at
+     * @param content       the entire content of the note
+     * @param character     final input of the user
+     * @param note          current note that we are looking at
      * @param universalList list of universal tags  across all notes for the combobox
      */
     public void checkForCorrectUserInput(String content, String character,
@@ -100,8 +103,7 @@ public class TagController {
     }
 
     /**
-     *
-     * @param selectedTag tag that has been selected from the combobox by the user
+     * @param selectedTag   tag that has been selected from the combobox by the user
      * @param notesListView listview of notes
      */
     public void filterNotesByTag(Tag selectedTag, ListView<Note> notesListView) {
@@ -120,7 +122,6 @@ public class TagController {
     }
 
     /**
-     *
      * @param filteredNotes notes that have been filtered on a tag
      * @param notesListView listview of notes
      */
@@ -129,9 +130,56 @@ public class TagController {
         notesListView.setItems(observableNotes);
     }
 
+    public void processNoteLinks(String content, Note note) {
+        if (content == null || content.isEmpty()) return;
+        Pattern pattern = Pattern.compile("\\[\\[(.*?)\\]\\]");
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            String referencedNoteTitle = matcher.group(1);
+            Note referencedNote = noteService.getNoteByTitle(referencedNoteTitle);
+            String replacement;
+            if (referencedNote != null) {
+                replacement = "<a href='/Note/" + referencedNote.getId() + "'>" + referencedNoteTitle + "</a>";
+            } else {
+                replacement = "<span style='color: red;'>[[ " + referencedNoteTitle + " ]] (not found)</span>";
+            }
+            content = content.replace("[[" + referencedNoteTitle + "]]", replacement);
+        }
+
+        note.setContent(content);
+    }
 
 
+    public void handleLinkClick(String link, ListView<Note> notesListView) {
+        if (link.startsWith("/Note/")) {
+            long noteId = Long.parseLong(link.replace("/Note/", ""));
+            Note note = noteService.getNoteById(noteId);
+            if (note != null) {
+                loadNoteInView(note, new WebView());
+            } else {
+                System.out.println("Note not found for ID: " + noteId);
+            }
+        } else if (link.startsWith("/tags/")) {
+            String tagName = link.replace("/tags/", "");
+            Tag tag = new Tag(tagName);
+            filterNotesByTag(tag, notesListView);
+        }
+    }
 
 
+    /**
+     * Load the given note into the UI.
+     *
+     * @param note the note to load into the view.
+     */
+    public void loadNoteInView(Note note, WebView webView) {
+        if (note == null) {
+            System.out.println("No note to be printed");
+            return;
+        }
+        processNoteLinks(note.getContent(), note);
+        webView.getEngine().loadContent(note.getContent());
+        System.out.println("Loading note: " + note.getTitle());
+    }
 
 }

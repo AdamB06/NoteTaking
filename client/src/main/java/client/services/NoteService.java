@@ -3,6 +3,7 @@ package client.services;
 import client.utils.ServerUtils;
 import commons.Note;
 import jakarta.inject.Inject;
+import server.database.NoteRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 public class NoteService {
     private final ServerUtils serverUtils;
+    private NoteRepository noteRepository;
     private List<Note> notes = new ArrayList<>();
 
     /**
@@ -127,5 +129,15 @@ public class NoteService {
      */
     public void refreshNotes() {
         notes = serverUtils.getNotes();
+    }
+
+    public Note getNoteByTitle(String title) {
+        if (title == null || title.isEmpty()) {
+            return null;
+        }
+        return noteRepository.findAll().stream()
+                .filter(note -> note.getTitle() != null && note.getTitle().equalsIgnoreCase(title))
+                .findFirst()
+                .orElse(null);
     }
 }
