@@ -35,9 +35,9 @@ public class NoteService {
      * @return returns saved note
      */
     public Note saveNote(Note note) {
-
         return noteRepository.save(note);
     }
+
 
     /**
      * Retrieves all notes from the database.
@@ -49,8 +49,6 @@ public class NoteService {
     }
 
 
-
-    //public List<Tag> getAllTags(){return tagRepository.findAll();}
 
     /**
      * Retrieves a note by its ID from the database.

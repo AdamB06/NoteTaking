@@ -1,14 +1,20 @@
 import client.LanguageController;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LanguageControllerTest {
 
+    private LanguageController lc;
+
+    @BeforeEach
+    public void init(){
+        lc = new LanguageController();
+    }
+
     @Test
     public void testLanguageLoad(){
-        LanguageController lc = new LanguageController();
-
         String lang = "en";
         lc.loadLanguage(lang);
 
@@ -20,8 +26,6 @@ public class LanguageControllerTest {
 
     @Test
     public void testLanguageSwitch(){
-        LanguageController lc = new LanguageController();
-
         String lang = "en";
         lc.loadLanguage(lang);
 
@@ -48,4 +52,19 @@ public class LanguageControllerTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void testPersistence(){
+        String lang="en";
+        lc.loadLanguage(lang);
+
+        LanguageController lc2 = new LanguageController();
+        lc2.loadLanguage(lang);
+
+        String expected=lc.getEditText();
+        String actual = lc2.getEditText();
+
+        assertEquals(actual, expected);
+    }
+
 }

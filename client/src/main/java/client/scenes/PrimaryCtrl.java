@@ -17,7 +17,8 @@ public class PrimaryCtrl {
      * @param home Pair of UI and Controller
      * @param edit Pair of EditCollection UI and its Controller
      */
-    public void init(Stage primaryStage, Pair<HomePageCtrl, Parent> home, Pair<EditCollectionCtrl, Parent> edit) {
+    public void init(Stage primaryStage, Pair<HomePageCtrl, Parent> home,
+                     Pair<EditCollectionCtrl, Parent> edit) {
         this.primaryStage = primaryStage;
         this.homeScene = new Scene(home.getValue());
         this.editScene = new Scene(edit.getValue());

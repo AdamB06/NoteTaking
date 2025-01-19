@@ -68,5 +68,3 @@ public class CollectionService{
         collections = serverUtils.getCollections();
     }
 }
-
-

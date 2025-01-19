@@ -1,6 +1,5 @@
 package commons;
 
-
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
@@ -26,6 +25,13 @@ public class Tag {
      */
     public Tag(String name) {
         this.name = name;
+    }
+
+    /**
+     * Default constructor for Tag
+     */
+    public Tag() {
+        // This is required for deserialization and object mapping
     }
 
     /**

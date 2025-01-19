@@ -3,24 +3,23 @@ package client;
 import client.services.NoteService;
 import commons.Note;
 import commons.Tag;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.scene.control.ListView;
 import javafx.scene.web.WebView;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class TagController {
-    private NoteService noteService;
+    private final NoteService noteService;
 
     public TagController(NoteService noteService) {
         this.noteService = noteService;
     }
+
 
     /**
      * Process tags in the note text and save them to the current note.
@@ -44,6 +43,7 @@ public class TagController {
         }
 
         try {
+            // Pattern to match hashtags like #tag1, #tag2, etc.
             Pattern pattern = Pattern.compile("#(\\w+)");
             Matcher matcher = pattern.matcher(content);
 
@@ -57,6 +57,7 @@ public class TagController {
                     universalList.add(newTag);
                     System.out.println(note.getTags());
                     System.out.println(universalList);
+
                 }
                 String link = "<a href='/tags/" + tagName + "'>#" + tagName + "</a>";
                 content = content.replace("#" + tagName, link);
@@ -85,33 +86,51 @@ public class TagController {
      * @param note          current note that we are looking at
      * @param universalList list of universal tags  across all notes for the combobox
      */
-    public void checkForCorrectUserInput(String content, String character,
-                                         Note note, Set<Tag> universalList) {
+    public void checkForCorrectUserInput(String content, String character, Note note, Set<Tag> universalList) {
+        if (content == null || content.trim().isEmpty()) {
+            return;
+        }
 
+        String[] words = content.split("\\s+");
+        if (words.length == 0) {
+            return;
+        }
 
-        if (character.equals(" ") || character.equals("\n")) {
-            System.out.println("Space detected.");
-            String[] words = content.split("\\s+");
-            String lastWord = words[words.length - 1];
-            if (lastWord.startsWith("#") && lastWord.length() > 1 &&
-                    lastWord.substring(1).matches("\\w+")) {
-                System.out.println("Valid tag detected: " + lastWord);
-                initializeTags(content, note, universalList);
+        String lastWord = words[words.length - 1];
+        if (lastWord.startsWith("#")) {
+            if (character.equals(" ") || character.equals("\n")) {
+                System.out.println("Space detected.");
+
+                if (lastWord.length() > 1 && lastWord.substring(1).matches("\\w+")) {
+                    System.out.println("Valid tag detected: " + lastWord);
+                    initializeTags(content, note, universalList);
+                }
             }
         }
     }
 
+
     /**
-     * @param selectedTag   tag that has been selected from the combobox by the user
+     * @param selectedTags  tags that have been selected from the checkcombobox by the user
      * @param notesListView listview of notes
      */
-    public void filterNotesByTag(Tag selectedTag, ListView<Note> notesListView) {
+    public void filterNotesByTag(Set<Tag> selectedTags, ListView<Note> notesListView, List<Note> noteList) {
         List<Note> filteredNotes = new ArrayList<>();
-        for (Note note : noteService.getNotes()) {
+        for (Note note : noteList) {
             System.out.println("Checking note: " + note.getTitle());
             System.out.println("Tags: " + note.getTags());
-            if (note.getTags().contains(selectedTag)) {
-                filteredNotes.add(note);
+
+            boolean hasAllTags = true;
+            for (Tag tag : selectedTags) {
+                if (!note.getTags().contains(tag)) {
+                    hasAllTags = false;
+                    break;
+                }
+            }
+
+            if (hasAllTags) {
+                System.out.println("This note contains all selected tags.");
+                filteredNotes.add(note); // Add note if it contains all selected tags
             }
         }
 
@@ -120,13 +139,16 @@ public class TagController {
         updateNotesListView(filteredNotes, notesListView);
     }
 
+
     /**
      * @param filteredNotes notes that have been filtered on a tag
      * @param notesListView listview of notes
      */
     public void updateNotesListView(List<Note> filteredNotes, ListView<Note> notesListView) {
-        ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
-        notesListView.setItems(observableNotes);
+        notesListView.getItems().clear();
+        System.out.println("CLEARED NOTES");
+        notesListView.getItems().addAll(filteredNotes);
+        System.out.println("NOW SHOWING: " + notesListView.getItems());
     }
 
     public void processNoteLinks(String content, Note note) {
@@ -163,14 +185,16 @@ public class TagController {
         } else if (link.startsWith("/tags/")) {
             String tagName = link.replace("/tags/", "");
             Tag tag = new Tag(tagName);
-            filterNotesByTag(tag, notesListView);
+            //filterNotesByTag(tag, notesListView); needs to be resolved
         }
     }
 
 
+//ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
+//notesListView.setItems(observableNotes);
+
     /**
-     *
-     * @param note gives a note
+     * @param note    gives a note
      * @param webView is the webview
      */
     public void loadNoteInView(Note note, WebView webView) {
@@ -192,6 +216,7 @@ public class TagController {
                 processNoteLinks(updatedContent, note); // Re-process links
             }
         }
-
     }
 }
+
+
