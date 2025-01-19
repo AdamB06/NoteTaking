@@ -104,7 +104,6 @@ public class HomePageCtrl implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         String defaultLanguage = ClientConfig.loadConfig().getPreferredLanguage();
-        System.out.println(defaultLanguage);
         languageController.loadLanguage(defaultLanguage);
 
         titleField.setEditable(false);
