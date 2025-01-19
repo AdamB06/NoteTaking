@@ -3,6 +3,7 @@ package client.services;
 import client.utils.ServerUtils;
 import commons.Note;
 import jakarta.inject.Inject;
+//import server.database.NoteRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +145,18 @@ public class NoteService {
      */
     public void refreshNotes() {
         notes = serverUtils.getNotes();
+    }
+
+    public Note getNoteByTitle(String title) {
+        if (title == null || title.isEmpty()) {
+            return null;
+        }
+        // somehow doesn't work anymore, needs to be fixed
+//        return noteRepository.findAll().stream()
+//                .filter(note -> note.getTitle() != null && note.getTitle().equalsIgnoreCase(title))
+//                .findFirst()
+//                .orElse(null);
+        return null;
     }
 
     /**

@@ -151,8 +151,30 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
 
+        webView.getEngine().setOnAlert(event -> {
+            String link = event.getData();
+            tagController.handleLinkClick(link, notesListView);
+        });
+
+        notesBodyArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            Note current = currentNote.get();
+            if (current != null) {
+                current.setContent(newValue); // Update the current note's content
+                tagController.processNoteLinks(newValue, current); // Process links
+                webView.getEngine().loadContent(current.getContent()); // Reload processed content into WebView
+            }
+        });
+
+        webView.getEngine().loadContent("<html><body>" +
+                "<p>No notes available. Please add a note to see links here.</p>" +
+                "</body></html>");
+
         shortcutsButton.setOnAction(action -> shortcutsHint());
     }
+
+    public void renameNote(String oldTitle, String newTitle) {
+        tagController.updateNoteReferences(oldTitle, newTitle);
+        }
 
     /**
      * Initializes the button graphics

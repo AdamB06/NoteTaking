@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import server.api.NoteService;
 import server.database.NoteRepository;
 import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public class NoteController {
 
     /**
      * @param noteRepository The note repository
-     * @param noteService The note service interface
+     * @param noteService    The note service interface
      */
     @Autowired
     public NoteController(NoteRepository noteRepository, NoteService noteService) {
@@ -38,10 +39,9 @@ public class NoteController {
      */
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
-        if(checkDuplicateTitle(note.getTitle())) {
+        if (checkDuplicateTitle(note.getTitle())) {
             throw new IllegalArgumentException("Note title already exists");
-        }
-        else{
+        } else {
             Note savedNote = noteService.saveNote(note);
             return ResponseEntity.ok(savedNote);
         }
@@ -49,23 +49,34 @@ public class NoteController {
 
     /**
      * Endpoint to edit the content of a note.
+     *
      * @param title New title for the note
-     * @param id ID of the note to be edited
+     * @param id    ID of the note to be edited
      * @return The edited note
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Note> editNoteTitle (@RequestBody String title,
-                                               @PathVariable("id") long id){
+    public ResponseEntity<Note> editNoteTitle(@RequestBody String title,
+                                              @PathVariable("id") long id) {
         Note note = noteService.getNoteById(id);
-        if(checkDuplicateTitle(title)){
+        if (checkDuplicateTitle(title)) {
             throw new IllegalArgumentException("Note title already exists");
-        }
-        else{
+        } else {
+            String oldTitle = note.getTitle();
             note.setTitle(title);
-            Note savedNote = noteService.saveNote (note);
+            Note savedNote = noteService.saveNote(note);
+            List<Note> allNotes = noteService.getAllNotes();
+            for (Note n : allNotes) {
+                if (n.getContent().contains("[[" + oldTitle + "]]")) {
+                    String updatedContent = n.getContent().replace("[[" + oldTitle + "]]", "[[" + title + "]]");
+                    n.setContent(updatedContent);
+                    noteService.saveNote(n);
+                }
+            }
+
             return ResponseEntity.ok(savedNote);
         }
     }
+
 
     /**
      * @param title The title of the note
@@ -79,6 +90,7 @@ public class NoteController {
 
     /**
      * Checks if the provided note title is a duplicate from the list of notes.
+     *
      * @param title The title of the note
      * @return True if the title is a duplicate, false otherwise.
      */
@@ -106,6 +118,7 @@ public class NoteController {
 
     /**
      * This deletes the note with the given ID.
+     *
      * @param id ID of the note that needs to be deleted.
      */
     @DeleteMapping("/{id}")
@@ -115,8 +128,9 @@ public class NoteController {
 
     /**
      * Endpoint for patch request to edit content of note
-     * @param id of the to be edited note
-     * @param changes to be added into the contents
+     *
+     * @param id             of the to be edited note
+     * @param changes        to be added into the contents
      * @param overrideMethod to use post as patch mapping
      * @return returns a response of if the method successfully executed
      */
@@ -143,19 +157,19 @@ public class NoteController {
             noteService.saveNote(note);
             System.out.println("Updated Content");
             return ResponseEntity.ok().build();
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
         }
     }
 
     /**
      * Takes the patch and applies it on the content in the database
+     *
      * @param originalContent the saved content
-     * @param operation what operation to do
-     * @param startIndex from where to place the new text
-     * @param endIndex to where to place the new text
-     * @param newText the text to be added
+     * @param operation       what operation to do
+     * @param startIndex      from where to place the new text
+     * @param endIndex        to where to place the new text
+     * @param newText         the text to be added
      * @return the resulting string
      */
     public String applyPatch(String originalContent, String operation,
@@ -187,7 +201,6 @@ public class NoteController {
     }
 
     /**
-     *
      * @param id identification of the note
      * @return the id of the note
      */
@@ -201,7 +214,6 @@ public class NoteController {
     }
 
     /**
-     *
      * @param tagName name of the tag
      * @return returns the list of notes with that specific tagname
      */
@@ -210,4 +222,6 @@ public class NoteController {
         List<Note> notes = noteService.findNotesByTagName(tagName);
         return ResponseEntity.ok(notes);
     }
+
+
 }

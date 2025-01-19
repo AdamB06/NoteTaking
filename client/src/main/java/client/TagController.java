@@ -5,6 +5,7 @@ import commons.Note;
 import commons.Tag;
 
 import javafx.scene.control.ListView;
+import javafx.scene.web.WebView;
 
 
 import java.util.*;
@@ -15,11 +16,9 @@ import java.util.regex.Pattern;
 public class TagController {
     private final NoteService noteService;
 
-    public TagController(NoteService noteService){
+    public TagController(NoteService noteService) {
         this.noteService = noteService;
     }
-
-
 
 
     /**
@@ -49,7 +48,7 @@ public class TagController {
             Matcher matcher = pattern.matcher(content);
 
             while (matcher.find()) {
-                String tagName = matcher.group(1); // this is so that we store the tag without the #
+                String tagName = matcher.group(1);
                 System.out.println("Extracted tag: " + tagName);
 
                 if (!(note.getTags().contains(tagName))) {
@@ -60,6 +59,8 @@ public class TagController {
                     System.out.println(universalList);
 
                 }
+                String link = "<a href='/tags/" + tagName + "'>#" + tagName + "</a>";
+                content = content.replace("#" + tagName, link);
 
 
                /* for (Tag tag : note.getTags()) {
@@ -74,7 +75,6 @@ public class TagController {
                 */
 
             }
-
         } catch (Exception e) {
             System.err.println("Error initializing tags: " + e.getMessage());
         }
@@ -113,7 +113,7 @@ public class TagController {
     /**
      * @param selectedTags  tags that have been selected from the checkcombobox by the user
      * @param notesListView listview of notes
-     * @param noteList      the list of notes that needs to be filtered
+     * @param noteList list of notes that has to be filtered
      */
     public void filterNotesByTag(Set<Tag> selectedTags, ListView<Note> notesListView, List<Note> noteList) {
         List<Note> filteredNotes = new ArrayList<>();
@@ -136,6 +136,7 @@ public class TagController {
         }
 
         System.out.println("Filtered notes count: " + filteredNotes.size());
+
         updateNotesListView(filteredNotes, notesListView);
     }
 
@@ -149,11 +150,74 @@ public class TagController {
         System.out.println("CLEARED NOTES");
         notesListView.getItems().addAll(filteredNotes);
         System.out.println("NOW SHOWING: " + notesListView.getItems());
+    }
+
+    public void processNoteLinks(String content, Note note) {
+        if (content == null || content.isEmpty()) return;
+        Pattern pattern = Pattern.compile("\\[\\[(.*?)\\]\\]");
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            String referencedNoteTitle = matcher.group(1);
+            Note referencedNote = noteService.getNoteByTitle(referencedNoteTitle);
+            String replacement;
+            if (referencedNote != null) {
+                replacement = "<a href='/Note/" + referencedNote.getId() + "'>" + referencedNoteTitle + "</a>";
+            } else {
+                replacement = "<span style='color: red;'>[[ " + referencedNoteTitle + " ]] (not found)</span>";
+            }
+            content = content.replace("[[" + referencedNoteTitle + "]]", replacement);
+        }
+
+        note.setContent(content);
+
 
     }
 
 
-    //ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
-    //notesListView.setItems(observableNotes);
+    public void handleLinkClick(String link, ListView<Note> notesListView) {
+        if (link.startsWith("/Note/")) {
+            long noteId = Long.parseLong(link.replace("/Note/", ""));
+            Note note = noteService.getNoteById(noteId);
+            if (note != null) {
+                loadNoteInView(note, new WebView());
+            } else {
+                System.out.println("Note not found for ID: " + noteId);
+            }
+        } else if (link.startsWith("/tags/")) {
+            String tagName = link.replace("/tags/", "");
+            Tag tag = new Tag(tagName);
+            //filterNotesByTag(tag, notesListView); needs to be resolved
+        }
+    }
+
+
+//ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
+//notesListView.setItems(observableNotes);
+
+    /**
+     * @param note    gives a note
+     * @param webView is the webview
+     */
+    public void loadNoteInView(Note note, WebView webView) {
+        if (note == null) {
+            System.out.println("No note to be printed");
+            return;
+        }
+        processNoteLinks(note.getContent(), note);
+        webView.getEngine().loadContent(note.getContent());
+        System.out.println("Loading note: " + note.getTitle());
+    }
+
+    public void updateNoteReferences(String oldTitle, String newTitle) {
+        for (Note note : noteService.getNotes()) {
+            String content = note.getContent();
+            String updatedContent = content.replace("[[" + oldTitle + "]]", "[[" + newTitle + "]]");
+            if (!content.equals(updatedContent)) {
+                note.setContent(updatedContent);
+                processNoteLinks(updatedContent, note); // Re-process links
+            }
+        }
+    }
 }
+
 
