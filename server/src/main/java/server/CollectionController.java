@@ -1,6 +1,7 @@
 package server;
 
 import commons.Collection;
+import commons.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,7 @@ public class CollectionController {
 
     /**
      * Endpoint to delete a collection by id
+     *
      * @param id id of the collection to be deleted
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
@@ -88,6 +90,7 @@ public class CollectionController {
 
     /**
      * Endpoint to getting a collection by id
+     *
      * @param id id of the collection to get
      * @return A ResponseEntity containing the collection
      */
@@ -99,6 +102,7 @@ public class CollectionController {
 
     /**
      * Endpoint to add a note to a collection
+     *
      * @param id The id of the collection
      * @param note The Note to be added
      * @return A ResponseEntity containing a message if the method was successfully executed
@@ -111,6 +115,7 @@ public class CollectionController {
 
     /**
      * Endpoint to delete a note from a collection
+     *
      * @param collectionId The id of the collection
      * @param noteId The id of the Note to be deleted
      * @return A ResponseEntity containing a message if the method was successfully executed
