@@ -44,12 +44,11 @@ public class TagController {
         }
 
         try {
-            // Pattern to match hashtags like #tag1, #tag2, etc.
             Pattern pattern = Pattern.compile("#(\\w+)");
             Matcher matcher = pattern.matcher(content);
 
             while (matcher.find()) {
-                String tagName = matcher.group(1); // this is so that we store the tag without the #
+                String tagName = matcher.group(1);
                 System.out.println("Extracted tag: " + tagName);
 
                 if (!(note.getTags().contains(tagName))) {
@@ -147,6 +146,8 @@ public class TagController {
         }
 
         note.setContent(content);
+
+
     }
 
 
@@ -168,9 +169,9 @@ public class TagController {
 
 
     /**
-     * Load the given note into the UI.
      *
-     * @param note the note to load into the view.
+     * @param note gives a note
+     * @param webView is the webview
      */
     public void loadNoteInView(Note note, WebView webView) {
         if (note == null) {
@@ -182,4 +183,15 @@ public class TagController {
         System.out.println("Loading note: " + note.getTitle());
     }
 
+    public void updateNoteReferences(String oldTitle, String newTitle) {
+        for (Note note : noteService.getNotes()) {
+            String content = note.getContent();
+            String updatedContent = content.replace("[[" + oldTitle + "]]", "[[" + newTitle + "]]");
+            if (!content.equals(updatedContent)) {
+                note.setContent(updatedContent);
+                processNoteLinks(updatedContent, note); // Re-process links
+            }
+        }
+
+    }
 }

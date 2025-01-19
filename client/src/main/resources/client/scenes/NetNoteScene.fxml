@@ -150,7 +150,6 @@
                             </Label>
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                            <!-- Updated WebView with Mouse Click Event -->
                             <WebView fx:id="webView" layoutX="-1.0" layoutY="-2.0" prefHeight="638.0" prefWidth="263.0" />
                         </AnchorPane>
                     </SplitPane>
