@@ -81,10 +81,12 @@ public class HomePageCtrl implements Initializable {
     private final LanguageController languageController;
     private final MnemonicCreator mnemonicCreator;
     private final Warnings warnings;
-    private final TagController tagController = new TagController();
+    private final TagController tagController;
     private final WebSocketClient webSocketClient;
     private boolean suppressUpdates = false;
     private boolean isSaving = false;
+    private Set<Tag> lastSelectedTags = new HashSet<>();
+
 
     /**
      * Constructor for HomePageCtrl.
@@ -106,6 +108,7 @@ public class HomePageCtrl implements Initializable {
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
         this.autoSaveService = new AutoSaveService(serverUtils, noteService);
+        this.tagController = new TagController( noteService);
         webSocketClient = injector.getInstance(WebSocketClient.class);
         webSocketClient.setHomePageCtrl(this);
         webSocketClient.connect();
@@ -510,6 +513,7 @@ public class HomePageCtrl implements Initializable {
                         selectedNote, universalTags);
                 updateTagComboBox();
                 selectedNote.setContent(currentContent);
+
                 webSocketClient.sendMessage(selectedNote, "updateContent");
                 if(autoSaveService.onKeyPressed(selectedNote, currentContent)){
                     original = notesBodyArea.getText();
@@ -686,12 +690,13 @@ public class HomePageCtrl implements Initializable {
         tagComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Tag>) c -> {
             Set<Tag> selectedTags = new HashSet<>(tagComboBox.getCheckModel().getCheckedItems());
 
-            // Perform filtering based on the selected tags
-            if(selectedTags != null){
+            // Check if the selected tags have actually changed
+            if (!selectedTags.equals(lastSelectedTags)) {
+                lastSelectedTags = selectedTags;
+                System.out.println("filtering is being called");
                 tagController.filterNotesByTag(selectedTags, notesListView, noteService.getNotes());
             }
         });
-
     }
 
     /**
