@@ -113,6 +113,7 @@ public class TagController {
     /**
      * @param selectedTags  tags that have been selected from the checkcombobox by the user
      * @param notesListView listview of notes
+     * @param noteList list of notes that has to be filtered
      */
     public void filterNotesByTag(Set<Tag> selectedTags, ListView<Note> notesListView, List<Note> noteList) {
         List<Note> filteredNotes = new ArrayList<>();
