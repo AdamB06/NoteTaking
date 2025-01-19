@@ -7,6 +7,11 @@ public class LanguageController {
     private ResourceBundle bundle;
 
     /**
+     * @return the language bundle
+     */
+    public String getFilterButtonText(){return bundle.getString("filterButton.text");}
+
+    /**
      * loads a defined language for later use
      * @param language the language abbreviation
      */
@@ -14,6 +19,10 @@ public class LanguageController {
         Locale locale = new Locale(language);
         bundle = ResourceBundle.getBundle("i18n.messages", locale);
     }
+    /**
+     * @return clear filter button text
+     **/
+    public String getClearFilterButtonText(){return bundle.getString("clearFilters.text");}
 
     /**
      * @return edit button text

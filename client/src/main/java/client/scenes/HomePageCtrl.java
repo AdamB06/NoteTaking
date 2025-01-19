@@ -8,6 +8,7 @@ import client.utils.ServerUtils;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
 import commons.Note;
+import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -40,6 +41,8 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private Button refreshButton;
     @FXML
+    private Button clearFilterButton;
+    @FXML
     private Button shortcutsButton;
     @FXML
     private Label collectionsLabel;
@@ -51,6 +54,10 @@ public class HomePageCtrl implements Initializable {
     private TextField searchBox;
     @FXML
     private ComboBox<Image> languageComboBox;
+    @FXML
+    private ComboBox<Tag> tagComboBox;
+    @FXML
+    private Set<Tag> universalTags = new HashSet<>();
 
     @FXML
     private Image englishFlag;
@@ -72,6 +79,10 @@ public class HomePageCtrl implements Initializable {
     private final LanguageController languageController;
     private final MnemonicCreator mnemonicCreator;
     private final Warnings warnings;
+    private final TagController tagController = new TagController();
+    private final WebSocketClient webSocketClient;
+    private boolean suppressUpdates = false;
+    private boolean isSaving = false;
 
     /**
      * Constructor for HomePageCtrl.
@@ -93,6 +104,9 @@ public class HomePageCtrl implements Initializable {
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
         this.autoSaveService = new AutoSaveService(serverUtils, noteService);
+        webSocketClient = injector.getInstance(WebSocketClient.class);
+        webSocketClient.setHomePageCtrl(this);
+        webSocketClient.connect();
     }
 
     /**
@@ -104,7 +118,6 @@ public class HomePageCtrl implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         String defaultLanguage = ClientConfig.loadConfig().getPreferredLanguage();
-        System.out.println(defaultLanguage);
         languageController.loadLanguage(defaultLanguage);
 
         titleField.setEditable(false);
@@ -128,6 +141,7 @@ public class HomePageCtrl implements Initializable {
         configureAutoSave();
         notesBodyArea.setDisable(true);
         editButton.setDisable(true);
+        clearFilterButton.setOnAction(event -> clearFilter());
 
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
@@ -227,16 +241,21 @@ public class HomePageCtrl implements Initializable {
             }
         });
 
-        notesListView.getSelectionModel().selectedItemProperty().
-                addListener((observable, oldNote, newNote) -> {
-                    if (oldNote != null && !notesBodyArea.getText().equals(oldNote.getContent())) {
+        notesListView.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldNote, newNote) -> {
+                    if (oldNote != null) {
+                        // Save changes for the old note
+                        suppressUpdates = true; // Suppress incoming updates
                         saveChanges(oldNote.getId(), notesBodyArea.getText());
                     }
+
                     if (newNote != null) {
+                        // Load content for the new note
                         titleField.setText(newNote.getTitle());
                         notesBodyArea.setText(newNote.getContent());
                         original = newNote.getContent();
                         currentNote.set(newNote);
+
                         notesBodyArea.setDisable(false);
                         editButton.setDisable(false);
                         autoSaveService.setOriginalContent(original);
@@ -247,6 +266,7 @@ public class HomePageCtrl implements Initializable {
                         notesBodyArea.setDisable(true);
                         editButton.setDisable(true);
                     }
+                    suppressUpdates = false; // Re-enable updates
                 });
     }
 
@@ -270,12 +290,12 @@ public class HomePageCtrl implements Initializable {
                 if (selectedNote != null) {
                     String newTitle = titleField.getText();
                     String updatedTitle = noteService.updateNoteTitle(
-                            selectedNote.getId(), newTitle);
+                            selectedNote, newTitle);
                     if (updatedTitle.equals(newTitle)) {
+                        webSocketClient.sendMessage(selectedNote, "updateTitle");
                         selectedNote.setTitle(newTitle);
-                        int selectedIndex = notesListView.getSelectionModel().getSelectedIndex();
-                        notesListView.getItems().set(selectedIndex, selectedNote);
                         notesListView.refresh();
+                        notesListView.getSelectionModel().select(selectedNote);
                     } else {
                         String header, content;
                         boolean set = true;
@@ -357,6 +377,8 @@ public class HomePageCtrl implements Initializable {
         searchBox.setPromptText(languageController.getSearchBoxText());
         titleField.setPromptText(languageController.getTitleFieldText());
         notesBodyArea.setPromptText(languageController.getNotesBodyAreaText());
+        tagComboBox.setPromptText(languageController.getFilterButtonText());
+        clearFilterButton.setText(languageController.getClearFilterButtonText());
 
         loadAllFlags(i);
 
@@ -386,6 +408,77 @@ public class HomePageCtrl implements Initializable {
         languageComboBox.getSelectionModel().select(index);
     }
 
+    /**
+     * Handles incoming notes.
+     * @param note the note to be added
+     */
+    public void incomingNote(Note note) {
+        Platform.runLater(() -> {
+            if(!noteService.noteExists(note)){
+                notesListView.getItems().add(note);
+                System.out.println("Note added: " + note.getTitle());
+            }
+        });
+    }
+
+    /**
+     * Handles incoming deletions.
+     * @param note the note to be updated
+     */
+    public void incomingDeletion(Note note) {
+        Platform.runLater(() -> {
+            notesListView.getItems().remove(note);
+            System.out.println("Note removed: " + note.getTitle());
+        });
+    }
+
+    /**
+     * Handles incoming title updates.
+     * @param note the note to be updated
+     */
+    public void incomingTitleUpdate(Note note){
+        Platform.runLater(() -> {
+            int index = noteService.findNoteIndex(note, notesListView.getItems());
+            if (index != -1) {
+                notesListView.getItems().set(index, note);
+                notesListView.refresh();
+                notesListView.getSelectionModel().select(currentNote.get());
+            }
+            System.out.println("Note title updated: " + note.getTitle());
+            if(currentNote.get() != null && currentNote.get().getId() == note.getId()){
+                titleField.setText(note.getTitle());
+            }
+        });
+    }
+
+    /**
+     * Handles incoming content updates.
+     * @param note the note to be updated
+     */
+    public synchronized void incomingContentUpdate(Note note) {
+        Platform.runLater(() -> {
+            if (currentNote.get() != null && currentNote.get().getId() == note.getId()) {
+                String incomingContent = note.getContent();
+                String currentContent = notesBodyArea.getText();
+
+                if (!suppressUpdates && !incomingContent.equals(currentContent)) {
+                    int caretPosition = notesBodyArea.getCaretPosition();
+
+                    // Apply the incoming content carefully
+                    notesBodyArea.setText(incomingContent);
+                    notesBodyArea.positionCaret(Math.min(caretPosition, incomingContent.length()));
+
+                    String html = markdownService.convertToHtml(incomingContent);
+                    updateWebView(html);
+
+                    System.out.println("Applied incoming update: " + incomingContent);
+                }
+                suppressUpdates = false;
+            }
+        });
+    }
+
+
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override
         protected void updateItem(Image image, boolean empty) {
@@ -407,10 +500,18 @@ public class HomePageCtrl implements Initializable {
      */
     private void configureAutoSave() {
         notesBodyArea.setOnKeyTyped(event -> {
+            suppressUpdates = true;
             Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
             if (selectedNote != null) {
                 String currentContent = notesBodyArea.getText();
-                autoSaveService.onKeyPressed(selectedNote, currentContent);
+                tagController.checkForCorrectUserInput(currentContent, event.getCharacter(),
+                        selectedNote, universalTags);
+                updateTagComboBox();
+                selectedNote.setContent(currentContent);
+                webSocketClient.sendMessage(selectedNote, "updateContent");
+                if(autoSaveService.onKeyPressed(selectedNote, currentContent)){
+                    original = notesBodyArea.getText();
+                }
             }
         });
     }
@@ -465,6 +566,7 @@ public class HomePageCtrl implements Initializable {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);
             mnemonicCreator.updateIndex(notesListView.getSelectionModel().getSelectedIndex());
+            webSocketClient.sendMessage(createdNote, "create");
             System.out.println("Note created with ID: " + createdNote.getId());
             warnings.inform(languageController.getByTag("noticeText.text"),
                     languageController.getByTag("noteAddedContent.text"),
@@ -493,6 +595,7 @@ public class HomePageCtrl implements Initializable {
 
             String status = noteService.deleteNote(selectedNote);
             if ("Successful".equals(status)) {
+                webSocketClient.sendMessage(selectedNote, "delete");
                 refreshNotesInternal();
                 warnings.inform(
                         languageController.getByTag("noticeText.text"),
@@ -513,7 +616,6 @@ public class HomePageCtrl implements Initializable {
                     languageController.getByTag("notice.noNoteSelected.details")
             );
         }
-
     }
 
     /**
@@ -532,20 +634,33 @@ public class HomePageCtrl implements Initializable {
      * @param noteId  The ID of the note to save changes for.
      * @param content The new content of the note.
      */
-    private void saveChanges(long noteId, String content) {
-        System.out.println("Saving changes for note ID: " + noteId);
-        Map<String, Object> changes = autoSaveService.getChanges(original, content);
-        original = content;
+    private synchronized void saveChanges(long noteId, String content) {
+        if (isSaving) {
+            System.out.println("Save in progress. Skipping...");
+            return;
+        }
 
-        String status = noteService.saveChanges(noteId, changes);
-        System.out.println("Save status: " + status);
+        isSaving = true;
+        try {
+            if (content.equals(original)) {
+                System.out.println("No changes detected; skipping save.");
+                return;
+            }
 
-        if (!"Successful".equals(status)) {
-            Note note = noteService.getNoteById(noteId);
-            autoSaveService.retrySave(note, changes);
-        } else {
-            noteService.refreshNotes();
-            refreshNotesInternal();
+            System.out.println("Saving changes for note ID: " + noteId);
+            Map<String, Object> changes = autoSaveService.getChanges(original, content);
+
+            String status = noteService.saveChanges(noteId, changes);
+            if ("Successful".equals(status)) {
+                original = content; // Update original only after a successful save
+                System.out.println("Save successful. Updated original content.\n\n");
+            } else {
+                System.err.println("Save failed. Retrying...");
+                Note note = noteService.getNoteById(noteId);
+                autoSaveService.retrySave(note, changes);
+            }
+        } finally {
+            isSaving = false;
         }
     }
 
@@ -557,13 +672,29 @@ public class HomePageCtrl implements Initializable {
         Note current = currentNote.get();
         if (current != null) {
             String content = notesBodyArea.getText();
-
-            // Compare content vs. original
-            if (!content.equals(original)) {
-                saveChanges(current.getId(), content);
-            } else {
-                System.out.println("No changes detected; skipping final save.");
-            }
+            saveChanges(current.getId(), content);
         }
     }
+
+    /**
+     * updates the comboBox to contain the new tags that were added to notes
+     */
+    public void updateTagComboBox() {
+        tagComboBox.getItems().setAll(universalTags);
+        tagComboBox.setOnAction(event -> {
+            Tag selectedTag = tagComboBox.getSelectionModel().getSelectedItem();
+            if (selectedTag != null) {
+                tagController.filterNotesByTag(selectedTag, notesListView);
+            }
+        });
+    }
+
+    /**
+     * Reset the ListView to show all notes
+     */
+    private void clearFilter() {
+        tagController.updateNotesListView(new ArrayList<>(noteService.getNotes()), notesListView);
+        tagComboBox.getSelectionModel().clearSelection();
+    }
+
 }
