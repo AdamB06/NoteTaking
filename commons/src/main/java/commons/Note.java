@@ -23,8 +23,8 @@ public class Note {
     private String title;
     private String content;
 
-    @ManyToOne
-    private Collection collection;
+    private long collectionID;
+    private String collectionURL;
 
     @ManyToMany
     @JoinTable(
@@ -82,18 +82,33 @@ public class Note {
     }
 
     /**
-     * @return collection
+     * @return collectionID
      */
-    public Collection getCollection() {
-        return collection;
+    public long getCollectionID() {
+        return collectionID;
     }
 
     /**
-     * A setter for the collection the note is in
-     * @param collection collection the note is in
+     * @return collectionURL
      */
-    public void setCollection(Collection collection) {
-        this.collection = collection;
+    public String getCollectionURL() {
+        return collectionURL;
+    }
+
+    /**
+     * a setter for the id of the collection this is in
+     * @param collectionID id of the collection the note is in
+     */
+    public void setCollectionID(long collectionID) {
+        this.collectionID = collectionID;
+    }
+
+    /**
+     * a setter for the URL of the collection this is in
+     * @param collectionURL URL of the collection the note is in
+     */
+    public void setCollectionURL(String collectionURL) {
+        this.collectionURL = collectionURL;
     }
 
     /**
