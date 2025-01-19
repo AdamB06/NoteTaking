@@ -3,20 +3,23 @@ package client;
 import client.services.NoteService;
 import commons.Note;
 import commons.Tag;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.scene.control.ListView;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class TagController {
-    private NoteService noteService;
+    private final NoteService noteService;
+
+    public TagController(NoteService noteService){
+        this.noteService = noteService;
+    }
+
+
 
 
     /**
@@ -71,6 +74,7 @@ public class TagController {
                 */
 
             }
+
         } catch (Exception e) {
             System.err.println("Error initializing tags: " + e.getMessage());
         }
@@ -116,19 +120,25 @@ public class TagController {
         for (Note note : noteList) {
             System.out.println("Checking note: " + note.getTitle());
             System.out.println("Tags: " + note.getTags());
-            for(Tag tag : selectedTags) {
-                if (note.getTags().contains(tag)) {
-                    System.out.println("this note contains " + tag);
-                    filteredNotes.add(note);
+
+            boolean hasAllTags = true;
+            for (Tag tag : selectedTags) {
+                if (!note.getTags().contains(tag)) {
+                    hasAllTags = false;
+                    break;
                 }
-                else break;
+            }
+
+            if (hasAllTags) {
+                System.out.println("This note contains all selected tags.");
+                filteredNotes.add(note); // Add note if it contains all selected tags
             }
         }
 
         System.out.println("Filtered notes count: " + filteredNotes.size());
-
         updateNotesListView(filteredNotes, notesListView);
     }
+
 
     /**
      * @param filteredNotes notes that have been filtered on a tag
