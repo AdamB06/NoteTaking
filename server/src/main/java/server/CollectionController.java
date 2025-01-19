@@ -1,6 +1,7 @@
 package server;
 
 import commons.Collection;
+import commons.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,18 @@ public class CollectionController {
     }
 
     /**
+     * Endpoint to delete a collection by id
+     *
+     * @param id id of the collection to be deleted
+     * @return A ResponseEntity containing a message if the method was successfully executed
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCollection(@PathVariable long id) {
+        collectionService.deleteCollectionById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Endpoint to edit the name of a collection
      *
      * @param name The new name
@@ -76,14 +89,40 @@ public class CollectionController {
     }
 
     /**
-     * Endpoint to delete a collection by id
+     * Endpoint to getting a collection by id
      *
-     * @param id Id of the collection to be deleted
+     * @param id id of the collection to get
+     * @return A ResponseEntity containing the collection
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Collection> getCollectionById(long id) {
+        Collection collection = collectionService.getCollectionById(id);
+        return ResponseEntity.ok(collection);
+    }
+
+    /**
+     * Endpoint to add a note to a collection
+     *
+     * @param id The id of the collection
+     * @param note The Note to be added
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteCollection(@PathVariable long id) {
-        collectionService.deleteCollectionById(id);
+    @PutMapping("/NoteAdd/{id}")
+    public ResponseEntity<Void> addNote(@PathVariable long id, @RequestBody Note note) {
+        collectionService.addNoteToCollection(id, note);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Endpoint to delete a note from a collection
+     *
+     * @param collectionId The id of the collection
+     * @param noteId The id of the Note to be deleted
+     * @return A ResponseEntity containing a message if the method was successfully executed
+     */
+    @DeleteMapping("/NoteDelete/{collectionId}/{noteId}")
+    public ResponseEntity<Void> deleteNote(@PathVariable long collectionId, @PathVariable long noteId) {
+        collectionService.deleteNoteFromCollection(collectionId, noteId);
         return ResponseEntity.ok().build();
     }
 }
