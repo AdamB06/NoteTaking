@@ -19,12 +19,11 @@ public class TagController {
     private NoteService noteService;
 
 
-
     /**
      * Process tags in the note text and save them to the current note.
      *
-     * @param content content of the note
-     * @param note    current note
+     * @param content       content of the note
+     * @param note          current note
      * @param universalList list of all the tags that are in notes for the combobox;
      */
     public void initializeTags(String content, Note note, Set<Tag> universalList) {
@@ -78,39 +77,51 @@ public class TagController {
     }
 
     /**
-     * @param content   the entire content of the note
-     * @param character final input of the user
-     * @param note      current note that we are looking at
+     * @param content       the entire content of the note
+     * @param character     final input of the user
+     * @param note          current note that we are looking at
      * @param universalList list of universal tags  across all notes for the combobox
      */
-    public void checkForCorrectUserInput(String content, String character,
-                                         Note note, Set<Tag> universalList) {
+    public void checkForCorrectUserInput(String content, String character, Note note, Set<Tag> universalList) {
+        if (content == null || content.trim().isEmpty()) {
+            return;
+        }
 
+        String[] words = content.split("\\s+");
+        if (words.length == 0) {
+            return;
+        }
 
-        if (character.equals(" ") || character.equals("\n")) {
-            System.out.println("Space detected.");
-            String[] words = content.split("\\s+");
-            String lastWord = words[words.length - 1];
-            if (lastWord.startsWith("#") && lastWord.length() > 1 &&
-                    lastWord.substring(1).matches("\\w+")) {
-                System.out.println("Valid tag detected: " + lastWord);
-                initializeTags(content, note, universalList);
+        String lastWord = words[words.length - 1];
+        if (lastWord.startsWith("#")) {
+            if (character.equals(" ") || character.equals("\n")) {
+                System.out.println("Space detected.");
+
+                if (lastWord.length() > 1 && lastWord.substring(1).matches("\\w+")) {
+                    System.out.println("Valid tag detected: " + lastWord);
+                    initializeTags(content, note, universalList);
+                }
             }
         }
     }
 
+
     /**
-     *
-     * @param selectedTag tag that has been selected from the combobox by the user
+     * @param selectedTags  tags that have been selected from the checkcombobox by the user
      * @param notesListView listview of notes
+     * @param noteList      the list of notes that needs to be filtered
      */
-    public void filterNotesByTag(Tag selectedTag, ListView<Note> notesListView) {
+    public void filterNotesByTag(Set<Tag> selectedTags, ListView<Note> notesListView, List<Note> noteList) {
         List<Note> filteredNotes = new ArrayList<>();
-        for (Note note : noteService.getNotes()) {
+        for (Note note : noteList) {
             System.out.println("Checking note: " + note.getTitle());
             System.out.println("Tags: " + note.getTags());
-            if (note.getTags().contains(selectedTag)) {
-                filteredNotes.add(note);
+            for(Tag tag : selectedTags) {
+                if (note.getTags().contains(tag)) {
+                    System.out.println("this note contains " + tag);
+                    filteredNotes.add(note);
+                }
+                else break;
             }
         }
 
@@ -120,12 +131,19 @@ public class TagController {
     }
 
     /**
-     *
      * @param filteredNotes notes that have been filtered on a tag
      * @param notesListView listview of notes
      */
     public void updateNotesListView(List<Note> filteredNotes, ListView<Note> notesListView) {
-        ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
-        notesListView.setItems(observableNotes);
+        notesListView.getItems().clear();
+        System.out.println("CLEARED NOTES");
+        notesListView.getItems().addAll(filteredNotes);
+        System.out.println("NOW SHOWING: " + notesListView.getItems());
+
     }
+
+
+    //ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
+    //notesListView.setItems(observableNotes);
 }
+

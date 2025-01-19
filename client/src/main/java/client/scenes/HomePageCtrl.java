@@ -12,6 +12,7 @@ import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -20,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
+import org.controlsfx.control.CheckComboBox;
 
 import java.net.URL;
 import java.util.*;
@@ -55,7 +57,7 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private ComboBox<Image> languageComboBox;
     @FXML
-    private ComboBox<Tag> tagComboBox;
+    private CheckComboBox<Tag> tagComboBox;
     @FXML
     private Set<Tag> universalTags = new HashSet<>();
 
@@ -377,7 +379,7 @@ public class HomePageCtrl implements Initializable {
         searchBox.setPromptText(languageController.getSearchBoxText());
         titleField.setPromptText(languageController.getTitleFieldText());
         notesBodyArea.setPromptText(languageController.getNotesBodyAreaText());
-        tagComboBox.setPromptText(languageController.getFilterButtonText());
+        //tagComboBox.setPromp(languageController.getFilterButtonText());
         clearFilterButton.setText(languageController.getClearFilterButtonText());
 
         loadAllFlags(i);
@@ -681,20 +683,25 @@ public class HomePageCtrl implements Initializable {
      */
     public void updateTagComboBox() {
         tagComboBox.getItems().setAll(universalTags);
-        tagComboBox.setOnAction(event -> {
-            Tag selectedTag = tagComboBox.getSelectionModel().getSelectedItem();
-            if (selectedTag != null) {
-                tagController.filterNotesByTag(selectedTag, notesListView);
+        tagComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Tag>) c -> {
+            Set<Tag> selectedTags = new HashSet<>(tagComboBox.getCheckModel().getCheckedItems());
+
+            // Perform filtering based on the selected tags
+            if(selectedTags != null){
+                tagController.filterNotesByTag(selectedTags, notesListView, noteService.getNotes());
             }
         });
+
     }
 
     /**
      * Reset the ListView to show all notes
      */
     private void clearFilter() {
-        tagController.updateNotesListView(new ArrayList<>(noteService.getNotes()), notesListView);
-        tagComboBox.getSelectionModel().clearSelection();
+        tagComboBox.getCheckModel().clearChecks();
+        notesListView.getItems().clear();
+        notesListView.getItems().addAll(noteService.getNotes());
+
     }
 
 }
