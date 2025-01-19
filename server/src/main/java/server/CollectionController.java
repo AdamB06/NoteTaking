@@ -17,7 +17,8 @@ public class CollectionController {
 
     /**
      * Constructor for CollectionController
-     * @param collectionService The collectionService to be used
+     *
+     * @param collectionService    The collectionService to be used
      * @param collectionRepository The collectionRepository to interact with the database
      */
     @Autowired
@@ -29,15 +30,15 @@ public class CollectionController {
 
     /**
      * Endpoint to create a new collection
+     *
      * @param collection The collection to be saved
      * @return A ResponseEntity containing the saved collection with the generated id
      */
     @PostMapping
     public ResponseEntity<Collection> createCollection(@RequestBody Collection collection) {
-        if(collectionService.checkDuplicateName(collection.getName())) {
+        if (collectionService.checkDuplicateName(collection.getName())) {
             throw new IllegalArgumentException("Collection name already exists");
-        }
-        else {
+        } else {
             collectionService.saveCollection(collection);
             return ResponseEntity.ok().body(collection);
         }
@@ -45,18 +46,18 @@ public class CollectionController {
 
     /**
      * Endpoint to edit the name of a collection
+     *
      * @param name The new name
-     * @param id The id of the collection to be edited
+     * @param id   The id of the collection to be edited
      * @return A ResponseEntity containing the new edited collection
      */
     @PutMapping("/{id}")
     public ResponseEntity<Collection> editCollectionName(
             @RequestBody String name, @PathVariable long id) {
         Collection collection = collectionService.getCollectionById(id);
-        if(collectionService.checkDuplicateName(collection.getName())) {
+        if (collectionService.checkDuplicateName(collection.getName())) {
             throw new IllegalArgumentException("Collection name already exists");
-        }
-        else {
+        } else {
             collection.setName(name);
             collection = collectionService.saveCollection(collection);
             return ResponseEntity.ok(collection);
@@ -65,6 +66,7 @@ public class CollectionController {
 
     /**
      * Endpoint to get all the saved collections
+     *
      * @return A ResponseEntity containing a list of all saved collections
      */
     @GetMapping
@@ -75,6 +77,7 @@ public class CollectionController {
 
     /**
      * Endpoint to delete a collection by id
+     *
      * @param id Id of the collection to be deleted
      * @return A ResponseEntity containing a message if the method was successfully executed
      */

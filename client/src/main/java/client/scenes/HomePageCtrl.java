@@ -118,7 +118,6 @@ public class HomePageCtrl implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         String defaultLanguage = ClientConfig.loadConfig().getPreferredLanguage();
-        System.out.println(defaultLanguage);
         languageController.loadLanguage(defaultLanguage);
 
         titleField.setEditable(false);
@@ -264,14 +263,11 @@ public class HomePageCtrl implements Initializable {
                         titleField.clear();
                         notesBodyArea.clear();
                         currentNote.set(null);
-
                         notesBodyArea.setDisable(true);
                         editButton.setDisable(true);
                     }
-
                     suppressUpdates = false; // Re-enable updates
                 });
-
     }
 
     /**
@@ -620,7 +616,6 @@ public class HomePageCtrl implements Initializable {
                     languageController.getByTag("notice.noNoteSelected.details")
             );
         }
-
     }
 
     /**
@@ -668,7 +663,6 @@ public class HomePageCtrl implements Initializable {
             isSaving = false;
         }
     }
-
 
     /**
      * This method force saves the text that is typed if the application is

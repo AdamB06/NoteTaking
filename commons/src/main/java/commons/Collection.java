@@ -42,13 +42,6 @@ public class Collection {
     }
 
     /**
-     * @return the id of a collection
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
      * @return the name (the owner) of the collection
      */
     public String getName() {
@@ -60,6 +53,13 @@ public class Collection {
      */
     public List<Note> getNotes() {
         return notes;
+    }
+
+    /**
+     * @return id
+     */
+    public long getId(){
+        return id;
     }
 
     /**
