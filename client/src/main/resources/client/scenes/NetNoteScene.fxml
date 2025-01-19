@@ -30,6 +30,8 @@
                     <SplitPane dividerPositions="0.8747686613201727" layoutX="1.0" layoutY="1.0" prefHeight="52.0" prefWidth="1083.0">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                      <children>
+                         <ComboBox fx:id="tagComboBox" layoutX="771.0" prefHeight="50.0" prefWidth="172.0" promptText="Filter on tags" />
+                         <Button fx:id="clearFilterButton" layoutX="655.0" layoutY="12.0" mnemonicParsing="false" text="CLEAR FILTERS" />
                         <Button fx:id="shortcutsButton" layoutY="2.0" maxWidth="1000.0" minWidth="50.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="150.0" text="Show shortcuts">
                            <padding>
                               <Insets left="-30.0" />

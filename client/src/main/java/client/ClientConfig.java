@@ -62,7 +62,7 @@ public class ClientConfig {
         } catch (IOException e) {
             ClientConfig defaultConfig = new ClientConfig();
             defaultConfig.setPreferredLanguage("en");
-            defaultConfig.setServerUrl("http://localhost:8080");
+            defaultConfig.setServerUrl("http://localhost:8080/");
             defaultConfig.saveConfig();
             return defaultConfig;
         }

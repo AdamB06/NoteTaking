@@ -71,13 +71,15 @@ public class NoteService {
     /**
      * Updates the title of a note on the server.
      *
-     * @param noteId   The ID of the note to be updated.
+     * @param note   The ID of the note to be updated.
      * @param newTitle The new title for the note.
      * @return The updated title if successful, otherwise an error message.
      */
-    public String updateNoteTitle(long noteId, String newTitle) {
-        String updatedTitle = serverUtils.updateNoteTitle(noteId, newTitle);
-        return updatedTitle;
+    public String updateNoteTitle(Note note, String newTitle) {
+        if(note.getTitle().equals(newTitle)) {
+            return newTitle;
+        }
+        return serverUtils.updateNoteTitle(note.getId(), newTitle);
     }
 
     /**
@@ -88,6 +90,7 @@ public class NoteService {
      * @return Status of the save operation ("Successful" or "Failed").
      */
     public String saveChanges(long noteId, Map<String, Object> changes) {
+        System.out.println("NoteService save changes was called");
         return serverUtils.saveChanges(noteId, changes);
     }
 
@@ -123,9 +126,38 @@ public class NoteService {
     }
 
     /**
+     * Checks if a note exists in the internal list.
+     * @param note variable of note
+     * @return returns if the note exists
+     */
+    public boolean noteExists(Note note) {
+        for(Note n : notes) {
+            if(n.equals(note)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Refreshes the internal list of notes by fetching from the server.
      */
     public void refreshNotes() {
         notes = serverUtils.getNotes();
+    }
+
+    /**
+     * Finds the index of a note in a list of notes.
+     * @param note variable of note
+     * @param notes list of notes
+     * @return returns the index of the note
+     */
+    public int findNoteIndex(Note note, List<Note> notes) {
+        for(int i = 0; i < notes.size(); i++) {
+            if(notes.get(i).getId() == note.getId()) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

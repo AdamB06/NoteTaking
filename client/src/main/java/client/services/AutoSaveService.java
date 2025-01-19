@@ -32,18 +32,21 @@ public class AutoSaveService {
      *
      * @param currentNote variable of currentNote
      * @param currentContent variable of the current content
+     * @return returns a boolean value if saving took place
      */
-    public void onKeyPressed(Note currentNote, String currentContent) {
+    public boolean onKeyPressed(Note currentNote, String currentContent) {
         keyCount++;
         if (saveTask != null) {
             saveTask.cancel();
         }
-
         if (keyCount >= KEY_THRESHOLD) {
             keyCount = 0;
             save(currentNote, currentContent);
+            return true;
         } else {
-            timer = new Timer(true);
+            if (timer == null) {
+                timer = new Timer(true);
+            }
             saveTask = new TimerTask() {
                 @Override
                 public void run() {
@@ -52,6 +55,7 @@ public class AutoSaveService {
                 }
             };
             timer.schedule(saveTask, SAVE_DELAY);
+            return false;
         }
     }
 
@@ -64,6 +68,7 @@ public class AutoSaveService {
         if (note != null) {
             Map<String, Object> changes = getChanges(originalContent, content);
             originalContent = content;
+            System.out.println("Original content (After update): " + originalContent +"\n\n");
             String status = serverUtils.saveChanges(note.getId(), changes);
             if (!"Successful".equals(status)) {
                 retrySave(note, changes);
@@ -80,6 +85,9 @@ public class AutoSaveService {
      * @return returns the changes that occured
      */
     public Map<String, Object> getChanges(String original, String edited) {
+        System.out.println("Get changes called");
+        System.out.println("Original: " + original);
+        System.out.println("Edited: " + edited);
         int startIndex = 0;
         while (startIndex < original.length() && startIndex < edited.length()
                 && original.charAt(startIndex) == edited.charAt(startIndex)) {
