@@ -15,8 +15,7 @@ import java.util.List;
 public class Collection {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String id;
 
     private String name;
 
@@ -35,10 +34,12 @@ public class Collection {
      *
      * @param list "a list of notes"
      * @param name "name of the owner of the collection"
+     * @param id "unique string as id of the collection"
      */
-    public Collection(String name, List<Note> list){
+    public Collection(String name, List<Note> list, String id){
         this.notes = new ArrayList<>(list);
         this.name = name;
+        this.id = id;
     }
 
     /**
@@ -58,7 +59,7 @@ public class Collection {
     /**
      * @return id
      */
-    public long getId(){
+    public String getId(){
         return id;
     }
 

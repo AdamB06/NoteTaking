@@ -26,13 +26,12 @@ public class TestCollectionRepository implements CollectionRepository {
         return false;
     }
 
-    @Override
-    public Collection getById(Long aLong) {
-        return find(aLong).orElse(null);
+    public Collection getById(String string) {
+        return find(string).orElse(null);
     }
 
-    private Optional<Collection> find(Long id) {
-        return collections.stream().filter(note -> note.getId() == id).findFirst();
+    private Optional<Collection> find(String id) {
+        return collections.stream().filter(collection -> collection.getId().equals(id)).findFirst();
     }
 
     /**
@@ -93,6 +92,15 @@ public class TestCollectionRepository implements CollectionRepository {
      */
     @Override
     public Collection getOne(Long aLong) {
+        return null;
+    }
+
+    /**
+     * @param aLong
+     * @return
+     */
+    @Override
+    public Collection getById(Long aLong) {
         return null;
     }
 

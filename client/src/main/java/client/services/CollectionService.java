@@ -23,7 +23,7 @@ public class CollectionService{
      * fetches from the server
      * @return List of collections
      */
-    public List<Collection> getCollections() {
+    public List<Collection> getCollections() { //TODO You should only need specific collections from a server, so this method is useless
         if(collections.isEmpty()) {
             collections = serverUtils.getCollections();
         }
@@ -34,11 +34,11 @@ public class CollectionService{
         int counter = 1;
         String uniqueTitle = "New Collection Title" + counter;
         //TODO
-        while(serverUtils.isTitleCollectionDuplicate(uniqueTitle)){
+        while(serverUtils.isTitleCollectionDuplicate(uniqueTitle)){ //TODO remove auto generated titles since we have an UI that makes you input title
             counter++;
             uniqueTitle = "New Collection Title" + counter;
         }
-        Collection collection = new Collection(uniqueTitle, new ArrayList<>());
+        Collection collection = new Collection(uniqueTitle, new ArrayList<>(), "id"); //TODO implement using the id gotten from the user when creating
         Collection createdCollection = serverUtils.sendCollection(collection);
 
         if(createdCollection != null) {
@@ -62,9 +62,9 @@ public class CollectionService{
     }
 
     /**
-     * Refershes the internal list of collections by fetching from the server.
+     * Refreshes the internal list of collections by fetching from the server.
      */
     public void refreshCollections(){
-        collections = serverUtils.getCollections();
+        collections = serverUtils.getCollections(); //TODO You should make it so that only the collections already here or in the config file get pulled, not all from a single server
     }
 }

@@ -39,7 +39,7 @@ public class NoteController {
      */
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
-        if (checkDuplicateTitle(note.getTitle())) {
+        if (checkDuplicateTitle(note.getTitle(), -1)) {
             throw new IllegalArgumentException("Note title already exists");
         } else {
             Note savedNote = noteService.saveNote(note);
@@ -58,8 +58,8 @@ public class NoteController {
     public ResponseEntity<Note> editNoteTitle(@RequestBody String title,
                                               @PathVariable("id") long id) {
         Note note = noteService.getNoteById(id);
-        if (checkDuplicateTitle(title)) {
-            throw new IllegalArgumentException("Note title already exists");
+        if (checkDuplicateTitle(title, -1)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(note);
         } else {
             String oldTitle = note.getTitle();
             note.setTitle(title);
@@ -84,7 +84,7 @@ public class NoteController {
      */
     @GetMapping("/checkDuplicateTitle/{title}")
     public ResponseEntity<Boolean> checkDuplicateTitleEndpoint(@PathVariable String title) {
-        boolean isDuplicate = checkDuplicateTitle(title);
+        boolean isDuplicate = checkDuplicateTitle(title, -1);
         return ResponseEntity.ok(isDuplicate);
     }
 
@@ -92,12 +92,13 @@ public class NoteController {
      * Checks if the provided note title is a duplicate from the list of notes.
      *
      * @param title The title of the note
+     * @param id The id of the note
      * @return True if the title is a duplicate, false otherwise.
      */
-    public boolean checkDuplicateTitle(String title) {
+    public boolean checkDuplicateTitle(String title, long id) {
         List<Note> notes = noteService.getAllNotes();
         for (Note note : notes) {
-            if (note.getTitle().equals(title)) {
+            if (note.getTitle().equals(title) && note.getId() != id) {
                 return true;
             }
         }
@@ -120,10 +121,12 @@ public class NoteController {
      * This deletes the note with the given ID.
      *
      * @param id ID of the note that needs to be deleted.
+     * @return A ResponseEntity containing a message if the method has been correctly executed
      */
     @DeleteMapping("/{id}")
-    public void deleteNote(@PathVariable long id) {
+    public ResponseEntity<Void> deleteNote(@PathVariable long id) {
         noteRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     /**

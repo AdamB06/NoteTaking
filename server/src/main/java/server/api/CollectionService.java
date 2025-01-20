@@ -43,16 +43,16 @@ public class CollectionService {
      * @param id The id of the collection to be retrieved
      * @return The retrieved collection
      */
-    public Collection getCollectionById(long id) {
-        return collectionRepository.getById(id);
+    public Collection getCollectionById(String id) {
+        return collectionRepository.findAll().stream().filter(collection -> collection.getId().equals(id)).findFirst().get();
     }
 
     /**
      * Deletes a collection by its id from the database
      * @param id The id of the collection to be deleted
      */
-    public void deleteCollectionById(long id) {
-        collectionRepository.deleteById(id);
+    public void deleteCollectionById(String id) {
+        collectionRepository.delete(getCollectionById(id));
     }
 
     /**
@@ -60,7 +60,7 @@ public class CollectionService {
      * @param id the id of the collection
      * @param note the note to be added
      */
-    public void addNoteToCollection(long id, Note note) {
+    public void addNoteToCollection(String id, Note note) {
         Collection collection = getCollectionById(id);
         collection.getNotes().add(note);
         collectionRepository.save(collection);
@@ -71,7 +71,7 @@ public class CollectionService {
      * @param id the id of the collection
      * @param noteId the id of the note to be deleted
      */
-    public void deleteNoteFromCollection(long id, long noteId) {
+    public void deleteNoteFromCollection(String id, long noteId) {
         Collection collection = getCollectionById(id);
         collection.getNotes().stream()
                 .filter(note -> note.getId() == noteId)

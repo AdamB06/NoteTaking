@@ -9,8 +9,8 @@ import java.util.List;
 
 public class CollectionTest {
 
-    private static final Note note1 = new Note("User", "This is the first Test note");
-    private static final Note note2 = new Note("User1", "This is the second Test note");
+    private static final Note note1 = new Note("User", "This is the first Test note", "id", "");
+    private static final Note note2 = new Note("User1", "This is the second Test note", "id1", "");
     private static final List<Note> notes = new ArrayList<>();
 
 
@@ -19,7 +19,7 @@ public class CollectionTest {
         notes.add(note2);
     }
 
-    private static final Collection collection = new Collection("TestUser", notes);
+    private static final Collection collection = new Collection("TestUser", notes, "id");
 
     @Test
     public void ConstructorTest() {
@@ -31,15 +31,15 @@ public class CollectionTest {
     @Test
     public void constructorWithEmptyListTest() {
         List<Note> emptyNotes = new ArrayList<>();
-        Collection emptyCollection = new Collection("User", emptyNotes);
+        Collection emptyCollection = new Collection("User", emptyNotes, "id1");
         assertEquals(0, emptyCollection.getNotes().size());
     }
 
 
     @Test
     public void equalsHashCodeTest() {
-        Collection collection1 = new Collection("TestUser", notes);
-        Collection collection2 = new Collection("AnotherUser", notes);
+        Collection collection1 = new Collection("TestUser", notes, "id");
+        Collection collection2 = new Collection("AnotherUser", notes, "id1");
 
         assertEquals(collection1, collection1);
         assertNotEquals(collection1, collection2);
@@ -49,7 +49,7 @@ public class CollectionTest {
 
     @Test
     public void toStringTest() {
-        Collection collection = new Collection("TestCollection", new ArrayList<>());
+        Collection collection = new Collection("TestCollection", new ArrayList<>(), "id1");
         String collectionToString = collection.toString();
         assertTrue(collectionToString.contains("TestCollection"));
         assertTrue(collectionToString.contains("notes"));

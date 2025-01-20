@@ -1,6 +1,7 @@
 package client.services;
 
 import client.utils.ServerUtils;
+import commons.Collection;
 import commons.Note;
 import jakarta.inject.Inject;
 //import server.database.NoteRepository;
@@ -11,15 +12,18 @@ import java.util.Map;
 
 public class NoteService {
     private final ServerUtils serverUtils;
+    private final CollectionService collectionService;
     private List<Note> notes = new ArrayList<>();
 
     /**
      *
      * @param serverUtils makes use of serverutils class in order for some methods to work
+     * @param collectionService makes use of collectionService class in order for some methods to work
      */
     @Inject
-    public NoteService(ServerUtils serverUtils) {
+    public NoteService(ServerUtils serverUtils, CollectionService collectionService) {
         this.serverUtils = serverUtils;
+        this.collectionService = collectionService;
     }
 
     /**
@@ -29,7 +33,7 @@ public class NoteService {
      */
     public List<Note> getNotes() {
         if (notes.isEmpty()) {
-            notes = serverUtils.getNotes();
+            notes = serverUtils.getNotes(collectionService.getCollections());
         }
         return notes;
     }
@@ -37,16 +41,18 @@ public class NoteService {
     /**
      * Creates a new note with a unique title and sends it to the server.
      *
+     * @param collectionID ID of the collection to make the note in
+     * @param collectionURL URL of the collection to make the note in
      * @return The created Note object.
      */
-    public Note createNote() {
+    public Note createNote(String collectionID, String collectionURL) {
         int counter = 1;
         String uniqueTitle = "New Note Title " + counter;
-        while (serverUtils.isTitleDuplicate(uniqueTitle)) {
+        while (serverUtils.isTitleDuplicate(collectionURL, uniqueTitle)) {
             counter++;
             uniqueTitle = "New Note Title " + counter;
         }
-        Note note = new Note(uniqueTitle, "New Note Content");
+        Note note = new Note(uniqueTitle, "New Note Content", collectionID, collectionURL);
         Note createdNote = serverUtils.sendNote(note);
 
         if (createdNote != null) {
@@ -77,9 +83,6 @@ public class NoteService {
      * @return The updated title if successful, otherwise an error message.
      */
     public String updateNoteTitle(Note note, String newTitle) {
-        if(note.getTitle().equals(newTitle)) {
-            return newTitle;
-        }
         return serverUtils.updateNoteTitle(note.getId(), newTitle);
     }
 
@@ -87,22 +90,24 @@ public class NoteService {
      * Saves changes to a note on the server.
      *
      * @param noteId  The ID of the note to be updated.
+     * @param collectionURL The URL of the collection the note is in
      * @param changes A map detailing the changes to be made.
      * @return Status of the save operation ("Successful" or "Failed").
      */
-    public String saveChanges(long noteId, Map<String, Object> changes) {
+    public String saveChanges(long noteId, String collectionURL, Map<String, Object> changes) {
         System.out.println("NoteService save changes was called");
-        return serverUtils.saveChanges(noteId, changes);
+        return serverUtils.saveChanges(noteId, collectionURL, changes);
     }
 
     /**
      * Retrieves a note by its ID from the server.
      *
+     * @param collectionURL The URL of the collection to retrieve the note from
      * @param noteId The ID of the note to retrieve.
      * @return The Note object if found, otherwise null.
      */
-    public Note getNoteById(long noteId) {
-        return serverUtils.getNoteById(noteId);
+    public Note getNoteById(String collectionURL, long noteId) {
+        return serverUtils.getNoteById(collectionURL, noteId);
     }
 
     /**
@@ -144,10 +149,10 @@ public class NoteService {
      * Refreshes the internal list of notes by fetching from the server.
      */
     public void refreshNotes() {
-        notes = serverUtils.getNotes();
+        notes =  serverUtils.getNotes(collectionService.getCollections());
     }
 
-    public Note getNoteByTitle(String title) {
+    public Note getNoteByTitle(String title) { //TODO Why is this here? it tries to do things in the server while being on the client
         if (title == null || title.isEmpty()) {
             return null;
         }
