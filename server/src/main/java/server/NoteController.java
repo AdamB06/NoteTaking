@@ -59,7 +59,7 @@ public class NoteController {
                                               @PathVariable("id") long id) {
         Note note = noteService.getNoteById(id);
         if (checkDuplicateTitle(title)) {
-            throw new IllegalArgumentException("Note title already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(note);
         } else {
             String oldTitle = note.getTitle();
             note.setTitle(title);
@@ -122,8 +122,9 @@ public class NoteController {
      * @param id ID of the note that needs to be deleted.
      */
     @DeleteMapping("/{id}")
-    public void deleteNote(@PathVariable long id) {
+    public ResponseEntity<Void> deleteNote(@PathVariable long id) {
         noteRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     /**

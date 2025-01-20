@@ -27,7 +27,7 @@ public class HomePageCtrlTest {
         notesBodyArea = "";
         homePageCtrl = new HomePageCtrl(null, null, null, null);
         markdownService = new MarkdownService();
-        noteService = new NoteService(null);
+        noteService = new NoteService(null, null);
         autoSaveService = new AutoSaveService(null,noteService);
     }
 

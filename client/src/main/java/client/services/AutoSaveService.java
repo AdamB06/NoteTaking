@@ -69,7 +69,7 @@ public class AutoSaveService {
             Map<String, Object> changes = getChanges(originalContent, content);
             originalContent = content;
             System.out.println("Original content (After update): " + originalContent +"\n\n");
-            String status = serverUtils.saveChanges(note.getId(), changes);
+            String status = serverUtils.saveChanges(note.getId(), note.getCollectionURL(), changes);
             if (!"Successful".equals(status)) {
                 retrySave(note, changes);
             } else {
@@ -119,7 +119,7 @@ public class AutoSaveService {
     public void retrySave(Note note, Map<String, Object> changes) {
         int retries = 3;
         while (retries > 0) {
-            String status = serverUtils.saveChanges(note.getId(), changes);
+            String status = serverUtils.saveChanges(note.getId(), note.getCollectionURL(), changes);
             if ("Successful".equals(status)) {
                 System.out.println("Retry successful.");
                 return;

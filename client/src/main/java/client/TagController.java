@@ -177,7 +177,7 @@ public class TagController {
     public void handleLinkClick(String link, ListView<Note> notesListView) {
         if (link.startsWith("/Note/")) {
             long noteId = Long.parseLong(link.replace("/Note/", ""));
-            Note note = noteService.getNoteById(noteId);
+            Note note = noteService.getNoteById("", noteId); //TODO Change to current collectionURL
             if (note != null) {
                 loadNoteInView(note, new WebView());
             } else {
