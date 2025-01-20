@@ -37,16 +37,18 @@ public class NoteService {
     /**
      * Creates a new note with a unique title and sends it to the server.
      *
+     * @param collectionID ID of the collection to make the note in
+     * @param collectionURL URL of the collection to make the note in
      * @return The created Note object.
      */
-    public Note createNote() {
+    public Note createNote(long collectionID, String collectionURL) {
         int counter = 1;
         String uniqueTitle = "New Note Title " + counter;
         while (serverUtils.isTitleDuplicate(uniqueTitle)) {
             counter++;
             uniqueTitle = "New Note Title " + counter;
         }
-        Note note = new Note(uniqueTitle, "New Note Content");
+        Note note = new Note(uniqueTitle, "New Note Content", collectionID, collectionURL);
         Note createdNote = serverUtils.sendNote(note);
 
         if (createdNote != null) {

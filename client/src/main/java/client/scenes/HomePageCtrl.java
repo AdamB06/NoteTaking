@@ -589,7 +589,9 @@ public class HomePageCtrl implements Initializable {
      */
     @FXML
     private void handleAddNote(ActionEvent event) {
-        Note createdNote = noteService.createNote();
+        long collectionID = 0; //TODO remove
+        String collectionURL = ""; //TODO remove
+        Note createdNote = noteService.createNote(collectionID, collectionURL); //TODO Change to the id and url of current collection
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);

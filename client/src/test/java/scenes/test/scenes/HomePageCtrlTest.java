@@ -87,7 +87,7 @@ public class HomePageCtrlTest {
         // Create and store the notes
         List<Note> testList = new ArrayList<>();
         for (int i = 0; i < titles.length; i++) {
-            Note note = new Note(titles[i], contents[i]);
+            Note note = new Note(titles[i], contents[i], 0, "");
             testList.add(note);
         }
         List<Note> expectedList = new ArrayList<>();
@@ -105,7 +105,7 @@ public class HomePageCtrlTest {
         // Create and store the notes
         List<Note> testList = new ArrayList<>();
         for (int i = 0; i < titles.length; i++) {
-            Note note = new Note(titles[i], contents[i]);
+            Note note = new Note(titles[i], contents[i], 0, "");
             testList.add(note);
         }
         List<Note> expectedList = new ArrayList<>();
@@ -123,7 +123,7 @@ public class HomePageCtrlTest {
         // Create and store the notes
         List<Note> testList = new ArrayList<>();
         for (int i = 0; i < titles.length; i++) {
-            Note note = new Note(titles[i], contents[i]);
+            Note note = new Note(titles[i], contents[i], 0, "");
             testList.add(note);
         }
         List<Note> expectedList = new ArrayList<>();

@@ -50,10 +50,14 @@ public class Note {
     /**
      * @param title   "title of the note"
      * @param content "content of the note"
+     * @param collectionID ID of the collection the note is in
+     * @param collectionURL URL of the collection the note is inm
      */
-    public Note(String title, String content) {
+    public Note(String title, String content, long collectionID, String collectionURL) {
         this.title = title.replaceAll(" ", "").isEmpty() ? "New Note" : title;
         this.content = content;
+        this.collectionID = collectionID;
+        this.collectionURL = collectionURL;
     }
 
     /**

@@ -9,8 +9,8 @@ import java.util.List;
 
 public class CollectionTest {
 
-    private static final Note note1 = new Note("User", "This is the first Test note");
-    private static final Note note2 = new Note("User1", "This is the second Test note");
+    private static final Note note1 = new Note("User", "This is the first Test note", 0, "");
+    private static final Note note2 = new Note("User1", "This is the second Test note", 0, "");
     private static final List<Note> notes = new ArrayList<>();
 
 

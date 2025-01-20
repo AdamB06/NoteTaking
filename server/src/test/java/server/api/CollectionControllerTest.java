@@ -24,8 +24,8 @@ public class CollectionControllerTest {
 
     @Test
     public void testCreateCollection(){
-        Note n1 = new Note("title", "content");
-        Note n2 = new Note("title2", "content2");
+        Note n1 = new Note("title", "content", 0, "");
+        Note n2 = new Note("title2", "content2", 0, "");
         Collection c = new Collection("name", List.of(n1, n2));
 
         testController.createCollection(c);
@@ -35,8 +35,8 @@ public class CollectionControllerTest {
 
     @Test
     public void testRemoveCollection(){
-        Note n1 = new Note("title", "content");
-        Note n2 = new Note("title2", "content2");
+        Note n1 = new Note("title", "content", 0, "");
+        Note n2 = new Note("title2", "content2", 0, "");
         Collection c = new Collection("name", List.of(n1, n2));
 
         testController.createCollection(c);
@@ -48,8 +48,8 @@ public class CollectionControllerTest {
 
     @Test
     public void testEditCollection(){
-        Note n1 = new Note("title", "content");
-        Note n2 = new Note("title2", "content2");
+        Note n1 = new Note("title", "content", 0, "");
+        Note n2 = new Note("title2", "content2", 0, "");
         Collection c = new Collection("name", List.of(n1, n2));
 
         testController.createCollection(c);

@@ -21,7 +21,7 @@ public class NoteControllerTest {
 
     @Test
     public void databaseIsUsed() {
-        Note n = new Note("title", "content");
+        Note n = new Note("title", "content", 0, "");
         notesController.createNote(n);
         assertTrue(noteRepository.methodIsCalled("save"));
     }
@@ -29,15 +29,15 @@ public class NoteControllerTest {
 
     @Test
     public void testNewNote() {
-        Note note = new Note("Hello", "This is a note");
+        Note note = new Note("Hello", "This is a note", 0, "");
         notesController.createNote(note);
         assertEquals(note, noteRepository.getById(note.getId()));
     }
 
     @Test
     public void testDeleteNote() {
-        Note note = new Note("Hello", "This is a note");
-        Note note2 = new Note("Hello2", "This is a note2");
+        Note note = new Note("Hello", "This is a note", 0, "");
+        Note note2 = new Note("Hello2", "This is a note2", 0, "");
         notesController.createNote(note);
         notesController.createNote(note2);
         notesController.deleteNote(note2.getId());
@@ -47,26 +47,26 @@ public class NoteControllerTest {
 
     @Test
     public void testNewDuplicateNote(){
-        Note note = new Note ("Hello", "This is a note");
+        Note note = new Note ("Hello", "This is a note", 0, "");
         notesController.createNote (note);
-        Note note2 = new Note ("Hello", "This is a note");
+        Note note2 = new Note ("Hello", "This is a note", 0, "");
         assertThrows(IllegalArgumentException.class, () -> notesController.createNote(note2));
     }
 
     @Test
     public void testEditNoteTitle(){
-        Note note = new Note ("Hello", "This is a note");
+        Note note = new Note ("Hello", "This is a note", 0, "");
         notesController.createNote (note);
-        Note note2 = new Note ("Hello2", "This is a note");
+        Note note2 = new Note ("Hello2", "This is a note", 0, "");
         notesController.editNoteTitle("Hello2", note.getId());
         assertEquals(note2, noteRepository.getOne(note.getId()));
     }
 
     @Test
     public void testEditDuplicateNoteTitle(){
-        Note note = new Note ("Hello", "This is a note");
+        Note note = new Note ("Hello", "This is a note", 0, "");
         notesController.createNote (note);
-        Note note2 = new Note ("Hello2", "This is a note");
+        Note note2 = new Note ("Hello2", "This is a note", 0, "");
         assertThrows(IllegalArgumentException.class, () -> notesController.editNoteTitle("Hello", note2.getId()));
     }
 
