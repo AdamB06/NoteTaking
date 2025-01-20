@@ -121,6 +121,7 @@ public class NoteController {
      * This deletes the note with the given ID.
      *
      * @param id ID of the note that needs to be deleted.
+     * @return A ResponseEntity containing a message if the method has been correctly executed
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNote(@PathVariable long id) {

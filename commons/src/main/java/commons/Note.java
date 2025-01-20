@@ -21,7 +21,7 @@ public class Note {
     private String title;
     private String content;
 
-    private long collectionID;
+    private String collectionID;
     private String collectionURL;
 
     @ManyToMany
@@ -53,7 +53,7 @@ public class Note {
      * @param collectionID ID of the collection containing this note
      * @param collectionURL URL of the collection containing this note as a String
      */
-    public Note(String title, String content, long collectionID, String collectionURL) {
+    public Note(String title, String content, String collectionID, String collectionURL) {
         this.title = title.replaceAll(" ", "").isEmpty() ? "New Note" : title;
         this.content = content;
         this.collectionID = collectionID;
@@ -85,7 +85,7 @@ public class Note {
     /**
      * @return collectionID
      */
-    public long getCollectionID() {
+    public String getCollectionID() {
         return collectionID;
     }
 
@@ -100,7 +100,7 @@ public class Note {
      * a setter for the id of the collection this is in
      * @param collectionID id of the collection the note is in
      */
-    public void setCollectionID(long collectionID) {
+    public void setCollectionID(String collectionID) {
         this.collectionID = collectionID;
     }
 

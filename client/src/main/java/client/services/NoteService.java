@@ -45,7 +45,7 @@ public class NoteService {
      * @param collectionURL URL of the collection to make the note in
      * @return The created Note object.
      */
-    public Note createNote(long collectionID, String collectionURL) {
+    public Note createNote(String collectionID, String collectionURL) {
         int counter = 1;
         String uniqueTitle = "New Note Title " + counter;
         while (serverUtils.isTitleDuplicate(collectionURL, uniqueTitle)) {
