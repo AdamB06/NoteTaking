@@ -83,9 +83,6 @@ public class NoteService {
      * @return The updated title if successful, otherwise an error message.
      */
     public String updateNoteTitle(Note note, String newTitle) {
-        if(note.getTitle().equals(newTitle)) {
-            return newTitle;
-        }
         return serverUtils.updateNoteTitle(note.getId(), newTitle);
     }
 
