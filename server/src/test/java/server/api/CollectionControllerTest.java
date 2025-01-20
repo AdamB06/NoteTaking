@@ -26,36 +26,36 @@ public class CollectionControllerTest {
     public void testCreateCollection(){
         Note n1 = new Note("title", "content", 0, "");
         Note n2 = new Note("title2", "content2", 0, "");
-        Collection c = new Collection("name", List.of(n1, n2));
+        Collection c = new Collection("name", List.of(n1, n2), "id");
 
         testController.createCollection(c);
 
-        assertEquals(c, testRepository.getById(c.getId()));
+        assertEquals(c, testRepository.findAll().stream().filter(collection -> collection.getId().equals("id")).findFirst().get());
     }
 
     @Test
     public void testRemoveCollection(){
         Note n1 = new Note("title", "content", 0, "");
         Note n2 = new Note("title2", "content2", 0, "");
-        Collection c = new Collection("name", List.of(n1, n2));
+        Collection c = new Collection("name", List.of(n1, n2), "id");
 
         testController.createCollection(c);
-        assertEquals(c, testRepository.getById(c.getId()));
+        assertEquals(c, testRepository.findAll().stream().filter(collection -> collection.getId().equals("id")).findFirst().get());
 
         testController.deleteCollection(c.getId());
-        assertNotEquals(c, testRepository.getOne(c.getId()));
+        assertNotEquals(c, testRepository.findAll().stream().filter(collection -> collection.getId().equals("id")).findFirst().get());
     }
 
     @Test
     public void testEditCollection(){
         Note n1 = new Note("title", "content", 0, "");
         Note n2 = new Note("title2", "content2", 0, "");
-        Collection c = new Collection("name", List.of(n1, n2));
+        Collection c = new Collection("name", List.of(n1, n2), "id");
 
         testController.createCollection(c);
-        assertEquals(c, testRepository.getById(c.getId()));
+        assertEquals(c, testRepository.findAll().stream().filter(collection -> collection.getId().equals("id")).findFirst().get());
 
         testController.editCollectionName("new name", c.getId());
-        assertEquals("new name", testRepository.getById(c.getId()).getName());
+        assertEquals("new name", testRepository.findAll().stream().filter(collection -> collection.getId().equals("id")).findFirst().get().getName());
     }
 }
