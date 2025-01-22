@@ -56,7 +56,7 @@ public class NoteTest {
         assertEquals(expected, actual2);
         assertEquals("title", note3.getTitle());
     }
-@Test
+    @Test
     public void testAddTag() {
         Tag tag = new Tag( "Java");
         Note note = new Note();

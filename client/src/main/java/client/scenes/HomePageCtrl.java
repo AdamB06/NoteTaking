@@ -165,7 +165,7 @@ public class HomePageCtrl implements Initializable {
 
     public void renameNote(String oldTitle, String newTitle) {
         tagController.updateNoteReferences(oldTitle, newTitle);
-        }
+    }
 
     /**
      * Initializes the button graphics
