@@ -52,7 +52,7 @@ public class CollectionController {
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCollection(@PathVariable String id) {
+    public ResponseEntity<Void> deleteCollection(@PathVariable long id) {
         collectionService.deleteCollectionById(id);
         return ResponseEntity.ok().build();
     }
@@ -66,7 +66,7 @@ public class CollectionController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Collection> editCollectionName(
-            @RequestBody String name, @PathVariable String id) {
+            @RequestBody String name, @PathVariable long id) {
         Collection collection = collectionService.getCollectionById(id);
         if (collectionService.checkDuplicateName(collection.getName())) {
             throw new IllegalArgumentException("Collection name already exists");
@@ -95,7 +95,7 @@ public class CollectionController {
      * @return A ResponseEntity containing the collection
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Collection> getCollectionById(String id) {
+    public ResponseEntity<Collection> getCollectionById(long id) {
         Collection collection = collectionService.getCollectionById(id);
         return ResponseEntity.ok(collection);
     }
@@ -108,7 +108,7 @@ public class CollectionController {
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
     @PutMapping("/NoteAdd/{id}")
-    public ResponseEntity<Void> addNote(@PathVariable String id, @RequestBody Note note) {
+    public ResponseEntity<Void> addNote(@PathVariable long id, @RequestBody Note note) {
         collectionService.addNoteToCollection(id, note);
         return ResponseEntity.ok().build();
     }
@@ -121,7 +121,7 @@ public class CollectionController {
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
     @DeleteMapping("/NoteDelete/{collectionId}/{noteId}")
-    public ResponseEntity<Void> deleteNote(@PathVariable String collectionId, @PathVariable long noteId) {
+    public ResponseEntity<Void> deleteNote(@PathVariable long collectionId, @PathVariable long noteId) {
         collectionService.deleteNoteFromCollection(collectionId, noteId);
         return ResponseEntity.ok().build();
     }

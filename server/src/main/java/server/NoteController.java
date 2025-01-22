@@ -58,8 +58,8 @@ public class NoteController {
     public ResponseEntity<Note> editNoteTitle(@RequestBody String title,
                                               @PathVariable("id") long id) {
         Note note = noteService.getNoteById(id);
-        if (checkDuplicateTitle(title, -1)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(note);
+        if (checkDuplicateTitle(title, id)) {
+            throw new IllegalArgumentException("Note title already exists");
         } else {
             String oldTitle = note.getTitle();
             note.setTitle(title);
@@ -92,7 +92,7 @@ public class NoteController {
      * Checks if the provided note title is a duplicate from the list of notes.
      *
      * @param title The title of the note
-     * @param id The id of the note
+     * @param id    The ID of the note to be edited
      * @return True if the title is a duplicate, false otherwise.
      */
     public boolean checkDuplicateTitle(String title, long id) {
@@ -121,12 +121,10 @@ public class NoteController {
      * This deletes the note with the given ID.
      *
      * @param id ID of the note that needs to be deleted.
-     * @return A ResponseEntity containing a message if the method has been correctly executed
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNote(@PathVariable long id) {
+    public void deleteNote(@PathVariable long id) {
         noteRepository.deleteById(id);
-        return ResponseEntity.ok().build();
     }
 
     /**

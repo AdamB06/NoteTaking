@@ -21,9 +21,6 @@ public class Note {
     private String title;
     private String content;
 
-    private String collectionID;
-    private String collectionURL;
-
     @ManyToMany
     @JoinTable(
             name = "note_tag",
@@ -50,14 +47,10 @@ public class Note {
     /**
      * @param title   "title of the note"
      * @param content "content of the note"
-     * @param collectionID ID of the collection containing this note
-     * @param collectionURL URL of the collection containing this note as a String
      */
-    public Note(String title, String content, String collectionID, String collectionURL) {
+    public Note(String title, String content) {
         this.title = title.replaceAll(" ", "").isEmpty() ? "New Note" : title;
         this.content = content;
-        this.collectionID = collectionID;
-        this.collectionURL = collectionURL;
     }
 
     /**
@@ -81,37 +74,6 @@ public class Note {
     public String getContent() {
         return content;
     }
-
-    /**
-     * @return collectionID
-     */
-    public String getCollectionID() {
-        return collectionID;
-    }
-
-    /**
-     * @return collectionURL
-     */
-    public String getCollectionURL() {
-        return collectionURL;
-    }
-
-    /**
-     * a setter for the id of the collection this is in
-     * @param collectionID id of the collection the note is in
-     */
-    public void setCollectionID(String collectionID) {
-        this.collectionID = collectionID;
-    }
-
-    /**
-     * a setter for the URL of the collection this is in
-     * @param collectionURL URL of the collection the note is in
-     */
-    public void setCollectionURL(String collectionURL) {
-        this.collectionURL = collectionURL;
-    }
-
     /**
      * a setter for the content of a note
      *

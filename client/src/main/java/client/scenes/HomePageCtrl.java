@@ -165,7 +165,7 @@ public class HomePageCtrl implements Initializable {
 
     public void renameNote(String oldTitle, String newTitle) {
         tagController.updateNoteReferences(oldTitle, newTitle);
-        }
+    }
 
     /**
      * Initializes the button graphics
@@ -264,7 +264,7 @@ public class HomePageCtrl implements Initializable {
                     if (oldNote != null) {
                         // Save changes for the old note
                         suppressUpdates = true; // Suppress incoming updates
-                        saveChanges(oldNote.getCollectionURL(), oldNote.getId(), notesBodyArea.getText());
+                        saveChanges(oldNote.getId(), notesBodyArea.getText());
                     }
 
                     if (newNote != null) {
@@ -580,9 +580,7 @@ public class HomePageCtrl implements Initializable {
      */
     @FXML
     private void handleAddNote(ActionEvent event) {
-        String collectionID = "id"; //TODO remove
-        String collectionURL = ""; //TODO remove
-        Note createdNote = noteService.createNote(collectionID, collectionURL); //TODO Change to the id and url of current collection
+        Note createdNote = noteService.createNote();
         if (createdNote != null) {
             notesListView.getItems().add(createdNote);
             notesListView.getSelectionModel().select(createdNote);
@@ -652,11 +650,10 @@ public class HomePageCtrl implements Initializable {
     /**
      * Saves changes made to a note.
      *
-     * @param collectionURL The URL of the collection the note is in
      * @param noteId  The ID of the note to save changes for.
      * @param content The new content of the note.
      */
-    private synchronized void saveChanges(String collectionURL, long noteId, String content) {
+    private synchronized void saveChanges(long noteId, String content) {
         if (isSaving) {
             System.out.println("Save in progress. Skipping...");
             return;
@@ -672,13 +669,13 @@ public class HomePageCtrl implements Initializable {
             System.out.println("Saving changes for note ID: " + noteId);
             Map<String, Object> changes = autoSaveService.getChanges(original, content);
 
-            String status = noteService.saveChanges(noteId, collectionURL, changes);
+            String status = noteService.saveChanges(noteId, changes);
             if ("Successful".equals(status)) {
                 original = content; // Update original only after a successful save
                 System.out.println("Save successful. Updated original content.\n\n");
             } else {
                 System.err.println("Save failed. Retrying...");
-                Note note = noteService.getNoteById(collectionURL, noteId);
+                Note note = noteService.getNoteById(noteId);
                 autoSaveService.retrySave(note, changes);
             }
         } finally {
@@ -694,7 +691,7 @@ public class HomePageCtrl implements Initializable {
         Note current = currentNote.get();
         if (current != null) {
             String content = notesBodyArea.getText();
-            saveChanges(current.getCollectionURL(), current.getId(), content);
+            saveChanges(current.getId(), content);
         }
     }
 

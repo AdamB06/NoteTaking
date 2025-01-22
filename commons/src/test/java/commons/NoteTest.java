@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class NoteTest {
 
-    private static final Note note = new Note("TestNote", "This is a Test", "id", "");
+    private static final Note note = new Note("TestNote", "This is a Test");
 
     @Test
     public void ConstructorTest() {
@@ -19,8 +19,8 @@ public class NoteTest {
 
     @Test
     public void equalsHashCodeTest() {
-        Note note1 = new Note("TestNote", "This is a Test", "id", "");
-        Note note2 = new Note("TestNote", "This is another Test", "id1", "");
+        Note note1 = new Note("TestNote", "This is a Test");
+        Note note2 = new Note("TestNote", "This is another Test");
 
         assertEquals(note1, note);
         assertEquals(note, note);
@@ -33,7 +33,7 @@ public class NoteTest {
     @Test
     public void ToStringTest() {
 
-        var NoteTest = new Note("ToStringTest", "This is the content", "id1", "").toString();
+        var NoteTest = new Note("ToStringTest", "This is the content").toString();
         assertTrue(NoteTest.contains("\n"));
         assertTrue(NoteTest.contains("Note"));
         assertTrue(NoteTest.contains(Note.class.getSimpleName()));
@@ -43,9 +43,9 @@ public class NoteTest {
 
     @Test
     public void noteTitleNotEmpty(){
-        Note note = new Note("   ", "This is a Test", "id1", "");
-        Note note2 = new Note("", "This is a Test", "id2", "");
-        Note note3 = new Note("title", "This is another Test", "id3", "");
+        Note note = new Note("   ", "This is a Test");
+        Note note2 = new Note("", "This is a Test");
+        Note note3 = new Note("title", "This is another Test");
 
         String expected = "New Note";
 
@@ -56,7 +56,7 @@ public class NoteTest {
         assertEquals(expected, actual2);
         assertEquals("title", note3.getTitle());
     }
-@Test
+    @Test
     public void testAddTag() {
         Tag tag = new Tag( "Java");
         Note note = new Note();

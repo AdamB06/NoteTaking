@@ -27,7 +27,7 @@ public class HomePageCtrlTest {
         notesBodyArea = "";
         homePageCtrl = new HomePageCtrl(null, null, null, null);
         markdownService = new MarkdownService();
-        noteService = new NoteService(null, null);
+        noteService = new NoteService(null);
         autoSaveService = new AutoSaveService(null,noteService);
     }
 
@@ -87,7 +87,7 @@ public class HomePageCtrlTest {
         // Create and store the notes
         List<Note> testList = new ArrayList<>();
         for (int i = 0; i < titles.length; i++) {
-            Note note = new Note(titles[i], contents[i], "id", "");
+            Note note = new Note(titles[i], contents[i]);
             testList.add(note);
         }
         List<Note> expectedList = new ArrayList<>();
@@ -105,7 +105,7 @@ public class HomePageCtrlTest {
         // Create and store the notes
         List<Note> testList = new ArrayList<>();
         for (int i = 0; i < titles.length; i++) {
-            Note note = new Note(titles[i], contents[i], "id", "");
+            Note note = new Note(titles[i], contents[i]);
             testList.add(note);
         }
         List<Note> expectedList = new ArrayList<>();
@@ -123,7 +123,7 @@ public class HomePageCtrlTest {
         // Create and store the notes
         List<Note> testList = new ArrayList<>();
         for (int i = 0; i < titles.length; i++) {
-            Note note = new Note(titles[i], contents[i], "id", "");
+            Note note = new Note(titles[i], contents[i]);
             testList.add(note);
         }
         List<Note> expectedList = new ArrayList<>();

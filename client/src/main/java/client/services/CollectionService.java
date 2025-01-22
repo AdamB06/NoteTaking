@@ -38,7 +38,7 @@ public class CollectionService{
             counter++;
             uniqueTitle = "New Collection Title" + counter;
         }
-        Collection collection = new Collection(uniqueTitle, new ArrayList<>(), "id"); //TODO implement using the id gotten from the user when creating
+        Collection collection = new Collection(uniqueTitle, new ArrayList<>()); //TODO implement using the id gotten from the user when creating
         Collection createdCollection = serverUtils.sendCollection(collection);
 
         if(createdCollection != null) {
