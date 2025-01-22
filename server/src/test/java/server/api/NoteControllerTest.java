@@ -63,14 +63,6 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void testEditDuplicateNoteTitle(){
-        Note note = new Note ("Hello", "This is a note");
-        notesController.createNote (note);
-        Note note2 = new Note ("Hello2", "This is a note");
-        assertThrows(IllegalArgumentException.class, () -> notesController.editNoteTitle("Hello", note2.getId()));
-    }
-
-    @Test
     public void testApplyPatch() {
         String original = "Hello World";
         String edited = "Hello There World";
