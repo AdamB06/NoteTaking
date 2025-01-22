@@ -21,9 +21,6 @@ public class Note {
     private String title;
     private String content;
 
-    private long collectionID;
-    private String collectionURL;
-
     @ManyToMany
     @JoinTable(
             name = "note_tag",
@@ -77,37 +74,6 @@ public class Note {
     public String getContent() {
         return content;
     }
-
-    /**
-     * @return collectionID
-     */
-    public long getCollectionID() {
-        return collectionID;
-    }
-
-    /**
-     * @return collectionURL
-     */
-    public String getCollectionURL() {
-        return collectionURL;
-    }
-
-    /**
-     * a setter for the id of the collection this is in
-     * @param collectionID id of the collection the note is in
-     */
-    public void setCollectionID(long collectionID) {
-        this.collectionID = collectionID;
-    }
-
-    /**
-     * a setter for the URL of the collection this is in
-     * @param collectionURL URL of the collection the note is in
-     */
-    public void setCollectionURL(String collectionURL) {
-        this.collectionURL = collectionURL;
-    }
-
     /**
      * a setter for the content of a note
      *

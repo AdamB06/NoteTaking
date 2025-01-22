@@ -156,15 +156,6 @@ public class HomePageCtrl implements Initializable {
             tagController.handleLinkClick(link, notesListView);
         });
 
-        notesBodyArea.textProperty().addListener((observable, oldValue, newValue) -> {
-            Note current = currentNote.get();
-            if (current != null) {
-                current.setContent(newValue); // Update the current note's content
-                tagController.processNoteLinks(newValue, current); // Process links
-                webView.getEngine().loadContent(current.getContent()); // Reload processed content into WebView
-            }
-        });
-
         webView.getEngine().loadContent("<html><body>" +
                 "<p>No notes available. Please add a note to see links here.</p>" +
                 "</body></html>");
