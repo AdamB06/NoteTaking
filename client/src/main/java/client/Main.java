@@ -16,8 +16,6 @@ public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
-    private WebSocketClient webSocketClient;
-
     /**
      * PSVM method
      * @param args PSVM method arguments
@@ -35,12 +33,28 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         var serverUtils = INJECTOR.getInstance(ServerUtils.class);
-        if (!serverUtils.isServerAvailable()) {
-            var msg = "Server needs to be started before the client, " +
-                    "but it does not seem to be available. Shutting down.";
-            System.err.println(msg);
-            Platform.exit();
-            return;
+        var warnings = INJECTOR.getInstance(Warnings.class);
+        var lc = INJECTOR.getInstance(LanguageController.class);
+        lc.loadLanguage(ClientConfig.loadConfig().getPreferredLanguage());
+        boolean reconnect = true;
+
+        while (reconnect) {
+            if (serverUtils.isServerAvailable()) {
+                reconnect = false;
+            } else {
+                warnings = new Warnings();
+                reconnect = warnings.askOkCancel(
+                        lc.getByTag("serverNotFound.text"), lc.getByTag("serverNotFound.message")
+                );
+
+                if (reconnect) {
+                    System.out.println("Attempting to reconnect...");
+                } else {
+                    System.out.println("Server unavailable. Shutting down.");
+                    Platform.exit();
+                    return;
+                }
+            }
         }
         var overview = FXML.load(HomePageCtrl.class, "client", "scenes", "NetNoteScene.fxml");
         var editCollection = FXML.load(EditCollectionCtrl.class,
@@ -55,9 +69,6 @@ public class Main extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        if (webSocketClient != null) {
-            webSocketClient.closeConnection();
-        }
         Platform.runLater(() -> System.exit(0));
     }
 }
