@@ -95,10 +95,10 @@ public class LanguageController {
     }
 
     /**
-     * @param s the tag
+     * @param t the tag
      * @return the value
      */
-    public String getByTag(String s){
-        return bundle.getString(s);
+    public String getByTag(String t){
+        return bundle.getString(t);
     }
 }
