@@ -89,9 +89,9 @@
                                 </AnchorPane>
                                 <AnchorPane maxWidth="400.0" minWidth="150.0" prefHeight="200.0" prefWidth="200.0">
                                     <children>
-                                        <Label fx:id="previewTextLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="263.0" style="-fx-background-color: grey;" text="Preview Text:" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <Label fx:id="previewTextLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="263.0" style="-fx-background-color: gainsboro;" text="Preview Text:" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <font>
-                                                <Font size="21.0" />
+                                                <Font name="System Bold" size="21.0" />
                                             </font>
                                         </Label>
                                         <WebView fx:id="webView" layoutY="51.2" prefHeight="666.0" prefWidth="558.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="51.0" />
