@@ -88,6 +88,7 @@ public class HomePageCtrl implements Initializable {
     private boolean suppressUpdates = false;
     private boolean isSaving = false;
     private Set<Tag> lastSelectedTags = new HashSet<>();
+    private long lastSelectedNoteId = -1;
 
 
     /**
@@ -272,6 +273,10 @@ public class HomePageCtrl implements Initializable {
                     }
 
                     if (newNote != null) {
+                        if(newNote.getId() != lastSelectedNoteId){
+                            lastSelectedNoteId = newNote.getId();
+                            refreshNotesInternal();
+                        }
                         // Load content for the new note
                         titleField.setText(newNote.getTitle());
                         notesBodyArea.setText(newNote.getContent());
@@ -360,8 +365,9 @@ public class HomePageCtrl implements Initializable {
                 notesListView.getItems().addAll(notes);
 
                 // Preserve the selection if possible
-                if (selectedNote != null && notes.contains(selectedNote)) {
-                    notesListView.getSelectionModel().select(selectedNote);
+                if (selectedNote != null && noteService.findNoteIndex(selectedNote, notes) != -1) {
+                    int noteIndex = noteService.findNoteIndex(selectedNote, notes);
+                    notesListView.getSelectionModel().select(noteIndex);
                 }
             } else {
                 System.err.println("ListView not initialized!");
@@ -684,6 +690,7 @@ public class HomePageCtrl implements Initializable {
             if ("Successful".equals(status)) {
                 original = content; // Update original only after a successful save
                 System.out.println("Save successful. Updated original content.\n\n");
+                refreshNotesInternal();
             } else {
                 System.err.println("Save failed. Retrying...");
                 Note note = noteService.getNoteById(noteId);
