@@ -132,9 +132,7 @@ public class HomePageCtrl implements Initializable {
                 .getResource("/configuration/WebViewConfig.css").toString());
         initializeEdit();
         original = notesBodyArea.getText();
-        refreshNotesInternal();
 
-        // Load flag images
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
         spanishFlag = new Image(path + "es_flag.png");
@@ -152,21 +150,45 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
 
+
+        shortcutsButton.setOnAction(action -> shortcutsHint());
+
         webView.getEngine().setOnAlert(event -> {
             String link = event.getData();
             tagController.handleLinkClick(link, notesListView);
         });
 
-        webView.getEngine().loadContent("<html><body>" +
-                "<p>No notes available. Please add a note to see links here.</p>" +
-                "</body></html>");
-
-        shortcutsButton.setOnAction(action -> shortcutsHint());
+        notesListView.getSelectionModel().selectedItemProperty().addListener((obs, oldNote, newNote) -> {
+            if (newNote != null) {
+                loadSelectedNote(newNote);
+            }
+        });
+        refreshNotesInternal();
     }
 
-    public void renameNote(String oldTitle, String newTitle) {
-        tagController.updateNoteReferences(oldTitle, newTitle);
+    private void loadSelectedNote(Note note) {
+        if (note == null) {
+            clearNoteDisplay();
+            return;
+        }
+        titleField.setText(note.getTitle());
+        notesBodyArea.setText(note.getContent());
+        original = note.getContent();
+        Note tempNote = new Note(note.getTitle(), note.getContent());
+        tagController.processNoteLinks(tempNote.getContent(), tempNote);
+        webView.getEngine().loadContent(tempNote.getContent());
     }
+
+    /**
+     * Clears the title, content, and WebView when no note is selected.
+     */
+    private void clearNoteDisplay() {
+        titleField.clear();
+        notesBodyArea.clear();
+        webView.getEngine().loadContent("");
+        original = "";
+    }
+
 
     /**
      * Initializes the button graphics
@@ -354,12 +376,14 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(() -> {
             noteService.refreshNotes();
             List<Note> notes = noteService.getNotes();
+            notesListView.getItems().setAll(notes);
             if (notesListView != null) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
+                for (Note n : notes) {
+                    tagController.processNoteLinks(n.getContent(), n);
+                }
                 notesListView.getItems().clear();
                 notesListView.getItems().addAll(notes);
-
-                // Preserve the selection if possible
                 if (selectedNote != null && noteService.findNoteIndex(selectedNote, notes) != -1) {
                     int noteIndex = noteService.findNoteIndex(selectedNote, notes);
                     notesListView.getSelectionModel().select(noteIndex);
@@ -526,21 +550,24 @@ public class HomePageCtrl implements Initializable {
     private void configureAutoSave() {
         notesBodyArea.setOnKeyTyped(event -> {
             suppressUpdates = true;
-            Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
-            if (selectedNote != null) {
-                String currentContent = notesBodyArea.getText();
-                tagController.checkForCorrectUserInput(currentContent, event.getCharacter(),
-                        selectedNote, universalTags);
-//                updateTagComboBox();
-                selectedNote.setContent(currentContent);
 
-                webSocketClient.sendMessage(selectedNote, "updateContent");
-                if(autoSaveService.onKeyPressed(selectedNote, currentContent)){
-                    original = notesBodyArea.getText();
-                }
+            Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
+            if (selectedNote == null) {
+                suppressUpdates = false;
+                return;
             }
+            String currentContent = notesBodyArea.getText();
+            selectedNote.setContent(currentContent);
+            tagController.processNoteLinks(currentContent, selectedNote);
+            tagController.checkForCorrectUserInput(currentContent, event.getCharacter(), selectedNote, universalTags);
+            webSocketClient.sendMessage(selectedNote, "updateContent");
+            if (autoSaveService.onKeyPressed(selectedNote, currentContent)) {
+                original = currentContent;
+            }
+            suppressUpdates = false;
         });
     }
+
 
     /**
      * Initializes the filtering of notes.

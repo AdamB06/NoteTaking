@@ -154,24 +154,32 @@ public class TagController {
 
     public void processNoteLinks(String content, Note note) {
         if (content == null || content.isEmpty()) return;
+
         Pattern pattern = Pattern.compile("\\[\\[(.*?)\\]\\]");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             String referencedNoteTitle = matcher.group(1);
             Note referencedNote = noteService.getNoteByTitle(referencedNoteTitle);
+
             String replacement;
             if (referencedNote != null) {
-                replacement = "<a href='/Note/" + referencedNote.getId() + "'>" + referencedNoteTitle + "</a>";
+                replacement = String.format(
+                        "<a href='#' onclick='alert(\"/Note/%d\"); return false;'>%s</a>",
+                        referencedNote.getId(),
+                        referencedNoteTitle
+                );
             } else {
-                replacement = "<span style='color: red;'>[[ " + referencedNoteTitle + " ]] (not found)</span>";
+                replacement = String.format(
+                        "<span style='color: red;'>[[%s]] (not found)</span>",
+                        referencedNoteTitle
+                );
             }
             content = content.replace("[[" + referencedNoteTitle + "]]", replacement);
         }
-
         note.setContent(content);
-
-
     }
+
+
 
 
     public void handleLinkClick(String link, ListView<Note> notesListView) {
@@ -179,20 +187,12 @@ public class TagController {
             long noteId = Long.parseLong(link.replace("/Note/", ""));
             Note note = noteService.getNoteById(noteId);
             if (note != null) {
-                loadNoteInView(note, new WebView());
+                notesListView.getSelectionModel().select(note);
             } else {
                 System.out.println("Note not found for ID: " + noteId);
             }
-        } else if (link.startsWith("/tags/")) {
-            String tagName = link.replace("/tags/", "");
-            Tag tag = new Tag(tagName);
-            //filterNotesByTag(tag, notesListView); needs to be resolved
         }
     }
-
-
-//ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
-//notesListView.setItems(observableNotes);
 
     /**
      * @param note    gives a note
