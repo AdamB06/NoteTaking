@@ -47,8 +47,6 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private Button shortcutsButton;
     @FXML
-    private Label collectionsLabel;
-    @FXML
     private Label previewTextLabel;
     @FXML
     private ListView<Note> notesListView;
@@ -57,9 +55,11 @@ public class HomePageCtrl implements Initializable {
     @FXML
     private ComboBox<Image> languageComboBox;
     @FXML
-    private CheckComboBox<Tag> tagComboBox;
-    @FXML
     private Set<Tag> universalTags = new HashSet<>();
+    @FXML
+    private SplitMenuButton allTags;
+    @FXML
+    private SplitMenuButton selectedTags;
 
     @FXML
     private Image englishFlag;
@@ -394,13 +394,14 @@ public class HomePageCtrl implements Initializable {
         deleteButton.setText("\n" + languageController.getDeleteButtonText());
 
         shortcutsButton.setText(languageController.getByTag("showShortcuts.text"));
-        collectionsLabel.setText(languageController.getCollectionsLabelText());
         previewTextLabel.setText(languageController.getPreviewLabelText());
         searchBox.setPromptText(languageController.getSearchBoxText());
         titleField.setPromptText(languageController.getTitleFieldText());
         notesBodyArea.setPromptText(languageController.getNotesBodyAreaText());
         //tagComboBox.setPromp(languageController.getFilterButtonText());
         clearFilterButton.setText(languageController.getClearFilterButtonText());
+        allTags.setText(languageController.getAllTags());
+        selectedTags.setText(languageController.getSelectedTags());
 
         loadAllFlags(i);
 
@@ -528,7 +529,7 @@ public class HomePageCtrl implements Initializable {
                 String currentContent = notesBodyArea.getText();
                 tagController.checkForCorrectUserInput(currentContent, event.getCharacter(),
                         selectedNote, universalTags);
-                updateTagComboBox();
+//                updateTagComboBox();
                 selectedNote.setContent(currentContent);
 
                 webSocketClient.sendMessage(selectedNote, "updateContent");
@@ -703,25 +704,25 @@ public class HomePageCtrl implements Initializable {
     /**
      * updates the comboBox to contain the new tags that were added to notes
      */
-    public void updateTagComboBox() {
-        tagComboBox.getItems().setAll(universalTags);
-        tagComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Tag>) c -> {
-            Set<Tag> selectedTags = new HashSet<>(tagComboBox.getCheckModel().getCheckedItems());
-
-            // Check if the selected tags have actually changed
-            if (!selectedTags.equals(lastSelectedTags)) {
-                lastSelectedTags = selectedTags;
-                System.out.println("filtering is being called");
-                tagController.filterNotesByTag(selectedTags, notesListView, noteService.getNotes());
-            }
-        });
-    }
+//    public void updateTagComboBox() {
+//        tagComboBox.getItems().setAll(universalTags);
+//        tagComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Tag>) c -> {
+//            Set<Tag> selectedTags = new HashSet<>(tagComboBox.getCheckModel().getCheckedItems());
+//
+//            // Check if the selected tags have actually changed
+//            if (!selectedTags.equals(lastSelectedTags)) {
+//                lastSelectedTags = selectedTags;
+//                System.out.println("filtering is being called");
+//                tagController.filterNotesByTag(selectedTags, notesListView, noteService.getNotes());
+//            }
+//        });
+//    }
 
     /**
      * Reset the ListView to show all notes
      */
     private void clearFilter() {
-        tagComboBox.getCheckModel().clearChecks();
+//        tagComboBox.getCheckModel().clearChecks();
         notesListView.getItems().clear();
         notesListView.getItems().addAll(noteService.getNotes());
 
