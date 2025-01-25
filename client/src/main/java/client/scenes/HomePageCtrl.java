@@ -87,7 +87,6 @@ public class HomePageCtrl implements Initializable {
     private final WebSocketClient webSocketClient;
     private boolean suppressUpdates = false;
     private boolean isSaving = false;
-    private Set<Tag> lastSelectedTags = new HashSet<>();
     private long lastSelectedNoteId = -1;
 
 
@@ -161,12 +160,19 @@ public class HomePageCtrl implements Initializable {
         });
 
         webView.getEngine().loadContent("<html><body>" +
-                "<p>No notes available. Please add a note to see links here.</p>" +
+                "<p>" +
+                languageController.getByTag("previewEmpty.text") +
+                "</p>" +
                 "</body></html>");
 
         shortcutsButton.setOnAction(action -> shortcutsHint());
     }
 
+    /**
+     * Rename the note
+     * @param oldTitle the old title
+     * @param newTitle the new title
+     */
     public void renameNote(String oldTitle, String newTitle) {
         tagController.updateNoteReferences(oldTitle, newTitle);
     }
@@ -195,16 +201,9 @@ public class HomePageCtrl implements Initializable {
         removeV.setFitWidth(size);
         removeV.setPreserveRatio(true);
 
-        Image info = new Image("icons/information.png");
-        ImageView infoV = new ImageView(info);
-        infoV.setFitHeight(size);
-        infoV.setFitWidth(size);
-        infoV.setPreserveRatio(true);
-
         refreshButton.setGraphic(refreshV);
         addButton.setGraphic(addV);
         deleteButton.setGraphic(removeV);
-        shortcutsButton.setGraphic(infoV);
     }
 
     private void shortcutsHint(){

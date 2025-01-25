@@ -44,7 +44,9 @@ public class Main extends Application {
             } else {
                 warnings = new Warnings();
                 reconnect = warnings.askOkCancel(
-                        lc.getByTag("serverNotFound.text"), lc.getByTag("serverNotFound.message")
+                        lc.getByTag("serverNotFound.text"),
+                        lc.getByTag("serverNotFound.message"),
+                        lc
                 );
 
                 if (reconnect) {
