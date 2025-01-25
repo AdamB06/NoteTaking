@@ -47,7 +47,6 @@ public class TagController {
         }
 
         try {
-            // Pattern to match hashtags like #tag1, #tag2, etc.
             Pattern pattern = Pattern.compile("#(\\w+)");
             Matcher matcher = pattern.matcher(content);
 
@@ -65,18 +64,6 @@ public class TagController {
                 }
                 String link = "<a href='/tags/" + tagName + "'>#" + tagName + "</a>";
                 content = content.replace("#" + tagName, link);
-
-
-               /* for (Tag tag : note.getTags()) {
-                    if (!note.getContent().contains(tag.getName())) {
-                        note.removeTag(tag);
-                        System.out.println("Tag removed: " + tag.getName());
-                    }
-                }
-
-
-
-                */
 
             }
         } catch (Exception e) {

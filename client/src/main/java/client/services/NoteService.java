@@ -3,7 +3,6 @@ package client.services;
 import client.utils.ServerUtils;
 import commons.Note;
 import jakarta.inject.Inject;
-//import server.database.NoteRepository;
 
 import java.util.ArrayList;
 import java.util.List;

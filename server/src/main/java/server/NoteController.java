@@ -190,8 +190,6 @@ public class NoteController {
                 endIndex = originalContent.length();
             }
             if (startIndex > endIndex) {
-                // handle the case where startIndex is bigger than endIndex
-                // for example, you might swap them or skip the patch
                 int temp = startIndex;
                 startIndex = endIndex;
                 endIndex = temp;

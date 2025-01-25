@@ -20,7 +20,6 @@ import java.util.*;
 
 public class EditCollectionCtrl implements Initializable {
     private PrimaryCtrl primaryCtrl;
-    //TODO The Labels to be translated
     @FXML
     private TextField title;
     @FXML
@@ -62,7 +61,6 @@ public class EditCollectionCtrl implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //TODO Continue...
         refreshCollectionsInternal();
         disableBinding();
     }
@@ -79,7 +77,6 @@ public class EditCollectionCtrl implements Initializable {
             collectionsListView.getSelectionModel().select(createdCollection);
             System.out.println("Collection created with ID: " + createdCollection.getId());
         }
-        //TODO are mnemonics to be included here? something for WEEK8
     }
 
     /**
@@ -94,13 +91,9 @@ public class EditCollectionCtrl implements Initializable {
             if("Successful".equals(status)){
                 refreshCollectionsInternal();
             }
-            //TODO are mnemonics to be included here? something for WEEK8
         }
     }
 
-    //TODO saveChangesButton
-
-    //TODO makeCollectionDefaultButton
 
     /**
      * Refresh the collections in the ListView
@@ -114,8 +107,6 @@ public class EditCollectionCtrl implements Initializable {
                         getSelectionModel().getSelectedItem();
                 collectionsListView.getItems().clear();
                 collectionsListView.getItems().addAll(collections);
-
-                //Preserve the selection if possible
                 if(selectedCollection != null && collections.contains(selectedCollection)){
                     collectionsListView.getSelectionModel().select(selectedCollection);
                 }
@@ -181,10 +172,7 @@ public class EditCollectionCtrl implements Initializable {
     public void clearFields(){
         collectionsListView.getItems().clear();
         title.clear();
-        //TODO serverUrl attribute
         serverUrl.clear();
-
-        //TODO collection attribute
         collection.clear();
 
         status.clear();
