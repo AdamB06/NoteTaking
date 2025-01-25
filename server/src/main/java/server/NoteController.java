@@ -67,7 +67,8 @@ public class NoteController {
             List<Note> allNotes = noteService.getAllNotes();
             for (Note n : allNotes) {
                 if (n.getContent().contains("[[" + oldTitle + "]]")) {
-                    String updatedContent = n.getContent().replace("[[" + oldTitle + "]]", "[[" + title + "]]");
+                    String updatedContent = n.getContent().replace("[[" + oldTitle + "]]",
+                            "[[" + title + "]]");
                     n.setContent(updatedContent);
                     noteService.saveNote(n);
                 }

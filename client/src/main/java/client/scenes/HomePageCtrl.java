@@ -12,7 +12,6 @@ import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -21,7 +20,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
-import org.controlsfx.control.CheckComboBox;
 
 import java.net.URL;
 import java.util.*;
@@ -242,7 +240,8 @@ public class HomePageCtrl implements Initializable {
         if (notesBodyArea != null) {
             notesBodyArea.textProperty()
                     .addListener((observable, oldValue, markdownText) -> {
-                        String html = markdownService.convertToHtml(tagController.processNoteLinks(markdownText));
+                        String html = markdownService.convertToHtml(tagController.
+                                processNoteLinks(markdownText));
                         updateWebView(html);
                     });
         } else {
@@ -350,8 +349,8 @@ public class HomePageCtrl implements Initializable {
                             content = header = "";
                         }
                         if(set)
-                            warnings.error(languageController.getByTag("errorText.text"), content, header);
-                        // Optionally, revert the titleField to the original title
+                            warnings.error(languageController.getByTag("errorText.text"),
+                                    content, header);
                         titleField.setText(selectedNote.getTitle());
                     }
                 }
@@ -549,7 +548,8 @@ public class HomePageCtrl implements Initializable {
             }
             String currentContent = notesBodyArea.getText();
             selectedNote.setContent(currentContent);
-            tagController.checkForCorrectUserInput(currentContent, event.getCharacter(), selectedNote, universalTags);
+            tagController.checkForCorrectUserInput(currentContent,
+                    event.getCharacter(), selectedNote, universalTags);
             webSocketClient.sendMessage(selectedNote, "updateContent");
             if (autoSaveService.onKeyPressed(selectedNote, currentContent)) {
                 original = currentContent;
@@ -719,23 +719,6 @@ public class HomePageCtrl implements Initializable {
             saveChanges(current.getId(), content);
         }
     }
-
-    /**
-     * updates the comboBox to contain the new tags that were added to notes
-     */
-//    public void updateTagComboBox() {
-//        tagComboBox.getItems().setAll(universalTags);
-//        tagComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Tag>) c -> {
-//            Set<Tag> selectedTags = new HashSet<>(tagComboBox.getCheckModel().getCheckedItems());
-//
-//            // Check if the selected tags have actually changed
-//            if (!selectedTags.equals(lastSelectedTags)) {
-//                lastSelectedTags = selectedTags;
-//                System.out.println("filtering is being called");
-//                tagController.filterNotesByTag(selectedTags, notesListView, noteService.getNotes());
-//            }
-//        });
-//    }
 
     /**
      * Reset the ListView to show all notes

@@ -44,6 +44,10 @@ public class EditCollectionCtrl implements Initializable {
 
     private final SimpleObjectProperty<Collection> currentCollection = new SimpleObjectProperty<>();
 
+    /**
+     *
+     * @param primaryCtrl Instance of primaryctrl
+     */
     @Inject
     public EditCollectionCtrl(PrimaryCtrl primaryCtrl) {
         this.primaryCtrl = primaryCtrl;
@@ -51,6 +55,11 @@ public class EditCollectionCtrl implements Initializable {
         collectionService = injector.getInstance(CollectionService.class);
     }
 
+    /**
+     *
+     * @param location the location of the URL
+     * @param resources respresentation of the recources
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //TODO Continue...
@@ -101,7 +110,8 @@ public class EditCollectionCtrl implements Initializable {
             collectionService.refreshCollections();
             List<Collection> collections = collectionService.getCollections();
             if(collectionsListView != null) {
-                Collection selectedCollection = collectionsListView.getSelectionModel().getSelectedItem();
+                Collection selectedCollection = collectionsListView.
+                        getSelectionModel().getSelectedItem();
                 collectionsListView.getItems().clear();
                 collectionsListView.getItems().addAll(collections);
 
@@ -118,9 +128,11 @@ public class EditCollectionCtrl implements Initializable {
     }
 
     /**
-     * To prevent user interaction with UI elements when no Collection is selected. This ensures that:
+     * To prevent user interaction with UI elements when no
+     * Collection is selected. This ensures that:
      * - Users can't edit details of a collection when there isn't one selected.
-     * - UI behavior stays consistent with the application state, improving user experience and avoiding potential errors.
+     * - UI behavior stays consistent with the application state,
+     * improving user experience and avoiding potential errors.
      */
     private void disableBinding() {
         title.disableProperty().bind(Bindings.createBooleanBinding(
@@ -145,17 +157,27 @@ public class EditCollectionCtrl implements Initializable {
         ));
     }
 
+    /**
+     *
+     * @param e keyevent called e
+     */
     public void keyPressed(KeyEvent e) {
         if (Objects.requireNonNull(e.getCode()) == KeyCode.ESCAPE) {
             cancel();
         }
     }
 
+    /**
+     * cancels field
+     */
     public void cancel() {
         clearFields();
         primaryCtrl.showHome();
     }
 
+    /**
+     * clears field
+     */
     public void clearFields(){
         collectionsListView.getItems().clear();
         title.clear();

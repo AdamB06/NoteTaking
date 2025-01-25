@@ -144,6 +144,11 @@ public class NoteService {
         notes = serverUtils.getNotes();
     }
 
+    /**
+     *
+     * @param title representation of the note title
+     * @return returns the note if equal otherwise null
+     */
     public Note getNoteByTitle(String title) {
         if (title == null || title.isEmpty()) {
             return null;

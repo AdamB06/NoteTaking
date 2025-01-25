@@ -16,6 +16,10 @@ import java.util.regex.Pattern;
 public class TagController {
     private final NoteService noteService;
 
+    /**
+     *
+     * @param noteService noteservice Object for certain methods
+     */
     public TagController(NoteService noteService) {
         this.noteService = noteService;
     }
@@ -86,7 +90,8 @@ public class TagController {
      * @param note          current note that we are looking at
      * @param universalList list of universal tags  across all notes for the combobox
      */
-    public void checkForCorrectUserInput(String content, String character, Note note, Set<Tag> universalList) {
+    public void checkForCorrectUserInput(String content, String character,
+                                         Note note, Set<Tag> universalList) {
         if (content == null || content.trim().isEmpty()) {
             return;
         }
@@ -115,7 +120,8 @@ public class TagController {
      * @param notesListView listview of notes
      * @param noteList list of notes that has to be filtered
      */
-    public void filterNotesByTag(Set<Tag> selectedTags, ListView<Note> notesListView, List<Note> noteList) {
+    public void filterNotesByTag(Set<Tag> selectedTags,
+                                 ListView<Note> notesListView, List<Note> noteList) {
         List<Note> filteredNotes = new ArrayList<>();
         for (Note note : noteList) {
             System.out.println("Checking note: " + note.getTitle());
@@ -152,6 +158,11 @@ public class TagController {
         System.out.println("NOW SHOWING: " + notesListView.getItems());
     }
 
+    /**
+     *
+     * @param content String representation of content
+     * @return returns the content
+     */
     public String processNoteLinks(String content) {
         if (content == null || content.isEmpty()) return content;
 
@@ -179,6 +190,11 @@ public class TagController {
         return content;
     }
 
+    /**
+     *
+     * @param link representation of the link
+     * @param notesListView Object called noteListView
+     */
     public void handleLinkClick(String link, ListView<Note> notesListView) {
         if (link.startsWith("/Note/")) {
             long noteId = Long.parseLong(link.replace("/Note/", ""));
@@ -203,16 +219,5 @@ public class TagController {
         }
         webView.getEngine().loadContent(processNoteLinks(note.getContent()));
         System.out.println("Loading note: " + note.getTitle());
-    }
-
-    public void updateNoteReferences(String oldTitle, String newTitle) {
-        for (Note note : noteService.getNotes()) {
-            String content = note.getContent();
-            String updatedContent = content.replace("[[" + oldTitle + "]]", "[[" + newTitle + "]]");
-            if (!content.equals(updatedContent)) {
-                note.setContent(updatedContent);
-                processNoteLinks(updatedContent); // Re-process links
-            }
-        }
     }
 }

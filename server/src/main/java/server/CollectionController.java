@@ -121,7 +121,8 @@ public class CollectionController {
      * @return A ResponseEntity containing a message if the method was successfully executed
      */
     @DeleteMapping("/NoteDelete/{collectionId}/{noteId}")
-    public ResponseEntity<Void> deleteNote(@PathVariable long collectionId, @PathVariable long noteId) {
+    public ResponseEntity<Void> deleteNote(@PathVariable long collectionId,
+                                           @PathVariable long noteId) {
         collectionService.deleteNoteFromCollection(collectionId, noteId);
         return ResponseEntity.ok().build();
     }
