@@ -152,8 +152,8 @@ public class TagController {
         System.out.println("NOW SHOWING: " + notesListView.getItems());
     }
 
-    public void processNoteLinks(String content, Note note) {
-        if (content == null || content.isEmpty()) return;
+    public String processNoteLinks(String content) {
+        if (content == null || content.isEmpty()) return content;
 
         Pattern pattern = Pattern.compile("\\[\\[(.*?)\\]\\]");
         Matcher matcher = pattern.matcher(content);
@@ -176,18 +176,16 @@ public class TagController {
             }
             content = content.replace("[[" + referencedNoteTitle + "]]", replacement);
         }
-        note.setContent(content);
+        return content;
     }
-
-
-
 
     public void handleLinkClick(String link, ListView<Note> notesListView) {
         if (link.startsWith("/Note/")) {
             long noteId = Long.parseLong(link.replace("/Note/", ""));
             Note note = noteService.getNoteById(noteId);
             if (note != null) {
-                notesListView.getSelectionModel().select(note);
+                int noteIndex = noteService.findNoteIndex(note, notesListView.getItems());
+                notesListView.getSelectionModel().select(noteIndex);
             } else {
                 System.out.println("Note not found for ID: " + noteId);
             }
@@ -203,8 +201,7 @@ public class TagController {
             System.out.println("No note to be printed");
             return;
         }
-        processNoteLinks(note.getContent(), note);
-        webView.getEngine().loadContent(note.getContent());
+        webView.getEngine().loadContent(processNoteLinks(note.getContent()));
         System.out.println("Loading note: " + note.getTitle());
     }
 
@@ -214,10 +211,8 @@ public class TagController {
             String updatedContent = content.replace("[[" + oldTitle + "]]", "[[" + newTitle + "]]");
             if (!content.equals(updatedContent)) {
                 note.setContent(updatedContent);
-                processNoteLinks(updatedContent, note); // Re-process links
+                processNoteLinks(updatedContent); // Re-process links
             }
         }
     }
 }
-
-

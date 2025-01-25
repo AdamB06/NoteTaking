@@ -158,11 +158,6 @@ public class HomePageCtrl implements Initializable {
             tagController.handleLinkClick(link, notesListView);
         });
 
-        notesListView.getSelectionModel().selectedItemProperty().addListener((obs, oldNote, newNote) -> {
-            if (newNote != null) {
-                loadSelectedNote(newNote);
-            }
-        });
         refreshNotesInternal();
     }
 
@@ -174,9 +169,8 @@ public class HomePageCtrl implements Initializable {
         titleField.setText(note.getTitle());
         notesBodyArea.setText(note.getContent());
         original = note.getContent();
-        Note tempNote = new Note(note.getTitle(), note.getContent());
-        tagController.processNoteLinks(tempNote.getContent(), tempNote);
-        webView.getEngine().loadContent(tempNote.getContent());
+        String webViewText = tagController.processNoteLinks(original);
+        webView.getEngine().loadContent(webViewText);
     }
 
     /**
@@ -248,7 +242,7 @@ public class HomePageCtrl implements Initializable {
         if (notesBodyArea != null) {
             notesBodyArea.textProperty()
                     .addListener((observable, oldValue, markdownText) -> {
-                        String html = markdownService.convertToHtml(markdownText);
+                        String html = markdownService.convertToHtml(tagController.processNoteLinks(markdownText));
                         updateWebView(html);
                     });
         } else {
@@ -376,17 +370,14 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(() -> {
             noteService.refreshNotes();
             List<Note> notes = noteService.getNotes();
-            notesListView.getItems().setAll(notes);
             if (notesListView != null) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
-                for (Note n : notes) {
-                    tagController.processNoteLinks(n.getContent(), n);
-                }
                 notesListView.getItems().clear();
                 notesListView.getItems().addAll(notes);
                 if (selectedNote != null && noteService.findNoteIndex(selectedNote, notes) != -1) {
                     int noteIndex = noteService.findNoteIndex(selectedNote, notes);
                     notesListView.getSelectionModel().select(noteIndex);
+                    tagController.processNoteLinks(selectedNote.getContent());
                 }
             } else {
                 System.err.println("ListView not initialized!");
@@ -558,7 +549,6 @@ public class HomePageCtrl implements Initializable {
             }
             String currentContent = notesBodyArea.getText();
             selectedNote.setContent(currentContent);
-            tagController.processNoteLinks(currentContent, selectedNote);
             tagController.checkForCorrectUserInput(currentContent, event.getCharacter(), selectedNote, universalTags);
             webSocketClient.sendMessage(selectedNote, "updateContent");
             if (autoSaveService.onKeyPressed(selectedNote, currentContent)) {

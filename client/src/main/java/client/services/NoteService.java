@@ -150,7 +150,7 @@ public class NoteService {
         }
 
         for (Note note : notes) {
-            if (note.getTitle() != null && note.getTitle().equalsIgnoreCase(title)) {
+            if (note.getTitle() != null && note.getTitle().equals(title)) {
                 return note;
             }
         }

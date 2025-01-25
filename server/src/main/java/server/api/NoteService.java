@@ -56,7 +56,7 @@ public class NoteService {
      * @return The note with the specified ID.
      */
     public Note getNoteById(long id) {
-        return noteRepository.getReferenceById(id);
+        return noteRepository.findById(id).orElse(null);
     }
 
     /**
