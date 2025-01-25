@@ -101,4 +101,14 @@ public class LanguageController {
     public String getByTag(String t){
         return bundle.getString(t);
     }
+
+    /**
+     * @return allTags splitMenuButton
+     */
+    public String getAllTags(){return bundle.getString("allTags.text");}
+
+    /**
+     * @return selectedTags splitMenuButton
+     */
+    public String getSelectedTags(){return bundle.getString("selectedTags.text");}
 }
