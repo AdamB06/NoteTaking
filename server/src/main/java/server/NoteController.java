@@ -114,6 +114,9 @@ public class NoteController {
     @GetMapping
     public ResponseEntity<List<Note>> getAllNotes() {
         List<Note> notes = noteService.getAllNotes();
+        for (Note note : notes) {
+            note.setTags(null);
+        }
         return ResponseEntity.ok(notes);
     }
 

@@ -17,13 +17,14 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.net.ConnectException;
-import java.util.Map;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 import commons.Collection;
 import commons.Note;
+import commons.Tag;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -240,12 +241,26 @@ public class ServerUtils {
                     .request(APPLICATION_JSON)
                     .get();
             if (response.getStatus() == 200) {
-                return response.readEntity(new GenericType<List<Note>>() {});
+                List<Note> notes = response.readEntity(new GenericType<List<Note>>() {});
+                for (Note note : notes) {
+                    note.setTags(getTags(note.getContent()));
+                }
+                return notes;
             } else {
                 System.out.println("Error fetching notes: " + response.getStatus());
                 return Collections.emptyList();
             }
         }
+    }
+
+    public Set<Tag> getTags(String input){
+        Set<Tag> tags = new HashSet<Tag>();
+        Pattern pattern = Pattern.compile("#(\\w+)");
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            tags.add(new Tag(matcher.group(1)));
+        }
+        return tags;
     }
 
     /**
@@ -277,7 +292,9 @@ public class ServerUtils {
             Response response = client.target(serverUrl + "Note/" + noteId)
                     .request(APPLICATION_JSON).get();
             if (response.getStatus() == 200) {
-                return response.readEntity(Note.class);
+                Note note = response.readEntity(Note.class);
+                note.setTags(getTags(note.getContent()));
+                return note;
             } else {
                 logError("getNoteById", response);
                 return null;

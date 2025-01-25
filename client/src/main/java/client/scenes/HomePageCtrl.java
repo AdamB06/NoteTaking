@@ -164,10 +164,6 @@ public class HomePageCtrl implements Initializable {
         shortcutsButton.setOnAction(action -> shortcutsHint());
     }
 
-    public void renameNote(String oldTitle, String newTitle) {
-        tagController.updateNoteReferences(oldTitle, newTitle);
-    }
-
     /**
      * Initializes the button graphics
      */
@@ -311,10 +307,12 @@ public class HomePageCtrl implements Initializable {
             } else {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 if (selectedNote != null) {
+                    String oldTitle = selectedNote.getTitle();
                     String newTitle = titleField.getText();
                     String updatedTitle = noteService.updateNoteTitle(
                             selectedNote, newTitle);
                     if (updatedTitle.equals(newTitle)) {
+                        tagController.updateNoteReferences(oldTitle, newTitle);
                         webSocketClient.sendMessage(selectedNote, "updateTitle");
                         selectedNote.setTitle(newTitle);
                         notesListView.refresh();
