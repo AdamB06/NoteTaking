@@ -258,7 +258,7 @@ public class ServerUtils {
         Pattern pattern = Pattern.compile("#(\\w+)");
         Matcher matcher = pattern.matcher(input);
         while (matcher.find()) {
-            tags.add(new Tag(matcher.group()));
+            tags.add(new Tag(matcher.group(1)));
         }
         return tags;
     }
