@@ -1,10 +1,13 @@
 package client;
 
+import client.scenes.HomePageCtrl;
 import client.services.NoteService;
 import commons.Note;
 import commons.Tag;
 
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.web.WebView;
 
 
@@ -138,6 +141,31 @@ public class TagController {
         System.out.println("Filtered notes count: " + filteredNotes.size());
 
         updateNotesListView(filteredNotes, notesListView);
+    }
+
+
+
+    public MenuItem createMenuItemForAllTags(Tag tag, SplitMenuButton allTags, SplitMenuButton selectedTags) {
+
+        MenuItem menuItem = new MenuItem(tag.getName());
+        menuItem.setOnAction(event -> {
+            // Move from 'allTags' to 'selectedTags'
+            allTags.getItems().remove(menuItem);
+            selectedTags.getItems().add(createMenuItemForSelectedTags(tag, allTags, selectedTags));
+
+
+        });
+        return menuItem;
+    }
+
+    public  MenuItem createMenuItemForSelectedTags(Tag tag, SplitMenuButton allTags, SplitMenuButton selectedTags) {
+        MenuItem menuItem = new MenuItem(tag.getName());
+        menuItem.setOnAction(event -> {
+            // Move back from 'selectedTags' to 'allTags'
+            selectedTags.getItems().remove(menuItem);
+            allTags.getItems().add(createMenuItemForAllTags(tag, allTags, selectedTags));
+        });
+        return menuItem;
     }
 
 
