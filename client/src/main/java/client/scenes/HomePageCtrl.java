@@ -172,7 +172,7 @@ public class HomePageCtrl implements Initializable {
 
         webView.getEngine().setOnAlert(event -> {
             String link = event.getData();
-            tagController.handleLinkClick(link, notesListView);
+            tagController.handleLinkClick(link, notesListView, allTags, selectedTags);
         });
 
         refreshNotesInternal();
@@ -708,7 +708,8 @@ public class HomePageCtrl implements Initializable {
      */
     public void updateTagMenuButton(List<Note> filteredNotes) {
         System.out.println("updateTagMenuButton has been called");
-
+        updateUniversalTags();
+        allTags.getItems().removeIf(menuItem -> !tagController.getUniversalTags().contains(menuItem.getText()));
         Set<String> existingTags = new HashSet<>();
         allTags.getItems().forEach(item -> existingTags.add(item.getText()));
         selectedTags.getItems().forEach(item -> existingTags.add(item.getText()));
@@ -720,6 +721,12 @@ public class HomePageCtrl implements Initializable {
             }
         });
     }
+
+    public void updateUniversalTags() {
+        List<Note> allNotes = noteService.getNotes();
+       tagController.getUniversalTags().removeIf(tag -> !tagController.isTagInAnyNote(tag.getName()));
+    }
+
 
 
     /**

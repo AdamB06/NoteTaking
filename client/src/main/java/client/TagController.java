@@ -208,12 +208,29 @@ public class TagController {
     }
 
     /**
+     * Processes the note content by converting tag-like text to HTML links
+     * and handling references to other notes.
      *
      * @param content String representation of content
-     * @return returns the content
+     * @return returns the content with processed links and references
      */
     public String processNoteLinks(String content) {
         if (content == null || content.isEmpty()) return content;
+
+        String[] words = content.split("(?<=\\s)|(?=\\s)");
+
+        StringBuilder updatedContent = new StringBuilder();
+
+        for (String word : words) {
+            if (word.startsWith("#") && word.length() > 1) {
+                String link = String.format("<a href='#' onclick='alert(\"/Tag/%s\"); return false;'>%s</a>",
+                        word.substring(1), word);
+                updatedContent.append(link);
+            } else {
+                updatedContent.append(word);
+            }
+        }
+        content = updatedContent.toString();
 
         Pattern pattern = Pattern.compile("\\[\\[(.*?)\\]\\]");
         Matcher matcher = pattern.matcher(content);
@@ -239,12 +256,20 @@ public class TagController {
         return content;
     }
 
+
+
+
+
+
     /**
+     * Handles the click event on a link, either navigating to a note or adding/removing a tag.
      *
-     * @param link representation of the link
-     * @param notesListView Object called noteListView
+     * @param link         representation of the link
+     * @param notesListView Object called notesListView
+     * @param allTags      Object called allTags
+     * @param selectedTags Object called selectedTags
      */
-    public void handleLinkClick(String link, ListView<Note> notesListView) {
+    public void handleLinkClick(String link, ListView<Note> notesListView, SplitMenuButton allTags, SplitMenuButton selectedTags) {
         if (link.startsWith("/Note/")) {
             long noteId = Long.parseLong(link.replace("/Note/", ""));
             Note note = noteService.getNoteById(noteId);
@@ -253,6 +278,21 @@ public class TagController {
                 notesListView.getSelectionModel().select(noteIndex);
             } else {
                 System.out.println("Note not found for ID: " + noteId);
+            }
+        }
+        else if (link.startsWith("/Tag/")) {
+            String tagName = link.replace("/Tag/", "");
+            Tag tag = new Tag(tagName);
+            MenuItem menuItem = new MenuItem(tag.getName());
+            Set<Tag> selectedTagSet = selectedTags.getItems().stream()
+                    .map(menuItem1 -> new Tag(menuItem1.getText()))
+                    .collect(Collectors.toSet());
+            if(!selectedTagSet.contains(tag)){
+                selectedTagSet.add(tag);
+                allTags.getItems().remove(menuItem);
+                System.out.println("all tags: " + allTags.getItems());
+                selectedTags.getItems().add(menuItem);
+                filterNotesByTag(selectedTagSet, notesListView, noteService.getNotes());
             }
         }
     }
@@ -270,9 +310,16 @@ public class TagController {
             tags.add(new Tag(matcher.group(1)));
             universalTags.add(new Tag(matcher.group(1)));
         }
+
         return tags;
     }
 
+    public boolean isTagInAnyNote(String tagName) {
+        // Fetch notes from noteService to ensure you get the actual list of notes
+        return noteService.getNotes().stream()
+                .flatMap(note -> note.getTags().stream())
+                .anyMatch(tag -> tag.getName().equals(tagName));
+    }
 
 
     /**
