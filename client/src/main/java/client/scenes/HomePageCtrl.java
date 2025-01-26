@@ -514,7 +514,7 @@ public class HomePageCtrl implements Initializable {
                         System.out.println("Attempting to reconnect...");
                     } else {
                         System.out.println("Server unavailable. Shutting down.");
-                        Platform.exit();
+                        System.exit(0);
                         return;
                     }
                 }
