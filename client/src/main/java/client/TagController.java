@@ -297,7 +297,7 @@ public class TagController {
                 selectedTagSet.add(tag);
                 allTags.getItems().remove(menuItem);
                 System.out.println("all tags: " + allTags.getItems());
-                selectedTags.getItems().add(menuItem);
+                selectedTags.getItems().add(createMenuItemForSelectedTags(tag, allTags, selectedTags, notesListView));
                 filterNotesByTag(selectedTagSet, notesListView, noteService.getNotes());
             }
         }
