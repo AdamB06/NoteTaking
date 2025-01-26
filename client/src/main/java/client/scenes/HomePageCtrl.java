@@ -113,8 +113,8 @@ public class HomePageCtrl implements Initializable {
 
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
-        this.autoSaveService = new AutoSaveService(serverUtils, noteService);
-        this.tagController = new TagController(noteService);
+        this.autoSaveService = injector.getInstance(AutoSaveService.class);
+        this.tagController = injector.getInstance(TagController.class);
         webSocketClient = injector.getInstance(WebSocketClient.class);
         webSocketClient.setHomePageCtrl(this);
         webSocketClient.connect();
