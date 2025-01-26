@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.*;
 import client.services.AutoSaveService;
+import client.services.FilterService;
 import client.services.MarkdownService;
 import client.services.NoteService;
 import client.utils.ServerUtils;
@@ -77,6 +78,7 @@ public class HomePageCtrl implements Initializable {
     private NoteService noteService;
     private MarkdownService markdownService;
     private AutoSaveService autoSaveService;
+    private FilterService filterService;
     private final LanguageController languageController;
     private final MnemonicCreator mnemonicCreator;
     private final Warnings warnings;
@@ -86,6 +88,7 @@ public class HomePageCtrl implements Initializable {
     private boolean isSaving = false;
     private Set<Tag> lastSelectedTags = new HashSet<>();
     private long lastSelectedNoteId = -1;
+    private final ServerUtils serverUtils;
 
 
     /**
@@ -102,12 +105,14 @@ public class HomePageCtrl implements Initializable {
         this.languageController = languageController;
         this.mnemonicCreator = mnemonicCreator;
         this.warnings = warnings;
+        this.serverUtils = serverUtils;
 
         injector = Guice.createInjector(new MyModule());
 
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
         this.autoSaveService = new AutoSaveService(serverUtils, noteService);
+        this.filterService = new FilterService();
         this.tagController = new TagController(noteService);
         webSocketClient = injector.getInstance(WebSocketClient.class);
         webSocketClient.setHomePageCtrl(this);
@@ -133,6 +138,7 @@ public class HomePageCtrl implements Initializable {
         original = notesBodyArea.getText();
         refreshNotesInternal();
 
+
         // Load flag images
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
@@ -147,7 +153,15 @@ public class HomePageCtrl implements Initializable {
         notesBodyArea.setDisable(true);
         editButton.setDisable(true);
         clearFilterButton.setOnAction(event -> clearFilter());
-        updateTagMenuButton();
+
+
+        allTags.setOnShowing(event -> {
+            System.out.println("Dropdown arrow clicked, updating tags...");
+            updateTagMenuButton(noteService.getNotes());  // Update the menu button with new tags
+        });
+        selectedTags.getItems().clear();
+        allTags.getItems().clear();
+        filterService.setOnFilterUpdate(this::updateTagMenuButton);
 
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
@@ -530,12 +544,7 @@ public class HomePageCtrl implements Initializable {
             Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
             if (selectedNote != null) {
                 String currentContent = notesBodyArea.getText();
-                tagController.checkForCorrectUserInput(currentContent, event.getCharacter(),
-                        selectedNote, universalTags);
-                updateTagMenuButton();
-
                 selectedNote.setContent(currentContent);
-
                 webSocketClient.sendMessage(selectedNote, "updateContent");
                 if (autoSaveService.onKeyPressed(selectedNote, currentContent)) {
                     original = notesBodyArea.getText();
@@ -672,8 +681,6 @@ public class HomePageCtrl implements Initializable {
         try {
             if (content.equals(original)) {
                 System.out.println("No changes detected; skipping save.");
-                System.out.println(currentNote.get().getId());
-                System.out.println(currentNote.get().getTags());
                 return;
             }
 
@@ -708,51 +715,36 @@ public class HomePageCtrl implements Initializable {
         }
     }
 
+
     /**
-     * updates the comboBox to contain the new tags that were added to notes
+     * updates the splitMenuButtons for the filtering of tags
      */
-   /* public void updateTagMenuButton() {
-        allTags.getItems().setAll(universalTags);
-        allTags.getItems().addListener((ListChangeListener<Tag>) c -> {
-            Set<Tag> selectedTags = new HashSet<>(allTags.get)
-        });
-        tagComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Tag>) c -> {
-            Set<Tag> selectedTags2 = new HashSet<>(tagComboBox.getCheckModel().getCheckedItems());
-            // Check if the selected tags have actually changed
-            if (!selectedTags.equals(lastSelectedTags)) {
-                lastSelectedTags = selectedTags;
-                System.out.println("filtering is being called");
-                tagController.filterNotesByTag(selectedTags, notesListView, noteService.getNotes());
+    public void updateTagMenuButton(List<Note> filteredNotes) {
+        System.out.println("updateTagMenuButton has been called");
+
+        Set<String> existingTags = new HashSet<>();
+        allTags.getItems().forEach(item -> existingTags.add(item.getText()));
+        selectedTags.getItems().forEach(item -> existingTags.add(item.getText()));
+
+
+        tagController.getUniversalTags().forEach(tag -> {
+            if (!existingTags.contains(tag.getName())) {
+                allTags.getItems().add(tagController.createMenuItemForAllTags(tag, allTags, selectedTags, notesListView));
             }
         });
-    }*/
-
-    public void updateTagMenuButton() {
-        allTags.getItems().clear(); // these first 2 lines are so that the action 1 and 2 menuItems both get removed from the  splitMenuButtons.
-        selectedTags.getItems().clear();
-        Set<String> existingTags = allTags.getItems().stream()
-                .map(MenuItem::getText)
-                .collect(Collectors.toSet());
-
-        // Add only the new tags from 'universalTags' that aren't already in 'allTags'
-        universalTags.stream()
-                .filter(tag -> !existingTags.contains(tag.getName())) // Check for new tags
-                .forEach(tag -> allTags.getItems().add(
-                        tagController.createMenuItemForAllTags(tag, allTags, selectedTags)
-                ));
-
     }
+
 
     /**
      * Reset the ListView to show all notes
      */
     private void clearFilter() {
-//        tagComboBox.getCheckModel().clearChecks();
         notesListView.getItems().clear();
-        allTags.getItems().addAll(selectedTags.getItems());
+        allTags.getItems().retainAll(selectedTags.getItems());
         selectedTags.getItems().clear();
         notesListView.getItems().addAll(noteService.getNotes());
 
     }
+
 
 }
