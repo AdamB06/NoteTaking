@@ -23,14 +23,92 @@ public class TagController {
     private static  Set<Tag> universalTags = new HashSet<>();
 
 
+    /**
+     *
+     * @param noteService noteservice Object for certain methods
+     */
     public TagController(NoteService noteService) {
         this.noteService = noteService;
         filterService = new FilterService();
         universalTags = new HashSet<>();
     }
 
-    
 
+    /**
+     * Process tags in the note text and save them to the current note.
+     *
+     * @param content       content of the note
+     * @param note          current note
+     * @param universalList list of all the tags that are in notes for the combobox;
+     */
+    public void initializeTags(String content, Note note, Set<Tag> universalList) {
+        System.out.println("Initializing tags...");
+
+        if (content == null || content.isEmpty()) {
+            System.out.println("No content to process for tags.");
+            return;
+        }
+
+
+        if (note == null) {
+            System.out.println("No current note is selected.");
+            return;
+        }
+
+        try {
+            Pattern pattern = Pattern.compile("#(\\w+)");
+            Matcher matcher = pattern.matcher(content);
+
+            while (matcher.find()) {
+                String tagName = matcher.group(1);
+                System.out.println("Extracted tag: " + tagName);
+
+                if (!(note.getTags().contains(tagName))) {
+                    Tag newTag = new Tag(tagName);
+                    note.getTags().add(newTag);
+                    universalList.add(newTag);
+                    System.out.println(note.getTags());
+                    System.out.println(universalList);
+
+                }
+                String link = "<a href='/tags/" + tagName + "'>#" + tagName + "</a>";
+                content = content.replace("#" + tagName, link);
+
+            }
+        } catch (Exception e) {
+            System.err.println("Error initializing tags: " + e.getMessage());
+        }
+    }
+
+    /**
+     * @param content       the entire content of the note
+     * @param character     final input of the user
+     * @param note          current note that we are looking at
+     * @param universalList list of universal tags  across all notes for the combobox
+     */
+    public void checkForCorrectUserInput(String content, String character,
+                                         Note note, Set<Tag> universalList) {
+        if (content == null || content.trim().isEmpty()) {
+            return;
+        }
+
+        String[] words = content.split("\\s+");
+        if (words.length == 0) {
+            return;
+        }
+
+        String lastWord = words[words.length - 1];
+        if (lastWord.startsWith("#")) {
+            if (character.equals(" ") || character.equals("\n")) {
+                System.out.println("Space detected.");
+
+                if (lastWord.length() > 1 && lastWord.substring(1).matches("\\w+")) {
+                    System.out.println("Valid tag detected: " + lastWord);
+                    initializeTags(content, note, universalList);
+                }
+            }
+        }
+    }
 
 
     /**
@@ -38,7 +116,8 @@ public class TagController {
      * @param notesListView listview of notes
      * @param noteList list of notes that has to be filtered
      */
-    public void filterNotesByTag(Set<Tag> selectedTags, ListView<Note> notesListView, List<Note> noteList) {
+    public void filterNotesByTag(Set<Tag> selectedTags,
+                                 ListView<Note> notesListView, List<Note> noteList) {
         List<Note> filteredNotes = new ArrayList<>();
         for (Note note : noteList) {
             System.out.println("Checking note: " + note.getTitle());
@@ -128,41 +207,53 @@ public class TagController {
         System.out.println("NOW SHOWING: " + notesListView.getItems());
     }
 
-    public void processNoteLinks(String content, Note note) {
-        if (content == null || content.isEmpty()) return;
+    /**
+     *
+     * @param content String representation of content
+     * @return returns the content
+     */
+    public String processNoteLinks(String content) {
+        if (content == null || content.isEmpty()) return content;
+
         Pattern pattern = Pattern.compile("\\[\\[(.*?)\\]\\]");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             String referencedNoteTitle = matcher.group(1);
             Note referencedNote = noteService.getNoteByTitle(referencedNoteTitle);
+
             String replacement;
             if (referencedNote != null) {
-                replacement = "<a href='/Note/" + referencedNote.getId() + "'>" + referencedNoteTitle + "</a>";
+                replacement = String.format(
+                        "<a href='#' onclick='alert(\"/Note/%d\"); return false;'>%s</a>",
+                        referencedNote.getId(),
+                        referencedNoteTitle
+                );
             } else {
-                replacement = "<span style='color: red;'>[[ " + referencedNoteTitle + " ]] (not found)</span>";
+                replacement = String.format(
+                        "<span style='color: red;'>[[%s]] (not found)</span>",
+                        referencedNoteTitle
+                );
             }
             content = content.replace("[[" + referencedNoteTitle + "]]", replacement);
         }
-
-        note.setContent(content);
-
-
+        return content;
     }
 
-
+    /**
+     *
+     * @param link representation of the link
+     * @param notesListView Object called noteListView
+     */
     public void handleLinkClick(String link, ListView<Note> notesListView) {
         if (link.startsWith("/Note/")) {
             long noteId = Long.parseLong(link.replace("/Note/", ""));
             Note note = noteService.getNoteById(noteId);
             if (note != null) {
-                loadNoteInView(note, new WebView());
+                int noteIndex = noteService.findNoteIndex(note, notesListView.getItems());
+                notesListView.getSelectionModel().select(noteIndex);
             } else {
                 System.out.println("Note not found for ID: " + noteId);
             }
-        } else if (link.startsWith("/tags/")) {
-            String tagName = link.replace("/tags/", "");
-            Tag tag = new Tag(tagName);
-            //filterNotesByTag(tag, notesListView); needs to be resolved
         }
     }
 
@@ -193,21 +284,11 @@ public class TagController {
             System.out.println("No note to be printed");
             return;
         }
-        processNoteLinks(note.getContent(), note);
-        webView.getEngine().loadContent(note.getContent());
+        webView.getEngine().loadContent(processNoteLinks(note.getContent()));
         System.out.println("Loading note: " + note.getTitle());
     }
 
-    public void updateNoteReferences(String oldTitle, String newTitle) {
-        for (Note note : noteService.getNotes()) {
-            String content = note.getContent();
-            String updatedContent = content.replace("[[" + oldTitle + "]]", "[[" + newTitle + "]]");
-            if (!content.equals(updatedContent)) {
-                note.setContent(updatedContent);
-                processNoteLinks(updatedContent, note); // Re-process links
-            }
-        }
-    }
+
 
     /**
      *
@@ -219,5 +300,3 @@ public class TagController {
 
 
 }
-
-

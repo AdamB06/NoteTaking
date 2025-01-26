@@ -1,10 +1,7 @@
 package client;
 
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
@@ -13,17 +10,20 @@ import java.io.StringWriter;
 import java.util.Optional;
 
 public class Warnings {
-
     /**
      * Gives a prompt to the user asking for confirmation
      *
      * @param title  the title
      * @param header the header
+     * @param lc the language
      * @return true if the OK button is clicked, false otherwise
      */
-    public boolean askOkCancel(String title, String header) {
+    public boolean askOkCancel(String title, String header, LanguageController lc) {
 
-        Alert alert = alertBuilder(title, "", header, AlertType.CONFIRMATION);
+        Alert alert = alertBuilder(title, "", header, AlertType.CONFIRMATION, lc);
+
+        var cancelButton = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL);
+        cancelButton.setText(lc.getByTag("cancel.text"));
 
         Optional<ButtonType> result = alert.showAndWait();
         return result
@@ -37,9 +37,10 @@ public class Warnings {
      * @param title   the title
      * @param content the content
      * @param header  the header
+     * @param lc the language
      */
-    public void inform(String title, String content, String header) {
-        Alert alert = alertBuilder(title, content, header, AlertType.INFORMATION);
+    public void inform(String title, String content, String header, LanguageController lc) {
+        Alert alert = alertBuilder(title, content, header, AlertType.INFORMATION, lc);
         alert.showAndWait();
     }
 
@@ -49,9 +50,10 @@ public class Warnings {
      * @param title   the title
      * @param content the content
      * @param header  the header
+     * @param lc the language
      */
-    public void warn(String title, String content, String header) {
-        Alert alert = alertBuilder(title, content, header, AlertType.WARNING);
+    public void warn(String title, String content, String header, LanguageController lc) {
+        Alert alert = alertBuilder(title, content, header, AlertType.WARNING, lc);
         alert.showAndWait();
     }
 
@@ -61,9 +63,10 @@ public class Warnings {
      * @param title   the title
      * @param content the content
      * @param header  the header
+     * @param lc the language
      */
-    public void error(String title, String content, String header) {
-        Alert alert = alertBuilder(title, content, header, AlertType.ERROR);
+    public void error(String title, String content, String header, LanguageController lc) {
+        Alert alert = alertBuilder(title, content, header, AlertType.ERROR, lc);
         alert.showAndWait();
     }
 
@@ -74,11 +77,12 @@ public class Warnings {
      * @param content the content
      * @param header  the header
      * @param e       the exception that has occurred
+     * @param lc the language
      */
     public void exception(String title, String content,
-                          String header, Exception e) {
+                          String header, Exception e, LanguageController lc) {
 
-        Alert alert = alertBuilder(title, content, header, AlertType.ERROR);
+        Alert alert = alertBuilder(title, content, header, AlertType.ERROR, lc);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -117,12 +121,15 @@ public class Warnings {
      * @return the constructed Alert instance with the given arguments
      */
     private Alert alertBuilder(String title, String content,
-                               String header, AlertType type) {
+                               String header, AlertType type, LanguageController lc) {
         Alert alert = new Alert(type);
 
         alert.setTitle(title);
         alert.setContentText(content);
         alert.setHeaderText(header);
+
+        var okButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        okButton.setText(lc.getByTag("ok.text"));
 
         return alert;
     }

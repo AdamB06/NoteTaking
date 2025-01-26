@@ -13,6 +13,10 @@ public class CollectionService{
     private List<Collection> collections = new ArrayList<>();
 
 
+    /**
+     *
+     * @param serverUtils Object serverUtils
+     */
     @Inject
     public CollectionService(ServerUtils serverUtils) {
         this.serverUtils = serverUtils;
@@ -23,22 +27,25 @@ public class CollectionService{
      * fetches from the server
      * @return List of collections
      */
-    public List<Collection> getCollections() { //TODO You should only need specific collections from a server, so this method is useless
+    public List<Collection> getCollections() {
         if(collections.isEmpty()) {
             collections = serverUtils.getCollections();
         }
         return collections;
     }
 
+    /**
+     *
+     * @return returns a created collection
+     */
     public Collection createCollection() {
         int counter = 1;
         String uniqueTitle = "New Collection Title" + counter;
-        //TODO
-        while(serverUtils.isTitleCollectionDuplicate(uniqueTitle)){ //TODO remove auto generated titles since we have an UI that makes you input title
+        while(serverUtils.isTitleCollectionDuplicate(uniqueTitle)){
             counter++;
             uniqueTitle = "New Collection Title" + counter;
         }
-        Collection collection = new Collection(uniqueTitle, new ArrayList<>()); //TODO implement using the id gotten from the user when creating
+        Collection collection = new Collection(uniqueTitle, new ArrayList<>());
         Collection createdCollection = serverUtils.sendCollection(collection);
 
         if(createdCollection != null) {
@@ -65,6 +72,6 @@ public class CollectionService{
      * Refreshes the internal list of collections by fetching from the server.
      */
     public void refreshCollections(){
-        collections = serverUtils.getCollections(); //TODO You should make it so that only the collections already here or in the config file get pulled, not all from a single server
+        collections = serverUtils.getCollections();
     }
 }
