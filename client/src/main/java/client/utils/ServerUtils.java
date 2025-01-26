@@ -22,6 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import client.TagController;
+import client.services.NoteService;
 import commons.Collection;
 import commons.Note;
 import commons.Tag;
@@ -38,6 +40,8 @@ import jakarta.ws.rs.client.ClientBuilder;
 public class ServerUtils {
 
     private final String serverUrl;
+    private final TagController tagController;
+    private final NoteService noteService;
 
     /**
      * Constructor of the ServerUtils class
@@ -45,6 +49,8 @@ public class ServerUtils {
      */
     public ServerUtils(String serverUrl) {
         this.serverUrl = serverUrl;
+        this.noteService = new NoteService(this);
+        tagController = new TagController(noteService);
     }
 
     /**
@@ -243,7 +249,7 @@ public class ServerUtils {
             if (response.getStatus() == 200) {
                 List<Note> notes = response.readEntity(new GenericType<List<Note>>() {});
                 for (Note note : notes) {
-                    note.setTags(getTags(note.getContent()));
+                    note.setTags(tagController.getTags(note.getContent()));
                 }
                 return notes;
             } else {
@@ -253,15 +259,7 @@ public class ServerUtils {
         }
     }
 
-    public Set<Tag> getTags(String input){
-        Set<Tag> tags = new HashSet<Tag>();
-        Pattern pattern = Pattern.compile("#(\\w+)");
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            tags.add(new Tag(matcher.group(1)));
-        }
-        return tags;
-    }
+
 
     /**
      * @return the list of collections
@@ -293,7 +291,7 @@ public class ServerUtils {
                     .request(APPLICATION_JSON).get();
             if (response.getStatus() == 200) {
                 Note note = response.readEntity(Note.class);
-                note.setTags(getTags(note.getContent()));
+                note.setTags(tagController.getTags(note.getContent()));
                 return note;
             } else {
                 logError("getNoteById", response);
