@@ -34,6 +34,14 @@ public class NoteService {
     }
 
     /**
+     * Setter method for notes to use in tests
+     * @param newNotes new list of notes
+     */
+    public void setNotes(List<Note> newNotes) {
+        notes = newNotes;
+    }
+
+    /**
      * Creates a new note with a unique title and sends it to the server.
      *
      * @return The created Note object.
