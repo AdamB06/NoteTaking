@@ -1,6 +1,6 @@
 package client;
 
-import client.scenes.HomePageCtrl;
+import client.services.FilterService;
 import client.services.NoteService;
 import commons.Note;
 import commons.Tag;
@@ -14,107 +14,30 @@ import javafx.scene.web.WebView;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class TagController {
     private final NoteService noteService;
+    private final FilterService filterService;
+    private static  Set<Tag> universalTags = new HashSet<>();
+
 
     public TagController(NoteService noteService) {
         this.noteService = noteService;
+        filterService = new FilterService();
+        universalTags = new HashSet<>();
     }
 
 
-    /**
-     * Process tags in the note text and save them to the current note.
-     *
-     * @param content       content of the note
-     * @param note          current note
-     * @param universalList list of all the tags that are in notes for the combobox;
-     */
-    public void initializeTags(String content, Note note, Set<Tag> universalList) {
-        System.out.println("Initializing tags...");
-
-        if (content == null || content.isEmpty()) {
-            System.out.println("No content to process for tags.");
-            return;
-        }
-
-
-        if (note == null) {
-            System.out.println("No current note is selected.");
-            return;
-        }
-
-        try {
-            // Pattern to match hashtags like #tag1, #tag2, etc.
-            Pattern pattern = Pattern.compile("#(\\w+)");
-            Matcher matcher = pattern.matcher(content);
-
-            while (matcher.find()) {
-                String tagName = matcher.group(1);
-                System.out.println("Extracted tag: " + tagName);
-
-                if (!(note.getTags().contains(tagName))) {
-                    Tag newTag = new Tag(tagName);
-                    note.getTags().add(newTag);
-                    universalList.add(newTag);
-                    System.out.println(note.getTags());
-                    System.out.println(universalList);
-
-                }
-                String link = "<a href='/tags/" + tagName + "'>#" + tagName + "</a>";
-                content = content.replace("#" + tagName, link);
-
-
-               /* for (Tag tag : note.getTags()) {
-                    if (!note.getContent().contains(tag.getName())) {
-                        note.removeTag(tag);
-                        System.out.println("Tag removed: " + tag.getName());
-                    }
-                }
 
 
 
-                */
 
-            }
-        } catch (Exception e) {
-            System.err.println("Error initializing tags: " + e.getMessage());
-        }
-    }
-
-    /**
-     * @param content       the entire content of the note
-     * @param character     final input of the user
-     * @param note          current note that we are looking at
-     * @param universalList list of universal tags  across all notes for the combobox
-     */
-    public void checkForCorrectUserInput(String content, String character, Note note, Set<Tag> universalList) {
-        if (content == null || content.trim().isEmpty()) {
-            return;
-        }
-
-        String[] words = content.split("\\s+");
-        if (words.length == 0) {
-            return;
-        }
-
-        String lastWord = words[words.length - 1];
-        if (lastWord.startsWith("#")) {
-            if (character.equals(" ") || character.equals("\n")) {
-                System.out.println("Space detected.");
-
-                if (lastWord.length() > 1 && lastWord.substring(1).matches("\\w+")) {
-                    System.out.println("Valid tag detected: " + lastWord);
-                    initializeTags(content, note, universalList);
-                }
-            }
-        }
-    }
 
 
     /**
-     * @param selectedTags  tags that have been selected from the checkcombobox by the user
+     * @param selectedTags  tags that have been selected from the allTags button or unselected from the selectedTags button by the user
      * @param notesListView listview of notes
      * @param noteList list of notes that has to be filtered
      */
@@ -134,36 +57,64 @@ public class TagController {
 
             if (hasAllTags) {
                 System.out.println("This note contains all selected tags.");
-                filteredNotes.add(note); // Add note if it contains all selected tags
+                filteredNotes.add(note);
             }
         }
 
         System.out.println("Filtered notes count: " + filteredNotes.size());
-
+        filterService.setFilteredNotes(filteredNotes);
         updateNotesListView(filteredNotes, notesListView);
     }
 
 
-
-    public MenuItem createMenuItemForAllTags(Tag tag, SplitMenuButton allTags, SplitMenuButton selectedTags) {
-
+    /**
+     *
+     * @param tag tag
+     * @param allTags tags in allTags button
+     * @param selectedTags tags of the selectedTags button
+     * @param noteListView listview of notes
+     * @return returns the menuItem that has been clicked
+     */
+    public MenuItem createMenuItemForAllTags(Tag tag, SplitMenuButton allTags, SplitMenuButton selectedTags, ListView<Note> noteListView) {
         MenuItem menuItem = new MenuItem(tag.getName());
         menuItem.setOnAction(event -> {
-            // Move from 'allTags' to 'selectedTags'
+
             allTags.getItems().remove(menuItem);
-            selectedTags.getItems().add(createMenuItemForSelectedTags(tag, allTags, selectedTags));
+            selectedTags.getItems().add(createMenuItemForSelectedTags(tag, allTags, selectedTags, noteListView));
+
+            // this is because selectedTagSet.getItems() does not work so we need a proper Set
+            Set<Tag> selectedTagSet = selectedTags.getItems().stream()
+                    .map(menuItem1 -> new Tag(menuItem1.getText()))
+                    .collect(Collectors.toSet());
 
 
+            filterNotesByTag(selectedTagSet, noteListView, noteService.getNotes());
         });
         return menuItem;
     }
 
-    public  MenuItem createMenuItemForSelectedTags(Tag tag, SplitMenuButton allTags, SplitMenuButton selectedTags) {
+    /**
+     *
+     * @param tag tag
+     * @param allTags tags in allTags button
+     * @param selectedTags tags of the selectedTags button
+     * @param noteListView listview of notes
+     * @return returns the menuItem that has been clicked
+     */
+    public MenuItem createMenuItemForSelectedTags(Tag tag, SplitMenuButton allTags, SplitMenuButton selectedTags, ListView<Note> noteListView) {
         MenuItem menuItem = new MenuItem(tag.getName());
         menuItem.setOnAction(event -> {
-            // Move back from 'selectedTags' to 'allTags'
             selectedTags.getItems().remove(menuItem);
-            allTags.getItems().add(createMenuItemForAllTags(tag, allTags, selectedTags));
+            allTags.getItems().add(createMenuItemForAllTags(tag, allTags, selectedTags, noteListView));
+
+
+            Set<Tag> selectedTagSet = selectedTags.getItems().stream()
+                    .map(menuItem1 -> new Tag(menuItem1.getText()))
+                    .collect(Collectors.toSet());
+
+            // Trigger filtering again because if multiple are selected and one is removed, it needs to filter again
+            filterNotesByTag(selectedTagSet, noteListView, noteService.getNotes());
+
         });
         return menuItem;
     }
@@ -218,13 +169,27 @@ public class TagController {
         }
     }
 
+    /**
+     *
+     * @param input content of the note
+     * @return returns the tags (words that start with #)
+     */
+    public Set<Tag> getTags(String input){
+        Set<Tag> tags = new HashSet<Tag>();
+        Pattern pattern = Pattern.compile("#(\\w+)");
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            tags.add(new Tag(matcher.group(1)));
+            universalTags.add(new Tag(matcher.group(1)));
+        }
+        return tags;
+    }
 
-//ObservableList<Note> observableNotes = FXCollections.observableArrayList(filteredNotes);
-//notesListView.setItems(observableNotes);
+
 
     /**
      * @param note    gives a note
-     * @param webView is the webview
+     * @param webView is the webView
      */
     public void loadNoteInView(Note note, WebView webView) {
         if (note == null) {
@@ -246,6 +211,16 @@ public class TagController {
             }
         }
     }
+
+    /**
+     *
+     * @return returns universalTags
+     */
+    public Set<Tag> getUniversalTags() {
+        return universalTags;
+    }
+
+
 }
 
 
