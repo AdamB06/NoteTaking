@@ -499,10 +499,26 @@ public class HomePageCtrl implements Initializable {
      */
     public void incomingServerShutdown() {
         Platform.runLater(() -> {
-            warnings.error(languageController.getByTag("errorText.text"),
-                    languageController.getByTag("serverShutdownContent.text"),
-                    languageController.getByTag("serverShutdownTitle.text"),
-                    languageController);
+            boolean reconnect = true;
+            while (reconnect) {
+                if (serverUtils.isServerAvailable()) {
+                    reconnect = false;
+                } else {
+                    reconnect = warnings.askOkCancel(
+                            languageController.getByTag("serverNotFound.text"),
+                            languageController.getByTag("serverNotFound.message"),
+                            languageController
+                    );
+
+                    if (reconnect) {
+                        System.out.println("Attempting to reconnect...");
+                    } else {
+                        System.out.println("Server unavailable. Shutting down.");
+                        Platform.exit();
+                        return;
+                    }
+                }
+            }
         });
     }
 
