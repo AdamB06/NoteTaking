@@ -65,12 +65,14 @@ public class HomePageCtrl implements Initializable {
     private Image dutchFlag;
     @FXML
     private Image spanishFlag;
+    @FXML
+    private Image germanFlag;
 
     private final String path = "flags/";
     private boolean isEditText;
     private boolean isLoadingLanguage = false;
     private final SimpleObjectProperty<Note> currentNote = new SimpleObjectProperty<>();
-    private final String[] languages = {"en", "nl", "es"};
+    private final String[] languages = {"en", "nl", "es", "de"};
     private String original;
     private Injector injector;
     private NoteService noteService;
@@ -83,7 +85,6 @@ public class HomePageCtrl implements Initializable {
     private final WebSocketClient webSocketClient;
     private boolean suppressUpdates = false;
     private boolean isSaving = false;
-    private Set<Tag> lastSelectedTags = new HashSet<>();
     private long lastSelectedNoteId = -1;
 
 
@@ -134,6 +135,7 @@ public class HomePageCtrl implements Initializable {
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
         spanishFlag = new Image(path + "es_flag.png");
+        germanFlag = new Image(path + "de_flag.png");
 
         loadAllFlags(Arrays.asList(languages).indexOf(defaultLanguage));
         languageComboBox.setOnAction(this::loadLanguage);
@@ -159,7 +161,6 @@ public class HomePageCtrl implements Initializable {
         refreshNotesInternal();
     }
 
-
     /**
      * Initializes the button graphics
      */
@@ -184,22 +185,16 @@ public class HomePageCtrl implements Initializable {
         removeV.setFitWidth(size);
         removeV.setPreserveRatio(true);
 
-        Image info = new Image("icons/information.png");
-        ImageView infoV = new ImageView(info);
-        infoV.setFitHeight(size);
-        infoV.setFitWidth(size);
-        infoV.setPreserveRatio(true);
-
         refreshButton.setGraphic(refreshV);
         addButton.setGraphic(addV);
         deleteButton.setGraphic(removeV);
-        shortcutsButton.setGraphic(infoV);
     }
 
     private void shortcutsHint(){
         warnings.inform(languageController.getByTag("shortcutsTitle.text"),
                 languageController.getByTag("shortcutsInfo.text"),
-                languageController.getByTag("shortcutsHeader.text"));
+                languageController.getByTag("shortcutsHeader.text"),
+                languageController);
     }
 
     /**
@@ -323,7 +318,8 @@ public class HomePageCtrl implements Initializable {
                         }
                         if(set)
                             warnings.error(languageController.getByTag("errorText.text"),
-                                    content, header);
+                                    content, header, languageController);
+                        // Optionally, revert the titleField to the original title
                         titleField.setText(selectedNote.getTitle());
                     }
                 }
@@ -408,7 +404,7 @@ public class HomePageCtrl implements Initializable {
      */
     private void loadAllFlags(int index) {
         languageComboBox.getItems().clear();
-        languageComboBox.getItems().addAll(englishFlag, dutchFlag, spanishFlag);
+        languageComboBox.getItems().addAll(englishFlag, dutchFlag, spanishFlag, germanFlag);
         languageComboBox.setCellFactory(unused -> new LanguageSelectCell());
         languageComboBox.setButtonCell(new LanguageSelectCell());
         languageComboBox.getSelectionModel().select(index);
@@ -577,11 +573,13 @@ public class HomePageCtrl implements Initializable {
             System.out.println("Note created with ID: " + createdNote.getId());
             warnings.inform(languageController.getByTag("noticeText.text"),
                     languageController.getByTag("noteAddedContent.text"),
-                    languageController.getByTag("noteAddedHeader.text"));
+                    languageController.getByTag("noteAddedHeader.text"),
+                    languageController);
         } else {
             warnings.error(languageController.getByTag("errorText.text"),
                     languageController.getByTag("noteFailedContent.text"),
-                    languageController.getByTag("noteFailedHeader.text"));
+                    languageController.getByTag("noteFailedHeader.text"),
+                    languageController);
         }
     }
 
@@ -594,7 +592,8 @@ public class HomePageCtrl implements Initializable {
         if (selectedNote != null) {
             boolean confirm = warnings.askOkCancel(
                     languageController.getByTag("confirmationText.text"),
-                    languageController.getByTag("confirmationText.message")
+                    languageController.getByTag("confirmationText.message"),
+                    languageController
             );
 
             if (!confirm)
@@ -607,20 +606,23 @@ public class HomePageCtrl implements Initializable {
                 warnings.inform(
                         languageController.getByTag("noticeText.text"),
                         languageController.getByTag("notice.noteRemoved.message"),
-                        languageController.getByTag("notice.noteRemoved.details")
+                        languageController.getByTag("notice.noteRemoved.details"),
+                        languageController
                 );
             } else {
                 warnings.error(
                         languageController.getByTag("errorText.text"),
                         languageController.getByTag("error.deletionFailed.message"),
-                        languageController.getByTag("error.deletionFailed.details")
+                        languageController.getByTag("error.deletionFailed.details"),
+                        languageController
                 );
             }
         } else {
             warnings.inform(
                     languageController.getByTag("noticeText.text"),
                     languageController.getByTag("notice.noNoteSelected.message"),
-                    languageController.getByTag("notice.noNoteSelected.details")
+                    languageController.getByTag("notice.noNoteSelected.details"),
+                    languageController
             );
         }
     }
