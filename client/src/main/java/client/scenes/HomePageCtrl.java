@@ -12,7 +12,6 @@ import commons.Tag;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -21,7 +20,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
-import org.controlsfx.control.CheckComboBox;
 
 import java.net.URL;
 import java.util.*;
@@ -133,9 +131,7 @@ public class HomePageCtrl implements Initializable {
                 .getResource("/configuration/WebViewConfig.css").toString());
         initializeEdit();
         original = notesBodyArea.getText();
-        refreshNotesInternal();
 
-        // Load flag images
         englishFlag = new Image(path + "uk_flag.png");
         dutchFlag = new Image(path + "nl_flag.png");
         spanishFlag = new Image(path + "es_flag.png");
@@ -154,19 +150,17 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
 
+
+        shortcutsButton.setOnAction(action -> shortcutsHint());
+
         webView.getEngine().setOnAlert(event -> {
             String link = event.getData();
             tagController.handleLinkClick(link, notesListView);
         });
 
-        webView.getEngine().loadContent("<html><body>" +
-                "<p>" +
-                languageController.getByTag("previewEmpty.text") +
-                "</p>" +
-                "</body></html>");
-
-        shortcutsButton.setOnAction(action -> shortcutsHint());
+        refreshNotesInternal();
     }
+
 
     /**
      * Rename the note
@@ -229,7 +223,8 @@ public class HomePageCtrl implements Initializable {
         if (notesBodyArea != null) {
             notesBodyArea.textProperty()
                     .addListener((observable, oldValue, markdownText) -> {
-                        String html = markdownService.convertToHtml(markdownText);
+                        String html = markdownService.convertToHtml(tagController.
+                                processNoteLinks(markdownText));
                         updateWebView(html);
                     });
         } else {
@@ -250,7 +245,6 @@ public class HomePageCtrl implements Initializable {
      * Sets up the notes ListView.
      */
     private void setupNotesListView() {
-        // Custom cell factory to show only titles
         notesListView.setCellFactory(listView -> new ListCell<Note>() {
             @Override
             protected void updateItem(Note note, boolean empty) {
@@ -266,22 +260,18 @@ public class HomePageCtrl implements Initializable {
         notesListView.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldNote, newNote) -> {
                     if (oldNote != null) {
-                        // Save changes for the old note
-                        suppressUpdates = true; // Suppress incoming updates
+                        suppressUpdates = true;
                         saveChanges(oldNote.getId(), notesBodyArea.getText());
                     }
-
                     if (newNote != null) {
                         if(newNote.getId() != lastSelectedNoteId){
                             lastSelectedNoteId = newNote.getId();
                             refreshNotesInternal();
                         }
-                        // Load content for the new note
                         titleField.setText(newNote.getTitle());
                         notesBodyArea.setText(newNote.getContent());
                         original = newNote.getContent();
                         currentNote.set(newNote);
-
                         notesBodyArea.setDisable(false);
                         editButton.setDisable(false);
                         autoSaveService.setOriginalContent(original);
@@ -292,7 +282,7 @@ public class HomePageCtrl implements Initializable {
                         notesBodyArea.setDisable(true);
                         editButton.setDisable(true);
                     }
-                    suppressUpdates = false; // Re-enable updates
+                    suppressUpdates = false;
                 });
     }
 
@@ -314,12 +304,10 @@ public class HomePageCtrl implements Initializable {
             } else {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 if (selectedNote != null) {
-                    String oldTitle = selectedNote.getTitle();
                     String newTitle = titleField.getText();
                     String updatedTitle = noteService.updateNoteTitle(
                             selectedNote, newTitle);
                     if (updatedTitle.equals(newTitle)) {
-                        tagController.updateNoteReferences(oldTitle, newTitle);
                         webSocketClient.sendMessage(selectedNote, "updateTitle");
                         selectedNote.setTitle(newTitle);
                         notesListView.refresh();
@@ -364,11 +352,10 @@ public class HomePageCtrl implements Initializable {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 notesListView.getItems().clear();
                 notesListView.getItems().addAll(notes);
-
-                // Preserve the selection if possible
                 if (selectedNote != null && noteService.findNoteIndex(selectedNote, notes) != -1) {
                     int noteIndex = noteService.findNoteIndex(selectedNote, notes);
                     notesListView.getSelectionModel().select(noteIndex);
+                    tagController.processNoteLinks(selectedNote.getContent());
                 }
             } else {
                 System.err.println("ListView not initialized!");
@@ -391,22 +378,16 @@ public class HomePageCtrl implements Initializable {
         String language = languages[i];
         languageController.loadLanguage(language);
         ClientConfig.loadConfig().setPreferredLanguage(language); // Update config
-
-        // Update UI texts based on the selected language
         editButton.setText(isEditText ? languageController.getEditText() :
                 languageController.getSaveText());
-
-        // newline for spacing because text is glued to the graphic
         refreshButton.setText("\n" + languageController.getRefreshButtonText());
         addButton.setText("\n" + languageController.getAddButtonText());
         deleteButton.setText("\n" + languageController.getDeleteButtonText());
-
         shortcutsButton.setText(languageController.getByTag("showShortcuts.text"));
         previewTextLabel.setText(languageController.getPreviewLabelText());
         searchBox.setPromptText(languageController.getSearchBoxText());
         titleField.setPromptText(languageController.getTitleFieldText());
         notesBodyArea.setPromptText(languageController.getNotesBodyAreaText());
-        //tagComboBox.setPromp(languageController.getFilterButtonText());
         clearFilterButton.setText(languageController.getClearFilterButtonText());
         allTags.setText(languageController.getAllTags());
         selectedTags.setText(languageController.getSelectedTags());
@@ -495,7 +476,6 @@ public class HomePageCtrl implements Initializable {
                 if (!suppressUpdates && !incomingContent.equals(currentContent)) {
                     int caretPosition = notesBodyArea.getCaretPosition();
 
-                    // Apply the incoming content carefully
                     notesBodyArea.setText(incomingContent);
                     notesBodyArea.positionCaret(Math.min(caretPosition, incomingContent.length()));
 
@@ -532,21 +512,22 @@ public class HomePageCtrl implements Initializable {
     private void configureAutoSave() {
         notesBodyArea.setOnKeyTyped(event -> {
             suppressUpdates = true;
+
             Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
             if (selectedNote != null) {
                 String currentContent = notesBodyArea.getText();
-                tagController.checkForCorrectUserInput(currentContent, event.getCharacter(),
-                        selectedNote, universalTags);
-//                updateTagComboBox();
                 selectedNote.setContent(currentContent);
-
+                tagController.checkForCorrectUserInput(currentContent,
+                        event.getCharacter(), selectedNote, universalTags);
                 webSocketClient.sendMessage(selectedNote, "updateContent");
-                if(autoSaveService.onKeyPressed(selectedNote, currentContent)){
-                    original = notesBodyArea.getText();
+                if (autoSaveService.onKeyPressed(selectedNote, currentContent)) {
+                    original = currentContent;
                 }
             }
+            suppressUpdates = false;
         });
     }
+
 
     /**
      * Initializes the filtering of notes.
@@ -690,7 +671,7 @@ public class HomePageCtrl implements Initializable {
 
             String status = noteService.saveChanges(noteId, changes);
             if ("Successful".equals(status)) {
-                original = content; // Update original only after a successful save
+                original = content;
                 System.out.println("Save successful. Updated original content.\n\n");
                 refreshNotesInternal();
             } else {
@@ -716,27 +697,9 @@ public class HomePageCtrl implements Initializable {
     }
 
     /**
-     * updates the comboBox to contain the new tags that were added to notes
-     */
-//    public void updateTagComboBox() {
-//        tagComboBox.getItems().setAll(universalTags);
-//        tagComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<Tag>) c -> {
-//            Set<Tag> selectedTags = new HashSet<>(tagComboBox.getCheckModel().getCheckedItems());
-//
-//            // Check if the selected tags have actually changed
-//            if (!selectedTags.equals(lastSelectedTags)) {
-//                lastSelectedTags = selectedTags;
-//                System.out.println("filtering is being called");
-//                tagController.filterNotesByTag(selectedTags, notesListView, noteService.getNotes());
-//            }
-//        });
-//    }
-
-    /**
      * Reset the ListView to show all notes
      */
     private void clearFilter() {
-//        tagComboBox.getCheckModel().clearChecks();
         notesListView.getItems().clear();
         notesListView.getItems().addAll(noteService.getNotes());
 
