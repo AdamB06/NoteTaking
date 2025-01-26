@@ -99,7 +99,7 @@ public class WebSocketClient {
     @OnClose
     public void onClose(Session session, CloseReason reason) {
         System.out.println("Disconnected: " + reason.getReasonPhrase());
-        Platform.exit();
+        hpc.incomingServerShutdown();
     }
 
     /**
