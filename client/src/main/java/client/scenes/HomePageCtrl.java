@@ -494,6 +494,18 @@ public class HomePageCtrl implements Initializable {
         });
     }
 
+    /**
+     * Handles incoming message that server has shut down
+     */
+    public void incomingServerShutdown() {
+        Platform.runLater(() -> {
+            warnings.error(languageController.getByTag("errorText.text"),
+                    languageController.getByTag("serverShutdownContent.text"),
+                    languageController.getByTag("serverShutdownTitle.text"),
+                    languageController);
+        });
+    }
+
 
     private static class LanguageSelectCell extends ListCell<Image> {
         @Override

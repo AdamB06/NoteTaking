@@ -64,13 +64,4 @@ public class Main extends Application {
         var mainCtrl = INJECTOR.getInstance(PrimaryCtrl.class);
         mainCtrl.init(primaryStage, overview, editCollection);
     }
-
-    /**
-     * Stop the client
-     */
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-        Platform.runLater(() -> System.exit(0));
-    }
 }
