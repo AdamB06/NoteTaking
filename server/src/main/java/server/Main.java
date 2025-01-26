@@ -29,7 +29,6 @@ public class Main {
      * @param args Main method arguments
      */
     public static void main(String[] args) {
-        //SpringApplication.run(Main.class, args);
         SpringApplication app = new SpringApplication(Main.class);
         app.run(args);
         System.out.println("RECEIVING THIS MESSAGE MEANS THAT THE SERVER HAS STARTED!");
