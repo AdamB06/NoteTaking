@@ -60,7 +60,7 @@
          </SplitMenuButton>
          <ImageView fitHeight="35.0" fitWidth="20.0" layoutX="4.0" layoutY="4.0" pickOnBounds="true" preserveRatio="true">
             <image>
-               <Image url="@../../icons/information.png" />
+               <Image url="/icons/information.png" />
             </image>
          </ImageView>
         </AnchorPane>
@@ -102,7 +102,7 @@
                                 <AnchorPane minHeight="0.0" minWidth="10.0" prefHeight="160.0" prefWidth="100.0">
                                     <children>
                                         <Button fx:id="editButton" layoutX="304.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="125.0" text="Button" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0" />
-                                        <TextArea fx:id="notesBodyArea" focusTraversable="false" layoutY="40.0" prefHeight="200.0" prefWidth="200.0" promptText="Enter the note content..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="40.0" />
+                                        <TextArea fx:id="notesBodyArea" focusTraversable="true" layoutY="40.0" prefHeight="200.0" prefWidth="200.0" promptText="Enter the note content..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="40.0" />
                                         <TextField fx:id="titleField" layoutX="14.0" layoutY="15.0" prefHeight="35.0" prefWidth="278.0" promptText="Enter the note title..." AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="2.0" />
                                     </children>
                                 </AnchorPane>
