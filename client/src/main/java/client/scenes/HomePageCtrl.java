@@ -717,7 +717,8 @@ public class HomePageCtrl implements Initializable {
 
 
     /**
-     * updates the splitMenuButtons for the filtering of tags
+     * updates both tag splitMenuButtons
+     * @param filteredNotes notes after filtering
      */
     public void updateTagMenuButton(List<Note> filteredNotes) {
         System.out.println("updateTagMenuButton has been called");
