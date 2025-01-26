@@ -16,7 +16,7 @@ public class AutoSaveService {
     private final ServerUtils serverUtils;
     private final NoteService noteService;
     private static final int KEY_THRESHOLD = 10;
-    private static final long SAVE_DELAY = 5000; // 5 seconds
+    private static final long SAVE_DELAY = 2500; // 2.5 seconds
 
     /**
      *
