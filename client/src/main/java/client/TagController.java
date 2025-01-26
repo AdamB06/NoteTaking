@@ -5,6 +5,7 @@ import client.services.NoteService;
 import commons.Note;
 import commons.Tag;
 
+import jakarta.inject.Inject;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
@@ -26,6 +27,7 @@ public class TagController {
      *
      * @param noteService noteservice Object for certain methods
      */
+    @Inject
     public TagController(NoteService noteService) {
         this.noteService = noteService;
         universalTags = new HashSet<>();

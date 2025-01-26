@@ -2,6 +2,7 @@ package client.services;
 
 import commons.Note;
 import client.utils.ServerUtils;
+import jakarta.inject.Inject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class AutoSaveService {
      * @param serverUtils variable of the serverUtils
      * @param noteService variable of the noteService
      */
+    @Inject
     public AutoSaveService(ServerUtils serverUtils, NoteService noteService) {
         this.serverUtils = serverUtils;
         this.noteService = noteService;
