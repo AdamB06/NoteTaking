@@ -62,6 +62,18 @@ public class Note {
     }
 
     /**
+     * Constructor used for testing
+     * @param title title of the note
+     * @param content content of the note
+     * @param id id of the note
+     */
+    public Note(String title, String content, long id) {
+        this.title = title.replaceAll(" ", "").isEmpty() ? "New Note" : title;
+        this.content = content;
+        this.id = id;
+    }
+
+    /**
      * @return id
      */
     public long getId() {
