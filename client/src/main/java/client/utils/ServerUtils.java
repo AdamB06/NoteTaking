@@ -250,7 +250,6 @@ public class ServerUtils {
                 List<Note> notes = response.readEntity(new GenericType<List<Note>>() {});
                 for (Note note : notes) {
                     note.setTags(tagController.getTags(note.getContent()));
-                    System.out.println(note.getTags());
                 }
                 return notes;
             } else {

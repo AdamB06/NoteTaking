@@ -2,7 +2,6 @@ package client.scenes;
 
 import client.*;
 import client.services.AutoSaveService;
-import client.services.FilterService;
 import client.services.MarkdownService;
 import client.services.NoteService;
 import client.utils.ServerUtils;
@@ -82,7 +81,6 @@ public class HomePageCtrl implements Initializable {
     private NoteService noteService;
     private MarkdownService markdownService;
     private AutoSaveService autoSaveService;
-    private FilterService filterService;
     private final LanguageController languageController;
     private final MnemonicCreator mnemonicCreator;
     private final Warnings warnings;
@@ -115,7 +113,6 @@ public class HomePageCtrl implements Initializable {
         this.noteService = injector.getInstance(NoteService.class);
         this.markdownService = injector.getInstance(MarkdownService.class);
         this.autoSaveService = new AutoSaveService(serverUtils, noteService);
-        this.filterService = new FilterService();
         this.tagController = new TagController(noteService);
         webSocketClient = injector.getInstance(WebSocketClient.class);
         webSocketClient.setHomePageCtrl(this);
@@ -157,12 +154,10 @@ public class HomePageCtrl implements Initializable {
 
 
         allTags.setOnShowing(event -> {
-            System.out.println("Dropdown arrow clicked, updating tags...");
             updateTagMenuButton(noteService.getNotes());  // Update the menu button with new tags
         });
         selectedTags.getItems().clear();
         allTags.getItems().clear();
-        filterService.setOnFilterUpdate(this::updateTagMenuButton);
 
         Platform.runLater(this::initializeButtonsGraphics);
         Platform.runLater(this::initializeMnemonicsAndLanguage);
@@ -701,33 +696,37 @@ public class HomePageCtrl implements Initializable {
         }
     }
 
-
     /**
-     * updates both tag splitMenuButtons
-     * @param filteredNotes notes after filtering
+     * updates both splitmenubuttons with created tags
+     * @param filteredNotes notes that have been filtered
      */
     public void updateTagMenuButton(List<Note> filteredNotes) {
-        System.out.println("updateTagMenuButton has been called");
-        updateUniversalTags();
+
+        tagController.updateUniversalTags(filteredNotes);
+
         allTags.getItems().removeIf(menuItem -> !tagController.getUniversalTags().contains(menuItem.getText()));
+
         Set<String> existingTags = new HashSet<>();
         allTags.getItems().forEach(item -> existingTags.add(item.getText()));
         selectedTags.getItems().forEach(item -> existingTags.add(item.getText()));
 
-
         tagController.getUniversalTags().forEach(tag -> {
-            if (!existingTags.contains(tag.getName())) {
+            if (!existingTags.contains(tag.getName()) && isTagInFilteredNotes(tag, filteredNotes)) {
                 allTags.getItems().add(tagController.createMenuItemForAllTags(tag, allTags, selectedTags, notesListView));
             }
         });
     }
 
-    public void updateUniversalTags() {
-        List<Note> allNotes = noteService.getNotes();
-       tagController.getUniversalTags().removeIf(tag -> !tagController.isTagInAnyNote(tag.getName()));
+    /**
+     *
+     * @param tag tag
+     * @param filteredNotes notes that have been filtered
+     * @return
+     */
+    private boolean isTagInFilteredNotes(Tag tag, List<Note> filteredNotes) {
+        return filteredNotes.stream()
+                .anyMatch(note -> note.getTags().contains(tag));
     }
-
-
 
     /**
      * Reset the ListView to show all notes
@@ -736,6 +735,7 @@ public class HomePageCtrl implements Initializable {
         notesListView.getItems().clear();
         allTags.getItems().retainAll(selectedTags.getItems());
         selectedTags.getItems().clear();
+        tagController.refreshUniversalTags();
         notesListView.getItems().addAll(noteService.getNotes());
 
     }

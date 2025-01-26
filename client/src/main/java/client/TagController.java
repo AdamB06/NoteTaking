@@ -1,6 +1,6 @@
 package client;
 
-import client.services.FilterService;
+
 import client.services.NoteService;
 import commons.Note;
 import commons.Tag;
@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 public class TagController {
     private final NoteService noteService;
-    private final FilterService filterService;
     private static  Set<Tag> universalTags = new HashSet<>();
 
 
@@ -29,7 +28,6 @@ public class TagController {
      */
     public TagController(NoteService noteService) {
         this.noteService = noteService;
-        filterService = new FilterService();
         universalTags = new HashSet<>();
     }
 
@@ -42,7 +40,6 @@ public class TagController {
      * @param universalList list of all the tags that are in notes for the combobox;
      */
     public void initializeTags(String content, Note note, Set<Tag> universalList) {
-        System.out.println("Initializing tags...");
 
         if (content == null || content.isEmpty()) {
             System.out.println("No content to process for tags.");
@@ -61,14 +58,12 @@ public class TagController {
 
             while (matcher.find()) {
                 String tagName = matcher.group(1);
-                System.out.println("Extracted tag: " + tagName);
 
                 if (!(note.getTags().contains(tagName))) {
                     Tag newTag = new Tag(tagName);
                     note.getTags().add(newTag);
                     universalList.add(newTag);
-                    System.out.println(note.getTags());
-                    System.out.println(universalList);
+
 
                 }
                 String link = "<a href='/tags/" + tagName + "'>#" + tagName + "</a>";
@@ -100,10 +95,8 @@ public class TagController {
         String lastWord = words[words.length - 1];
         if (lastWord.startsWith("#")) {
             if (character.equals(" ") || character.equals("\n")) {
-                System.out.println("Space detected.");
 
                 if (lastWord.length() > 1 && lastWord.substring(1).matches("\\w+")) {
-                    System.out.println("Valid tag detected: " + lastWord);
                     initializeTags(content, note, universalList);
                 }
             }
@@ -138,8 +131,21 @@ public class TagController {
         }
 
         System.out.println("Filtered notes count: " + filteredNotes.size());
-        filterService.setFilteredNotes(filteredNotes);
+        updateUniversalTagsFromFilteredNotes(filteredNotes);
         updateNotesListView(filteredNotes, notesListView);
+    }
+
+    /**
+     * updates universal tags so that only the tags still available are displayed
+     * @param filteredNotes notes that have been filtered
+     */
+    public void updateUniversalTagsFromFilteredNotes(List<Note> filteredNotes) {
+        Set<Tag> tagsInFilteredNotes = new HashSet<>();
+
+        for (Note note : filteredNotes) {
+            tagsInFilteredNotes.addAll(note.getTags());
+        }
+        universalTags = tagsInFilteredNotes;
     }
 
 
@@ -314,9 +320,15 @@ public class TagController {
         return tags;
     }
 
-    public boolean isTagInAnyNote(String tagName) {
-        // Fetch notes from noteService to ensure you get the actual list of notes
-        return noteService.getNotes().stream()
+    /**
+     *
+     * @param tagName tagname
+     * @param notes list of all notes
+     * @return returns true if the tag is in any of the available notes else false
+     */
+    public boolean isTagInAnyNote(String tagName, List<Note> notes) {
+        // Now it checks the provided list of notes instead of fetching all notes from noteService
+        return notes.stream()
                 .flatMap(note -> note.getTags().stream())
                 .anyMatch(tag -> tag.getName().equals(tagName));
     }
@@ -343,6 +355,25 @@ public class TagController {
      */
     public Set<Tag> getUniversalTags() {
         return universalTags;
+    }
+
+    /**
+     * adds all tags again to the universal tags. Used after the clear filter button
+     */
+    public void refreshUniversalTags(){
+        for(Note note : noteService.getNotes()){
+            universalTags.addAll(note.getTags());
+        }
+    }
+
+    /**
+     * updates universal tags when a tag is removed from a note
+     * @param notes all the notes in the server
+     */
+    public void updateUniversalTags(List<Note> notes) {
+        // Remove tags if they aren't in the notes anymore
+        getUniversalTags().removeIf(tag -> !isTagInAnyNote(tag.getName(), notes));
+
     }
 
 
