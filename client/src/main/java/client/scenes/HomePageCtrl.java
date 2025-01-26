@@ -433,7 +433,7 @@ public class HomePageCtrl implements Initializable {
         Platform.runLater(() -> {
             if(!noteService.noteExists(note)) {
                 noteService.addNoteToList(note);
-                if (noteService.matchSearch(note, searchBox.getText())) {
+                if (noteService.matchSearch(note, searchBox.getText()) && selectedTags.getItems().isEmpty()) {
                     notesListView.getItems().add(note);
                     System.out.println("Note added: " + note.getTitle());
                 }
@@ -484,7 +484,6 @@ public class HomePageCtrl implements Initializable {
                 if (!suppressUpdates && !incomingContent.equals(currentContent)) {
                     notesBodyArea.setText(incomingContent);
                     notesBodyArea.positionCaret(Math.min(caretPosition, incomingContent.length()));
-
                     String html = markdownService.convertToHtml(tagController.processNoteLinks(incomingContent));
                     updateWebView(html);
 
