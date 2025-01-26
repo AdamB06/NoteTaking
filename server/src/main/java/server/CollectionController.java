@@ -11,7 +11,7 @@ import server.database.CollectionRepository;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Collection")
+@RequestMapping("/my-collection/Collection")
 public class CollectionController {
     private final CollectionService collectionService;
     private final CollectionRepository collectionRepository;

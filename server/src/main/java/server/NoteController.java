@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/Note")
+@RequestMapping("/my-collection/Note")
 public class NoteController {
     private final NoteRepository noteRepository;
     private final NoteService noteService;

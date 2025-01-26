@@ -90,6 +90,7 @@ public class HomePageCtrl implements Initializable {
     private boolean isSaving = false;
     private long lastSelectedNoteId = -1;
     private final ServerUtils serverUtils;
+    private int caretPosition = 0;
 
 
     /**
@@ -315,6 +316,9 @@ public class HomePageCtrl implements Initializable {
                         notesListView.refresh();
                         notesListView.getSelectionModel().select(selectedNote);
                     } else {
+                        String oldTitle = noteService.getNoteById(selectedNote.getId()).getTitle();
+                        titleField.setText(oldTitle);
+                        selectedNote.setTitle(oldTitle);
                         String header, content;
                         boolean set = true;
                         if (selectedNote.getTitle().isEmpty()) {
@@ -348,7 +352,7 @@ public class HomePageCtrl implements Initializable {
     private void refreshNotesInternal() {
         Platform.runLater(() -> {
             noteService.refreshNotes();
-            List<Note> notes = noteService.getNotes();
+            List<Note> notes = noteService.checkFilter(searchBox.getText());
             if (notesListView != null) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 notesListView.getItems().clear();
@@ -427,9 +431,12 @@ public class HomePageCtrl implements Initializable {
      */
     public void incomingNote(Note note) {
         Platform.runLater(() -> {
-            if (!noteService.noteExists(note)) {
-                notesListView.getItems().add(note);
-                System.out.println("Note added: " + note.getTitle());
+            if(!noteService.noteExists(note)) {
+                noteService.addNoteToList(note);
+                if (noteService.matchSearch(note, searchBox.getText()) && selectedTags.getItems().isEmpty()) {
+                    notesListView.getItems().add(note);
+                    System.out.println("Note added: " + note.getTitle());
+                }
             }
         });
     }
@@ -475,12 +482,9 @@ public class HomePageCtrl implements Initializable {
                 String currentContent = notesBodyArea.getText();
 
                 if (!suppressUpdates && !incomingContent.equals(currentContent)) {
-                    int caretPosition = notesBodyArea.getCaretPosition();
-
                     notesBodyArea.setText(incomingContent);
                     notesBodyArea.positionCaret(Math.min(caretPosition, incomingContent.length()));
-
-                    String html = markdownService.convertToHtml(incomingContent);
+                    String html = markdownService.convertToHtml(tagController.processNoteLinks(incomingContent));
                     updateWebView(html);
 
                     System.out.println("Applied incoming update: " + incomingContent);
@@ -495,10 +499,26 @@ public class HomePageCtrl implements Initializable {
      */
     public void incomingServerShutdown() {
         Platform.runLater(() -> {
-            warnings.error(languageController.getByTag("errorText.text"),
-                    languageController.getByTag("serverShutdownContent.text"),
-                    languageController.getByTag("serverShutdownTitle.text"),
-                    languageController);
+            boolean reconnect = true;
+            while (reconnect) {
+                if (serverUtils.isServerAvailable()) {
+                    reconnect = false;
+                } else {
+                    reconnect = warnings.askOkCancel(
+                            languageController.getByTag("serverNotFound.text"),
+                            languageController.getByTag("serverNotFound.message"),
+                            languageController
+                    );
+
+                    if (reconnect) {
+                        System.out.println("Attempting to reconnect...");
+                    } else {
+                        System.out.println("Server unavailable. Shutting down.");
+                        Platform.exit();
+                        return;
+                    }
+                }
+            }
         });
     }
 
@@ -537,6 +557,7 @@ public class HomePageCtrl implements Initializable {
                 }
             }
             suppressUpdates = false;
+            caretPosition = notesBodyArea.getCaretPosition();
         });
     }
 
@@ -680,7 +701,6 @@ public class HomePageCtrl implements Initializable {
             System.out.println("Saving changes for note ID: " + noteId);
             Map<String, Object> changes = autoSaveService.getChanges(original, content);
 
-
             String status = noteService.saveChanges(noteId, changes);
             if ("Successful".equals(status)) {
                 original = content;
@@ -751,6 +771,5 @@ public class HomePageCtrl implements Initializable {
         notesListView.getItems().addAll(noteService.getNotes());
 
     }
-
 
 }

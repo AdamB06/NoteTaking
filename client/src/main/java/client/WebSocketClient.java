@@ -2,9 +2,11 @@ package client;
 import javax.websocket.*;
 
 import client.scenes.HomePageCtrl;
+import client.utils.ServerUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import commons.Note;
 import javafx.application.Platform;
 import java.net.URI;
@@ -13,12 +15,15 @@ import java.util.Map;
 
 import org.eclipse.jetty.client.HttpClient;
 
+import static com.google.inject.Guice.createInjector;
+
 @ClientEndpoint
 public class WebSocketClient {
     private Session session;
     private HttpClient httpClient;
     private ObjectMapper om;
     private HomePageCtrl hpc;
+    private static final Injector INJECTOR = createInjector(new MyModule());
 
     /**
      * Constructor for WebSocketClient
@@ -99,7 +104,9 @@ public class WebSocketClient {
     @OnClose
     public void onClose(Session session, CloseReason reason) {
         System.out.println("Disconnected: " + reason.getReasonPhrase());
-        hpc.incomingServerShutdown();
+        Platform.runLater(() -> {
+            hpc.incomingServerShutdown();
+        });
     }
 
     /**
@@ -140,7 +147,8 @@ public class WebSocketClient {
      */
     public void connect() {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        String uri = "ws://localhost:8080/chat";
+        String wsUrl = ClientConfig.loadConfig().getServerUrl().replace("http","ws");
+        String uri = wsUrl.replace("my-collection/","") +"chat";
         try {
             container.connectToServer(this, URI.create(uri));
         } catch (Exception e) {
