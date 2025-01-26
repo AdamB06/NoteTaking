@@ -508,17 +508,15 @@ public class HomePageCtrl implements Initializable {
             suppressUpdates = true;
 
             Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
-            if (selectedNote == null) {
-                suppressUpdates = false;
-                return;
-            }
-            String currentContent = notesBodyArea.getText();
-            selectedNote.setContent(currentContent);
-            tagController.checkForCorrectUserInput(currentContent,
-                    event.getCharacter(), selectedNote, universalTags);
-            webSocketClient.sendMessage(selectedNote, "updateContent");
-            if (autoSaveService.onKeyPressed(selectedNote, currentContent)) {
-                original = currentContent;
+            if (selectedNote != null) {
+                String currentContent = notesBodyArea.getText();
+                selectedNote.setContent(currentContent);
+                tagController.checkForCorrectUserInput(currentContent,
+                        event.getCharacter(), selectedNote, universalTags);
+                webSocketClient.sendMessage(selectedNote, "updateContent");
+                if (autoSaveService.onKeyPressed(selectedNote, currentContent)) {
+                    original = currentContent;
+                }
             }
             suppressUpdates = false;
         });
