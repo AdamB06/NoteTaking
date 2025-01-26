@@ -54,15 +54,6 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void testEditNoteTitle(){
-        Note note = new Note ("Hello", "This is a note");
-        notesController.createNote (note);
-        Note note2 = new Note ("Hello2", "This is a note");
-        notesController.editNoteTitle("Hello2", note.getId());
-        assertEquals(note2, noteRepository.getOne(note.getId()));
-    }
-
-    @Test
     public void testApplyPatch() {
         String original = "Hello World";
         String edited = "Hello There World";

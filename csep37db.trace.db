@@ -1,0 +1,12 @@
+2025-01-25 16:44:59.700569+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "CONTENT CHARACTER VARYING(255)": "'<span styl''color: red;''><span style=''color: red;''><span style=''color: red;... (326)"; SQL statement:
+update note set content=?,title=? where id=? [22001-224]
+2025-01-25 16:44:59.815473+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "CONTENT CHARACTER VARYING(255)": "'<span styl''color: red;''><span style=''color: red;''><span style=''color: red;... (326)"; SQL statement:
+update note set content=?,title=? where id=? [22001-224]
+2025-01-25 16:44:59.850961+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "CONTENT CHARACTER VARYING(255)": "'<span styl''color: red;''><span style=''color: red;''><span style=''color: red;... (326)"; SQL statement:
+update note set content=?,title=? where id=? [22001-224]
+2025-01-25 16:44:59.886325+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "CONTENT CHARACTER VARYING(255)": "'<span styl''color: red;''><span style=''color: red;''><span style=''color: red;... (326)"; SQL statement:
+update note set content=?,title=? where id=? [22001-224]
