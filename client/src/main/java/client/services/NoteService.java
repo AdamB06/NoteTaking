@@ -175,4 +175,30 @@ public class NoteService {
         }
         return -1;
     }
+
+    /**
+     * @param searchBoxQuery the search query
+     * @return returns the list of notes
+     */
+    public List<Note> checkFilter(String searchBoxQuery) {
+        if (searchBoxQuery == null || searchBoxQuery.isEmpty()) {
+            return notes;
+        }
+        return filterNotes(searchBoxQuery, notes);
+    }
+
+    public boolean matchSearch(Note note, String query){
+        if(note.getTitle().contains(query) || note.getContent().contains(query)){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds a note to the internal list.
+     * @param note the note to be added
+     */
+    public void addNoteToList(Note note) {
+        notes.add(note);
+    }
 }

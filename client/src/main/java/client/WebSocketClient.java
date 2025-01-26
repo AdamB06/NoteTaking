@@ -140,7 +140,8 @@ public class WebSocketClient {
      */
     public void connect() {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        String uri = "ws://localhost:8080/chat";
+        String wsUrl = ClientConfig.loadConfig().getServerUrl().replace("http","ws");
+        String uri = wsUrl.replace("my-collection/","") +"chat";
         try {
             container.connectToServer(this, URI.create(uri));
         } catch (Exception e) {

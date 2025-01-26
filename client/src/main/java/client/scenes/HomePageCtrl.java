@@ -308,6 +308,9 @@ public class HomePageCtrl implements Initializable {
                         notesListView.refresh();
                         notesListView.getSelectionModel().select(selectedNote);
                     } else {
+                        String oldTitle = noteService.getNoteById(selectedNote.getId()).getTitle();
+                        titleField.setText(oldTitle);
+                        selectedNote.setTitle(oldTitle);
                         String header, content;
                         boolean set = true;
                         if (selectedNote.getTitle().isEmpty()) {
@@ -341,7 +344,7 @@ public class HomePageCtrl implements Initializable {
     private void refreshNotesInternal() {
         Platform.runLater(() -> {
             noteService.refreshNotes();
-            List<Note> notes = noteService.getNotes();
+            List<Note> notes = noteService.checkFilter(searchBox.getText());
             if (notesListView != null) {
                 Note selectedNote = notesListView.getSelectionModel().getSelectedItem();
                 notesListView.getItems().clear();
@@ -420,9 +423,12 @@ public class HomePageCtrl implements Initializable {
      */
     public void incomingNote(Note note) {
         Platform.runLater(() -> {
-            if(!noteService.noteExists(note)){
-                notesListView.getItems().add(note);
-                System.out.println("Note added: " + note.getTitle());
+            if(!noteService.noteExists(note)) {
+                noteService.addNoteToList(note);
+                if (noteService.matchSearch(note, searchBox.getText())) {
+                    notesListView.getItems().add(note);
+                    System.out.println("Note added: " + note.getTitle());
+                }
             }
         });
     }
@@ -473,7 +479,7 @@ public class HomePageCtrl implements Initializable {
                     notesBodyArea.setText(incomingContent);
                     notesBodyArea.positionCaret(Math.min(caretPosition, incomingContent.length()));
 
-                    String html = markdownService.convertToHtml(incomingContent);
+                    String html = markdownService.convertToHtml(tagController.processNoteLinks(incomingContent));
                     updateWebView(html);
 
                     System.out.println("Applied incoming update: " + incomingContent);
