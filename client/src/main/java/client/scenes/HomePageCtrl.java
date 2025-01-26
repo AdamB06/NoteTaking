@@ -86,6 +86,7 @@ public class HomePageCtrl implements Initializable {
     private boolean suppressUpdates = false;
     private boolean isSaving = false;
     private long lastSelectedNoteId = -1;
+    private int caretPosition = 0;
 
 
     /**
@@ -470,8 +471,6 @@ public class HomePageCtrl implements Initializable {
                 String currentContent = notesBodyArea.getText();
 
                 if (!suppressUpdates && !incomingContent.equals(currentContent)) {
-                    int caretPosition = notesBodyArea.getCaretPosition();
-
                     notesBodyArea.setText(incomingContent);
                     notesBodyArea.positionCaret(Math.min(caretPosition, incomingContent.length()));
 
@@ -521,6 +520,7 @@ public class HomePageCtrl implements Initializable {
                 }
             }
             suppressUpdates = false;
+            caretPosition = notesBodyArea.getCaretPosition();
         });
     }
 
